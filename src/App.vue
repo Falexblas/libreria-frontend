@@ -5,39 +5,72 @@ import Footer from '@/components/common/Footer.vue'
 </script>
 
 <template>
-  <div id="app">
-   <Navbar /> 
-    <main class="contenido-principal">
+  <div id="app" class="d-flex flex-column min-vh-100">
+    <Navbar class="flex-shrink-0" /> 
+    <main class="flex-grow-1">
       <RouterView />
     </main>
-    <Footer />
+    <Footer class="flex-shrink-0" />
   </div>
 </template>
 
 <style>
-#app {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
+/* Reset global */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  background-color: #f8f9fa;
+/* Fondo global */
+html, body {
+  background-color: #EEEBE7 !important;
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
-.contenido-principal {
-  flex: 1;
-  min-height: calc(100vh - 200px);
+/* App principal */
+#app {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  background-color: #EEEBE7;
+}
+
+/* Main sin espacios */
+main {
+  background-color: #EEEBE7;
+  padding: 0;
+  margin: 0;
+}
+
+/* Eliminar espacios de Bootstrap y separaciones */
+.container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Eliminar separaciones entre navbar y main */
+nav.navbar {
+  margin-bottom: 0 !important;
+}
+
+main {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Asegurar que no haya espacios en blanco */
+#app > * {
+  margin: 0 !important;
+}
+
+#app > nav,
+#app > main,
+#app > footer {
+  width: 100%;
 }
 
 /* Estilos globales para enlaces */

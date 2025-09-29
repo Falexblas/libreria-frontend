@@ -28,3 +28,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+
+#Ignore windsurf AI rules
+.windsurfrules

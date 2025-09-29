@@ -6,47 +6,17 @@
         <div class="footer-grid">
           <!-- Información de la empresa -->
           <div class="footer-seccion">
-            <h3 class="footer-titulo">📚 LibreríaOnline</h3>
+            <h3 class="footer-titulo">Mundo de Papel</h3>
             <p class="footer-descripcion">
               Tu librería de confianza con la mejor selección de libros. 
               Descubre nuevos mundos a través de la lectura.
             </p>
             <div class="redes-sociales">
-              <a href="#" class="red-social" title="Facebook">📘</a>
-              <a href="#" class="red-social" title="Twitter">🐦</a>
-              <a href="#" class="red-social" title="Instagram">📷</a>
-              <a href="#" class="red-social" title="YouTube">📺</a>
+              <a href="https://facebook.com/bookify" target="_blank" class="red-social" title="Facebook">📘</a>
+              <a href="https://twitter.com/bookify" target="_blank" class="red-social" title="Twitter">🐦</a>
+              <a href="https://instagram.com/bookify" target="_blank" class="red-social" title="Instagram">📷</a>
+              <a href="https://youtube.com/bookify" target="_blank" class="red-social" title="YouTube">📺</a>
             </div>
-          </div>
-
-          <!-- Enlaces rápidos -->
-          <div class="footer-seccion">
-            <h4 class="footer-subtitulo">Enlaces Rápidos</h4>
-            <ul class="footer-lista">
-              <li><router-link to="/" class="footer-enlace">Inicio</router-link></li>
-              <li><router-link to="/libros" class="footer-enlace">Catálogo</router-link></li>
-              <li><router-link to="/ofertas" class="footer-enlace">Ofertas</router-link></li>
-              <li><router-link to="/novedades" class="footer-enlace">Novedades</router-link></li>
-              <li><router-link to="/bestsellers" class="footer-enlace">Más Vendidos</router-link></li>
-            </ul>
-          </div>
-
-          <!-- Categorías populares -->
-          <div class="footer-seccion">
-            <h4 class="footer-subtitulo">Categorías Populares</h4>
-            <ul class="footer-lista">
-              <li v-for="categoria in categoriasPopulares" :key="categoria.id">
-                <router-link 
-                  :to="`/libros/categoria/${categoria.id}`" 
-                  class="footer-enlace"
-                >
-                  {{ categoria.nombre }}
-                </router-link>
-              </li>
-              <li v-if="categoriasStore.cargandoCategorias">
-                <span class="footer-enlace">Cargando...</span>
-              </li>
-            </ul>
           </div>
 
           <!-- Atención al cliente -->
@@ -67,7 +37,7 @@
             <div class="contacto-info">
               <div class="contacto-item">
                 <span class="contacto-icono">📍</span>
-                <span class="contacto-texto">Av. Principal 123, Ciudad</span>
+                <span class="contacto-texto">Av. Principal 123, Lima</span>
               </div>
               <div class="contacto-item">
                 <span class="contacto-icono">📞</span>
@@ -75,7 +45,7 @@
               </div>
               <div class="contacto-item">
                 <span class="contacto-icono">✉️</span>
-                <span class="contacto-texto">info@libreriaonline.com</span>
+                <span class="contacto-texto">MundoDePapel@hotmail.com</span>
               </div>
               <div class="contacto-item">
                 <span class="contacto-icono">🕒</span>
@@ -84,35 +54,20 @@
             </div>
           </div>
 
-          <!-- Newsletter -->
+         <!-- Métodos de Pago -->
           <div class="footer-seccion">
-            <h4 class="footer-subtitulo">Mantente Informado</h4>
-            <p class="newsletter-descripcion">
-              Suscríbete para recibir ofertas especiales y novedades
-            </p>
-            <form @submit.prevent="suscribirseNewsletter" class="newsletter-form">
-              <div class="newsletter-input">
-                <input 
-                  type="email" 
-                  v-model="emailNewsletter"
-                  placeholder="Tu email aquí..."
-                  class="input-newsletter"
-                  required
-                >
-                <button type="submit" class="btn-newsletter" :disabled="enviandoNewsletter">
-                  {{ enviandoNewsletter ? '📤' : '✉️' }}
-                </button>
-              </div>
-            </form>
+            <h4 class="footer-subtitulo">Formas de Pago</h4>
             <div class="metodos-pago">
-              <h5 class="metodos-titulo">Métodos de Pago</h5>
               <div class="pago-iconos">
-                <span class="pago-icono">💳</span>
-                <span class="pago-icono">🏦</span>
-                <span class="pago-icono">📱</span>
-                <span class="pago-icono">💰</span>
+                <span class="pago-icono" title="Tarjeta de crédito">💳</span>
+                <span class="pago-icono" title="Transferencia bancaria">🏦</span>
+                <span class="pago-icono" title="Pago móvil">📱</span>
+                <span class="pago-icono" title="Efectivo/Pago contra entrega">💰</span>
               </div>
             </div>
+            <p class="footer-descripcion" style="font-size: 0.9rem; margin-top: 0.5rem;">
+              Paga de forma segura con tu método favorito.
+            </p>
           </div>
         </div>
       </div>
@@ -123,7 +78,7 @@
       <div class="container">
         <div class="footer-inferior-contenido">
           <div class="copyright">
-            <p>&copy; {{ añoActual }} LibreríaOnline. Todos los derechos reservados.</p>
+            <p>&copy; {{ añoActual }} Bookify. Todos los derechos reservados.</p>
           </div>
           <div class="enlaces-legales">
             <router-link to="/privacidad" class="enlace-legal">Política de Privacidad</router-link>
@@ -132,9 +87,7 @@
             <span class="separador">|</span>
             <router-link to="/terminos" class="enlace-legal">Términos de Uso</router-link>
           </div>
-          <div class="tecnologia">
-            <span class="tech-info">Desarrollado con ❤️ usando Vue.js</span>
-          </div>
+         
         </div>
       </div>
     </div>
@@ -189,9 +142,11 @@ async function suscribirseNewsletter() {
 
 <style scoped>
 .footer-principal {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  color: white;
+  background: #002e4d;
+  color: var(--color-background);
   margin-top: auto;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .container {
@@ -219,25 +174,25 @@ async function suscribirseNewsletter() {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #3498db;
+  color: var(--color-accent);
 }
 
 .footer-subtitulo {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #ecf0f1;
-  border-bottom: 2px solid #3498db;
+  color: var(--color-background);
+  border-bottom: 2px solid var(--color-accent);
   padding-bottom: 0.5rem;
 }
 
 .footer-descripcion {
   line-height: 1.6;
   margin-bottom: 1.5rem;
-  color: #bdc3c7;
+  color: rgba(245, 240, 230, 0.8);
 }
 
-/* Redes sociales */
+/* Redes sociales profesionales */
 .redes-sociales {
   display: flex;
   gap: 1rem;
@@ -247,19 +202,22 @@ async function suscribirseNewsletter() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   text-decoration: none;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
+  font-size: 1.3rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .red-social:hover {
-  background: #3498db;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Listas del footer */
@@ -273,14 +231,14 @@ async function suscribirseNewsletter() {
 }
 
 .footer-enlace {
-  color: #bdc3c7;
+  color: rgba(245, 240, 230, 0.8);
   text-decoration: none;
   transition: all 0.3s ease;
   display: inline-block;
 }
 
 .footer-enlace:hover {
-  color: #3498db;
+  color: var(--color-accent);
   transform: translateX(5px);
 }
 
@@ -303,13 +261,13 @@ async function suscribirseNewsletter() {
 }
 
 .contacto-texto {
-  color: #bdc3c7;
+  color: rgba(245, 240, 230, 0.8);
   font-size: 0.9rem;
 }
 
 /* Newsletter */
 .newsletter-descripcion {
-  color: #bdc3c7;
+  color: rgba(245, 240, 230, 0.8);
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
@@ -320,10 +278,10 @@ async function suscribirseNewsletter() {
 
 .newsletter-input {
   display: flex;
-  background: rgba(255,255,255,0.1);
+  background: rgba(245, 240, 230, 0.1);
   border-radius: 25px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(245, 240, 230, 0.2);
 }
 
 .input-newsletter {
@@ -331,26 +289,28 @@ async function suscribirseNewsletter() {
   padding: 0.75rem 1rem;
   background: transparent;
   border: none;
-  color: white;
+  color: var(--color-background);
   outline: none;
 }
 
 .input-newsletter::placeholder {
-  color: rgba(255,255,255,0.6);
+  color: rgba(245, 240, 230, 0.6);
 }
 
 .btn-newsletter {
   padding: 0.75rem 1rem;
-  background: #3498db;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-background);
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .btn-newsletter:hover:not(:disabled) {
-  background: #2980b9;
+  background: var(--color-accent);
+  color: var(--color-text);
 }
 
 .btn-newsletter:disabled {
@@ -366,7 +326,7 @@ async function suscribirseNewsletter() {
 .metodos-titulo {
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
-  color: #ecf0f1;
+  color: var(--color-background);
 }
 
 .pago-iconos {
@@ -378,24 +338,28 @@ async function suscribirseNewsletter() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 35px;
-  height: 25px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  width: 40px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .pago-icono:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Footer inferior */
 .footer-inferior {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 46, 77, 0.8);
   padding: 1rem 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-inferior-contenido {
@@ -408,7 +372,7 @@ async function suscribirseNewsletter() {
 
 .copyright p {
   margin: 0;
-  color: #bdc3c7;
+  color: rgba(245, 240, 230, 0.8);
   font-size: 0.9rem;
 }
 
@@ -419,24 +383,20 @@ async function suscribirseNewsletter() {
 }
 
 .enlace-legal {
-  color: #bdc3c7;
+  color: rgba(245, 240, 230, 0.8);
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.3s ease;
 }
 
 .enlace-legal:hover {
-  color: #3498db;
+  color: var(--color-accent);
 }
 
 .separador {
-  color: #7f8c8d;
+  color: rgba(245, 240, 230, 0.5);
 }
 
-.tech-info {
-  color: #bdc3c7;
-  font-size: 0.8rem;
-}
 
 /* Responsive */
 @media (max-width: 768px) {

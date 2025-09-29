@@ -4,16 +4,20 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
-/* Variables CSS personalizadas */
+/* Variables CSS personalizadas - Nueva paleta */
 :root {
-  --color-primary: #3498db;
-  --color-secondary: #2c3e50;
+  --color-primary: #222222;      /* Botones primarios, acentos */
+  --color-secondary: #4A4A2E;    /* Títulos, encabezados, iconos principales */
+  --color-accent: #ffffff;       /* Fondos secundarios, hover */
+  --color-background: #F5F0E6;   /* Fondo principal de página */
+  --color-text: #2C2C2C;         /* Texto principal */
+  --color-offer: #E63946;        /* Ofertas, etiquetas de "nuevo" o "descuento" */
+  
   --color-success: #27ae60;
-  --color-danger: #e74c3c;
   --color-warning: #f39c12;
   --color-info: #17a2b8;
-  --color-light: #f8f9fa;
-  --color-dark: #343a40;
+  --color-light: #F5F0E6;
+  --color-dark: #2C2C2C;
   
   --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   --border-radius: 8px;
