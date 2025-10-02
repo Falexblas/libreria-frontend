@@ -1,7 +1,17 @@
 <script setup>
+import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import Navbar from '@/components/common/Navbar.vue'
 import Footer from '@/components/common/Footer.vue'
+import CarritoSidebar from '@/components/carrito/CarritoSidebar.vue'
+import { useCarritoStore } from '@/stores/carrito'
+
+const carritoStore = useCarritoStore()
+
+// Inicializar carrito al montar la app
+onMounted(() => {
+  carritoStore.inicializar()
+})
 </script>
 
 <template>
@@ -11,6 +21,9 @@ import Footer from '@/components/common/Footer.vue'
       <RouterView />
     </main>
     <Footer class="flex-shrink-0" />
+    
+    <!-- Carrito Sidebar -->
+    <CarritoSidebar />
   </div>
 </template>
 

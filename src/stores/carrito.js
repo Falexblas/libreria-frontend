@@ -2,56 +2,174 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useCarritoStore = defineStore('carrito', () => {
-  const itemsCarrito = ref([])
-  const cargandoCarrito = ref(false)
+  // Estado
+  const items = ref([])
+  const mostrarCarrito = ref(false)
+  const cargando = ref(false)
 
-  // Contador total de items en el carrito
-  const contadorItems = computed(() => {
-    return itemsCarrito.value.reduce((total, item) => total + item.cantidad, 0)
+  // Computeds
+  const totalItems = computed(() => {
+    return items.value.reduce((total, item) => total + item.cantidad, 0)
   })
 
-  // Total del carrito
-  const totalCarrito = computed(() => {
-    return itemsCarrito.value.reduce((total, item) => total + (item.precio * item.cantidad), 0)
+  const subtotal = computed(() => {
+    return items.value.reduce((total, item) => total + (item.precio * item.cantidad), 0)
   })
 
-  // Agregar item al carrito
+  const envio = computed(() => {
+    return 0 // Envío gratis por ahora
+  })
+
+  const total = computed(() => {
+    return subtotal.value + envio.value
+  })
+
+  const estaVacio = computed(() => {
+    return items.value.length === 0
+  })
+
+  // Acciones
   function agregarAlCarrito(libro, cantidad = 1) {
-    const itemExistente = itemsCarrito.value.find(item => item.id === libro.id)
+    const itemExistente = items.value.find(item => item.id === libro.id)
     
     if (itemExistente) {
       itemExistente.cantidad += cantidad
     } else {
-      itemsCarrito.value.push({
+      const nuevoItem = {
         id: libro.id,
         titulo: libro.titulo,
-        precio: libro.precio,
+        autor: libro.autor,
+        precio: parseFloat(libro.precio),
         cantidad: cantidad,
-        imagen: libro.imagen
-      })
+        portadaUrl: libro.portadaUrl || libro.portada_url,
+        stock: libro.stock,
+        activo: libro.activo
+      }
+      items.value.push(nuevoItem)
     }
+    
+    // Abrir carrito automáticamente
+    abrirCarrito()
+    
+    // Guardar en localStorage
+    guardarEnLocalStorage()
   }
 
-  // Remover item del carrito
-  function removerDelCarrito(libroId) {
-    const index = itemsCarrito.value.findIndex(item => item.id === libroId)
+  function eliminarItem(itemId) {
+    const index = items.value.findIndex(item => item.id === itemId)
     if (index > -1) {
-      itemsCarrito.value.splice(index, 1)
+      items.value.splice(index, 1)
+      guardarEnLocalStorage()
     }
   }
 
-  // Limpiar carrito
+  function aumentarCantidad(itemId) {
+    const item = items.value.find(item => item.id === itemId)
+    if (item) {
+      item.cantidad++
+      guardarEnLocalStorage()
+    }
+  }
+
+  function disminuirCantidad(itemId) {
+    const item = items.value.find(item => item.id === itemId)
+    if (item && item.cantidad > 1) {
+      item.cantidad--
+      guardarEnLocalStorage()
+    }
+  }
+
+  function actualizarCantidad(itemId, nuevaCantidad) {
+    const item = items.value.find(item => item.id === itemId)
+    if (item && nuevaCantidad > 0) {
+      item.cantidad = nuevaCantidad
+      guardarEnLocalStorage()
+    }
+  }
+
   function limpiarCarrito() {
-    itemsCarrito.value = []
+    items.value = []
+    guardarEnLocalStorage()
+  }
+
+  function abrirCarrito() {
+    mostrarCarrito.value = true
+  }
+
+  function cerrarCarrito() {
+    mostrarCarrito.value = false
+  }
+
+  function toggleCarrito() {
+    mostrarCarrito.value = !mostrarCarrito.value
+  }
+
+  // Persistencia en localStorage
+  function guardarEnLocalStorage() {
+    try {
+      localStorage.setItem('carrito', JSON.stringify(items.value))
+    } catch (error) {
+      console.error('Error guardando carrito:', error)
+    }
+  }
+
+  function cargarDesdeLocalStorage() {
+    try {
+      const carritoGuardado = localStorage.getItem('carrito')
+      if (carritoGuardado) {
+        items.value = JSON.parse(carritoGuardado)
+      }
+    } catch (error) {
+      console.error('Error cargando carrito:', error)
+      items.value = []
+    }
+  }
+
+  // Verificar si un libro está en el carrito
+  function estaEnCarrito(libroId) {
+    return items.value.some(item => item.id === libroId)
+  }
+
+  // Obtener cantidad de un libro específico
+  function obtenerCantidad(libroId) {
+    const item = items.value.find(item => item.id === libroId)
+    return item ? item.cantidad : 0
+  }
+
+  // Inicializar carrito
+  function inicializar() {
+    cargarDesdeLocalStorage()
   }
 
   return {
-    itemsCarrito,
-    cargandoCarrito,
-    contadorItems,
-    totalCarrito,
+    // Estado
+    items,
+    mostrarCarrito,
+    cargando,
+    
+    // Computeds
+    totalItems,
+    subtotal,
+    envio,
+    total,
+    estaVacio,
+    
+    // Acciones
     agregarAlCarrito,
-    removerDelCarrito,
-    limpiarCarrito
+    eliminarItem,
+    aumentarCantidad,
+    disminuirCantidad,
+    actualizarCantidad,
+    limpiarCarrito,
+    abrirCarrito,
+    cerrarCarrito,
+    toggleCarrito,
+    estaEnCarrito,
+    obtenerCantidad,
+    inicializar,
+    
+    // Persistencia
+    guardarEnLocalStorage,
+    cargarDesdeLocalStorage
   }
 })

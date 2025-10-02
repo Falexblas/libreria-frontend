@@ -80,6 +80,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCarritoStore } from '@/stores/carrito'
 
 // Props
 const props = defineProps({
@@ -103,6 +104,7 @@ const props = defineProps({
 const emit = defineEmits(['agregar-carrito', 'ver-detalles', 'toggle-favorito'])
 
 const router = useRouter()
+const carritoStore = useCarritoStore()
 
 // Estado reactivo
 const esFavorito = ref(false)
@@ -145,9 +147,13 @@ const descuentoLibro = computed(() => {
 })
 
 const disponibleLibro = computed(() => {
-  // Verificar si está disponible y hay stock
-  if (props.libro.disponible === false) return false
-  if (props.libro.stock !== undefined && props.libro.stock <= 0) return false
+  // Si el libro no está activo, no está disponible
+  if (props.libro.activo === false) return false
+  
+  // Si no hay stock o el stock es 0 o menor, no está disponible
+  if (props.libro.stock === undefined || props.libro.stock <= 0) return false
+  
+  // Si tiene stock y está activo, está disponible
   return true
 })
 
@@ -160,9 +166,11 @@ const precioOriginal = computed(() => {
 })
 
 const imagenUrl = computed(() => {
-  // Ahora portadaUrl contiene la URL completa directamente
-  if (props.libro.portadaUrl && props.libro.portadaUrl.trim() !== '') {
-    return props.libro.portadaUrl
+  // Manejar tanto portadaUrl como portada_url (snake_case de BD)
+  const portadaUrl = props.libro.portadaUrl || props.libro.portada_url
+  
+  if (portadaUrl && portadaUrl.trim() !== '') {
+    return portadaUrl
   }
   
   // Fallback a imagen de Unsplash si no hay imagen
@@ -192,7 +200,11 @@ function verDetalles() {
 }
 
 function agregarAlCarrito() {
-  if (props.libro.disponible) {
+  if (disponibleLibro.value) {
+    // Agregar directamente al store del carrito
+    carritoStore.agregarAlCarrito(props.libro)
+    
+    // También emitir el evento para compatibilidad
     emit('agregar-carrito', props.libro)
   }
 }

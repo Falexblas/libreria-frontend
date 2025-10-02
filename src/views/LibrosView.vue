@@ -181,64 +181,8 @@ async function cargarLibros() {
     console.error('Error al cargar libros:', err)
     error.value = err.message
     
-    // Datos de prueba si falla el backend
-    console.log('Usando datos de prueba...')
-    todosLosLibros.value = [
-      {
-        id: 1,
-        titulo: "El Código Da Vinci",
-        autor: "Dan Brown",
-        precio: 25.99,
-        descuento: 10,
-        portadaUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
-        disponible: true
-      },
-      {
-        id: 2,
-        titulo: "Cien Años de Soledad",
-        autor: "Gabriel García Márquez",
-        precio: 22.50,
-        descuento: 0,
-        portadaUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop",
-        disponible: true
-      },
-      {
-        id: 3,
-        titulo: "Harry Potter y la Piedra Filosofal",
-        autor: "J.K. Rowling",
-        precio: 18.99,
-        descuento: 15,
-        portadaUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop",
-        disponible: true
-      },
-      {
-        id: 4,
-        titulo: "El Resplandor",
-        autor: "Stephen King",
-        precio: 21.99,
-        descuento: 5,
-        portadaUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop",
-        disponible: true
-      },
-      {
-        id: 5,
-        titulo: "La Casa de los Espíritus",
-        autor: "Isabel Allende",
-        precio: 19.99,
-        descuento: 0,
-        portadaUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300&h=400&fit=crop",
-        disponible: true
-      },
-      {
-        id: 6,
-        titulo: "Don Quijote de la Mancha",
-        autor: "Miguel de Cervantes",
-        precio: 24.99,
-        descuento: 20,
-        portadaUrl: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=300&h=400&fit=crop",
-        disponible: true
-      }
-    ]
+    // Sin datos de prueba - solo mostrar error
+    todosLosLibros.value = []
     
   } finally {
     cargando.value = false
