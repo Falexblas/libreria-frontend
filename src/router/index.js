@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LibrosView from '../views/LibrosView.vue'
+import LibroDetalleView from '../views/LibroDetalleView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +20,12 @@ const router = createRouter({
       path: '/libros/categoria/:id',
       name: 'libros-categoria',
       component: LibrosView,
+      props: true
+    },
+    {
+      path: '/libros/:id',
+      name: 'libro-detalle',
+      component: LibroDetalleView,
       props: true
     },
     // Aquí agregaremos más rutas:

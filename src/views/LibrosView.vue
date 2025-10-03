@@ -14,7 +14,7 @@
     </div>
 
     <!-- Grid de libros -->
-    <div class="libros-content">
+    <div class="libros-content"> 
       <div class="container">
         <!-- Loading -->
         <div v-if="cargando" class="loading">
