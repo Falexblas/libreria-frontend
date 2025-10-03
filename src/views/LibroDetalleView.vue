@@ -53,19 +53,19 @@
                 </div>
                 <div class="detalle-fila">
                   <span class="detalle-label">Editorial:</span>
-                  <span class="detalle-valor">{{ libro.editorial?.nombre || 'PLANETA' }}</span>
+                  <span class="detalle-valor">{{ libro.editorial?.nombre }}</span>
                 </div>
                 <div class="detalle-fila">
                   <span class="detalle-label">Año:</span>
-                  <span class="detalle-valor">{{ libro.fechaPublicacion || '2025' }}</span>
+                  <span class="detalle-valor">{{ libro.fechaPublicacion }}</span>
                 </div>
                 <div class="detalle-fila">
                   <span class="detalle-label">Páginas:</span>
-                  <span class="detalle-valor">{{ libro.paginas || '280' }}</span>
+                  <span class="detalle-valor">{{ libro.paginas }}</span>
                 </div>
                 <div class="detalle-fila">
                   <span class="detalle-label">ISBN:</span>
-                  <span class="detalle-valor">{{ libro.isbn || '9786123321222' }}</span>
+                  <span class="detalle-valor">{{ libro.isbn }}</span>
                 </div>
               </div>
               </div>
@@ -195,16 +195,20 @@
                   >
                     <h5 class="fw-bold mb-3">Sinopsis:</h5>
                     <p class="text-justify lh-lg sinopsis-texto">
-                      {{ libro.descripcion || 'Señalada como «catedral gótica del lenguaje», este clásico del siglo XX es el enorme y espléndido tapiz de la saga de la familia Buendía, en la mítica aldea de Macondo. UNO DE LOS 5 LIBROS MÁS IMPORTANTES DE LOS ÚLTIMOS 125 AÑOS SEGÚN THE NEW YORK TIMES. Un referente imprescindible de la vida y la narrativa latinoamericana. «Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo. Macondo era entonces una aldea de veinte casas de barro y cañabrava construidas a la orilla de un río de aguas diáfanas que se precipitaban por un lecho de piedras pulidas, blancas y enormes como huevos prehistóricos. El mundo era tan reciente, que muchas cosas carecían de nombre, y para mencionarlas había que señalarlas con el dedo». Con estas palabras empieza la novela ya legendaria en los anales de la literatura universal, una de las aventuras literarias más fascinantes de nuestro siglo. Millones de ejemplares de Cien años de soledad leídos en todas las lenguas y el Premio Nobel de Literatura coronando una obra que se había abierto paso «boca a boca» -como gusta decir al escritor- son la más palpable demostración de que la aventura fabulosa de la familia Buendía-Iguarán, con sus milagros, fantasías, obsesiones, tragedias, incestos, adulterios, rebeldías, descubrimientos y condenas, representaba al mismo tiempo el mito y la historia, la tragedia y el amor del mundo entero.' }}
+                      {{ libro.descripcion }}
                     </p>
                     
                     <!-- Categorías -->
-                    <div class="mt-4">
+                    <div class="mt-4" v-if="libro.categorias && libro.categorias.length > 0">
                       <h6 class="fw-bold mb-3">Categorías:</h6>
                       <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-secondary">Literatura</span>
-                        <span class="badge bg-secondary">Realismo Mágico</span>
-                        <span class="badge bg-secondary">Clásicos</span>
+                        <span 
+                          v-for="categoria in libro.categorias" 
+                          :key="categoria.id" 
+                          class="badge bg-secondary"
+                        >
+                          {{ categoria.nombre }}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -263,27 +267,6 @@ const libro = ref(null)
 const cantidad = ref(1)
 const enListaDeseos = ref(false)
 
-// Datos de ejemplo para "Cien años de soledad"
-const libroCienAnos = {
-  id: 2,
-  titulo: 'Cien años de soledad',
-  autor: {
-    nombre: 'Gabriel',
-    apellido: 'García Márquez'
-  },
-  precio: 57.85,
-  precioOriginal: 89.00,
-  descuento: 35,
-  activo: true,  // Cambiado de 'disponible' a 'activo'
-  stock: 15,
-  portadaUrl: '/src/assets/cien-anos-de-soledad.webp',
-  descripcion: 'Señalada como «catedral gótica del lenguaje», este clásico del siglo XX es el enorme y espléndido tapiz de la saga de la familia Buendía, en la mítica aldea de Macondo. UNO DE LOS 5 LIBROS MÁS IMPORTANTES DE LOS ÚLTIMOS 125 AÑOS SEGÚN THE NEW YORK TIMES. Un referente imprescindible de la vida y la narrativa latinoamericana. «Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo. Macondo era entonces una aldea de veinte casas de barro y cañabrava construidas a la orilla de un río de aguas diáfanas que se precipitaban por un lecho de piedras pulidas, blancas y enormes como huevos prehistóricos. El mundo era tan reciente, que muchas cosas carecían de nombre, y para mencionarlas había que señalarlas con el dedo». Con estas palabras empieza la novela ya legendaria en los anales de la literatura universal, una de las aventuras literarias más fascinantes de nuestro siglo. Millones de ejemplares de Cien años de soledad leídos en todas las lenguas y el Premio Nobel de Literatura coronando una obra que se había abierto paso «boca a boca» -como gusta decir al escritor- son la más palpable demostración de que la aventura fabulosa de la familia Buendía-Iguarán, con sus milagros, fantasías, obsesiones, tragedias, incestos, adulterios, rebeldías, descubrimientos y condenas, representaba al mismo tiempo el mito y la historia, la tragedia y el amor del mundo entero.',
-  editorial: { nombre: 'Editorial Sudamericana' },
-  fechaPublicacion: '1967',
-  paginas: 432,
-  isbn: '978-84-376-0494-4'
-}
-
 // Computed properties
 const autorCompleto = computed(() => {
   if (!libro.value?.autor) return 'Autor desconocido'
@@ -311,8 +294,18 @@ const precioFinal = computed(() => {
 })
 
 const precioOriginal = computed(() => {
-  if (libro.value?.descuento > 0 && libro.value?.precioOriginal) {
-    return Number(libro.value.precioOriginal).toFixed(2)
+  if (libro.value?.descuento > 0) {
+    // Si hay un precio original en la BD, usarlo
+    if (libro.value.precioOriginal) {
+      return Number(libro.value.precioOriginal).toFixed(2)
+    }
+    // Si no, calcularlo basado en el precio actual y el descuento
+    // precio actual = precio original * (1 - descuento/100)
+    // precio original = precio actual / (1 - descuento/100)
+    const precioActual = Number(libro.value.precio)
+    const descuentoDecimal = Number(libro.value.descuento) / 100
+    const precioOriginaleCalculado = precioActual / (1 - descuentoDecimal)
+    return precioOriginaleCalculado.toFixed(2)
   }
   return precioFinal.value
 })
@@ -334,11 +327,6 @@ async function cargarLibro() {
     const response = await api.get(`/libros/${libroId}`)
     libro.value = response.data
     
-    // Forzar la descripción actualizada para "Cien años de soledad"
-    if (libro.value.id === 2 || libro.value.titulo?.includes('Cien años') || libro.value.titulo?.includes('Cien Años')) {
-      libro.value.descripcion = 'Señalada como «catedral gótica del lenguaje», este clásico del siglo XX es el enorme y espléndido tapiz de la saga de la familia Buendía, en la mítica aldea de Macondo. UNO DE LOS 5 LIBROS MÁS IMPORTANTES DE LOS ÚLTIMOS 125 AÑOS SEGÚN THE NEW YORK TIMES. Un referente imprescindible de la vida y la narrativa latinoamericana. «Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo. Macondo era entonces una aldea de veinte casas de barro y cañabrava construidas a la orilla de un río de aguas diáfanas que se precipitaban por un lecho de piedras pulidas, blancas y enormes como huevos prehistóricos. El mundo era tan reciente, que muchas cosas carecían de nombre, y para mencionarlas había que señalarlas con el dedo». Con estas palabras empieza la novela ya legendaria en los anales de la literatura universal, una de las aventuras literarias más fascinantes de nuestro siglo. Millones de ejemplares de Cien años de soledad leídos en todas las lenguas y el Premio Nobel de Literatura coronando una obra que se había abierto paso «boca a boca» -como gusta decir al escritor- son la más palpable demostración de que la aventura fabulosa de la familia Buendía-Iguarán, con sus milagros, fantasías, obsesiones, tragedias, incestos, adulterios, rebeldías, descubrimientos y condenas, representaba al mismo tiempo el mito y la historia, la tragedia y el amor del mundo entero.'
-    }
-    
     console.log('✅ Libro cargado desde backend:', response.data)
     
   } catch (err) {
@@ -351,12 +339,6 @@ async function cargarLibro() {
       
       if (foundBook) {
         libro.value = foundBook
-        
-        // Forzar la descripción actualizada para "Cien años de soledad"
-        if (foundBook.id === 2 || foundBook.titulo?.includes('Cien años') || foundBook.titulo?.includes('Cien Años')) {
-          libro.value.descripcion = 'Señalada como «catedral gótica del lenguaje», este clásico del siglo XX es el enorme y espléndido tapiz de la saga de la familia Buendía, en la mítica aldea de Macondo. UNO DE LOS 5 LIBROS MÁS IMPORTANTES DE LOS ÚLTIMOS 125 AÑOS SEGÚN THE NEW YORK TIMES. Un referente imprescindible de la vida y la narrativa latinoamericana. «Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo. Macondo era entonces una aldea de veinte casas de barro y cañabrava construidas a la orilla de un río de aguas diáfanas que se precipitaban por un lecho de piedras pulidas, blancas y enormes como huevos prehistóricos. El mundo era tan reciente, que muchas cosas carecían de nombre, y para mencionarlas había que señalarlas con el dedo». Con estas palabras empieza la novela ya legendaria en los anales de la literatura universal, una de las aventuras literarias más fascinantes de nuestro siglo. Millones de ejemplares de Cien años de soledad leídos en todas las lenguas y el Premio Nobel de Literatura coronando una obra que se había abierto paso «boca a boca» -como gusta decir al escritor- son la más palpable demostración de que la aventura fabulosa de la familia Buendía-Iguarán, con sus milagros, fantasías, obsesiones, tragedias, incestos, adulterios, rebeldías, descubrimientos y condenas, representaba al mismo tiempo el mito y la historia, la tragedia y el amor del mundo entero.'
-        }
-        
         console.log('✅ Libro encontrado en lista completa:', foundBook)
         return
       }
@@ -366,15 +348,9 @@ async function cargarLibro() {
     } catch (err2) {
       console.error('Error al cargar libros desde backend:', err2)
       
-      // Fallback: usar datos de ejemplo para "Cien años de soledad"
-      if (libroId === '1' || libroId === '2' || libroId === 'cien-anos-soledad') {
-        console.log('📚 Usando datos de ejemplo para Cien años de soledad')
-        libro.value = libroCienAnos
-      } else {
-        console.warn('Libro no encontrado:', libroId)
-        // Redirigir a la lista de libros si no se encuentra
-        router.push('/libros')
-      }
+      // Si no se encuentra el libro, redirigir a la lista de libros
+      console.warn('Libro no encontrado:', libroId)
+      router.push('/libros')
     }
   }
 }
@@ -462,6 +438,7 @@ onMounted(() => {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 100vh;
   padding: 2rem 0;
+  overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 .container {
@@ -547,8 +524,8 @@ onMounted(() => {
 
 /* Mover la sección de información del libro más a la izquierda */
 .col-md-6.col-lg-7 {
-  padding-left: 0.5rem !important; /* Reducir padding izquierdo */
-  margin-left: -4rem !important; /* Margen negativo para empujar más a la izquierda */
+  padding-left: 0rem !important; /* Reducir padding izquierdo */
+  margin-left: -2rem !important; /* Margen negativo para mover más a la izquierda */
   padding-top: 2rem;
 }
 
@@ -748,8 +725,8 @@ onMounted(() => {
   .col-md-6.col-lg-7 {
     flex: 0 0 auto;
     width: 58%;
-    padding-left: 2.5rem !important;
-    margin-left: -1rem !important;
+    padding-left: 2.9rem !important; /* Mismo padding que el estilo general */
+    margin-left: -2.8rem !important; /* Mismo margen que el estilo general */
     padding-top: 1rem;
   }
   
