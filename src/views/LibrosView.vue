@@ -82,56 +82,11 @@ const nombreCategoria = computed(() => {
   return categoria ? categoria.nombre : 'Categoría no encontrada'
 })
 
-// Computed para libros filtrados
+// Computed para libros filtrados (ya no necesita filtrar, el backend lo hace)
 const librosFiltrados = computed(() => {
-  if (!categoriaActual.value) {
-    return todosLosLibros.value // Mostrar todos si no hay categoría
-  }
-  
-  // Filtrar por categoría (por ahora simulado, luego conectarás con tu backend)
-  const filtrados = todosLosLibros.value.filter(libro => {
-    const categoriaLibro = asignarCategoriaSimulada(libro)
-    return categoriaLibro === categoriaActual.value
-  })
-  
-  console.log(`📂 Categoría ${categoriaActual.value}: ${filtrados.length} libros encontrados`)
-  return filtrados
+  // El backend ya devuelve los libros filtrados por categoría
+  return todosLosLibros.value
 })
-
-// Función para simular categorías (temporal hasta que tengas el backend completo)
-function asignarCategoriaSimulada(libro) {
-  const titulo = (libro.titulo || '').toLowerCase()
-  
-  // Manejar diferentes formatos del autor
-  let autorString = ''
-  if (typeof libro.autor === 'string') {
-    autorString = libro.autor.toLowerCase()
-  } else if (libro.autor && typeof libro.autor === 'object') {
-    // Si es un objeto autor con nombre y apellido
-    if (libro.autor.nombre && libro.autor.apellido) {
-      autorString = `${libro.autor.nombre} ${libro.autor.apellido}`.toLowerCase()
-    } else if (libro.autor.nombre) {
-      autorString = libro.autor.nombre.toLowerCase()
-    }
-  }
-  
-  // Mapeo simulado basado en títulos/autores conocidos
-  if (titulo.includes('harry potter') || autorString.includes('rowling')) return 2 // Fantasía
-  if (titulo.includes('resplandor') || autorString.includes('king')) return 8 // Terror
-  if (titulo.includes('código') || titulo.includes('da vinci') || autorString.includes('brown')) return 3 // Misterio
-  if (titulo.includes('soledad') || autorString.includes('garcía márquez') || autorString.includes('márquez')) return 11 // Literatura Latinoamericana
-  if (titulo.includes('espíritus') || autorString.includes('allende')) return 11 // Literatura Latinoamericana
-  if (titulo.includes('quijote') || autorString.includes('cervantes')) return 7 // Historia
-  
-  // Distribución más variada para tener libros en diferentes categorías
-  const hashCode = titulo.split('').reduce((a, b) => {
-    a = ((a << 5) - a) + b.charCodeAt(0)
-    return a & a
-  }, 0)
-  
-  const categorias = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-  return categorias[Math.abs(hashCode) % categorias.length]
-}
 
 // Métodos
 async function cargarLibros() {
@@ -139,8 +94,15 @@ async function cargarLibros() {
   error.value = null
   
   try {
-    // Intentar cargar desde el backend
-    const response = await fetch('http://localhost:8080/api/libros')
+    // Construir URL según si hay categoría o no
+    const url = categoriaActual.value 
+      ? `http://localhost:8080/api/libros/categoria/${categoriaActual.value}`
+      : 'http://localhost:8080/api/libros'
+    
+    console.log(`📡 Cargando libros desde: ${url}`)
+    
+    // Cargar desde el backend
+    const response = await fetch(url)
     
     if (!response.ok) {
       throw new Error(`Error ${response.status}: ${response.statusText}`)
@@ -153,6 +115,10 @@ async function cargarLibros() {
     if (data.length > 0) {
       const primerElemento = data[0]
       console.log('🔍 Primer elemento recibido:', primerElemento)
+      console.log('🔍 Estructura completa del libro:', JSON.stringify(primerElemento, null, 2))
+      console.log('🔍 categoria_id:', primerElemento.categoria_id)
+      console.log('🔍 categoriaId:', primerElemento.categoriaId)
+      console.log('🔍 categoria:', primerElemento.categoria)
       
       // Verificar si es un libro (tiene titulo) o un autor (tiene nombre/apellido sin titulo)
       if (primerElemento.titulo) {
@@ -208,12 +174,15 @@ function toggleFavorito(data) {
   alert(`${data.libro.titulo} ${mensaje} favoritos`)
 }
 
-// Watcher para reaccionar a cambios de ruta
+// Watcher para reaccionar a cambios de ruta y recargar libros
 watch(() => route.params.id, (newId, oldId) => {
   console.log(`🔄 Ruta cambió de ${oldId} a ${newId}`)
   console.log(`📂 Nueva categoría: ${nombreCategoria.value}`)
   console.log(`🔢 ID de categoría: ${categoriaActual.value}`)
-}, { immediate: true })
+  
+  // Recargar libros cuando cambia la categoría
+  cargarLibros()
+})
 
 // Lifecycle
 onMounted(() => {
