@@ -1,6 +1,11 @@
 <script setup>
 // Importar componentes necesarios para la página principal
 import HeroSlider from '@/components/home/HeroSlider.vue'
+import SwiperCarouselDestacados from '@/components/SwiperCarouselDestacados.vue';
+import SwiperCarouselFiccion from '@/components/SwiperCarouselFiccion.vue';
+import SwiperCarouselMisterio from '@/components/SwiperCarouselMisterio.vue';
+import SwiperCarouselNovedades from '@/components/SwiperCarouselNovedades.vue';
+import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
 </script>
 
 <template>
@@ -23,11 +28,41 @@ import HeroSlider from '@/components/home/HeroSlider.vue'
           </p>
         </div>
         
+<br></br>
+<section class="carousel_Destacados_section">
+          <div class="container">
+            <SwiperCarouselDestacados/>
+          </div>
+        </section>
+
+<br></br>
+<section class="carousel_Novedades_section">
+          <div class="container">
+            <SwiperCarouselNovedades/>
+          </div>
+        </section>
+<br></br>
+<section class="carousel_Ficcion_section">
+          <div class="container">
+            <SwiperCarouselFiccion/>
+          </div>
+        </section>
+<br></br>
+<section class="carousel_Romances_section">
+          <div class="container">
+            <SwiperCarouselRomance/>
+          </div>
+        </section>
+<br></br>
+<section class="carousel_Misterio_section">
+          <div class="container">
+            <SwiperCarouselMisterio/>
+          </div>
+        </section>
+
+
         <!-- Aquí irán más secciones: libros destacados, categorías, etc. -->
-        <div class="coming-soon">
-          <h2>🚀 Próximamente</h2>
-          <p>Libros destacados, recomendaciones personalizadas y mucho más...</p>
-        </div>
+        
       </div>
     </section>
   </main>
