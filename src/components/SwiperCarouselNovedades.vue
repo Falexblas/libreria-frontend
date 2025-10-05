@@ -43,7 +43,7 @@ const modules = [Navigation, Autoplay]
         <span class="icon-star">★</span>
         <h2 class="section-title">Novedades</h2>
       </div>
-      <a href="#" class="ver-mas-link">
+      <a href="http://localhost:5173/libros" class="ver-mas-link">
         Ver más ›
       </a>
     </div>

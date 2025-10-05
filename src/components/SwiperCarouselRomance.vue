@@ -41,9 +41,9 @@ const modules = [Navigation, Autoplay]
         <span class="icon-star">★</span>
         <h2 class="section-title">Libros de Romance</h2>
       </div>
-      <a href="#" class="ver-mas-link">
-        Ver más ›
-      </a>
+      <a href="http://localhost:5173/libros/categoria/4" class="ver-mas-link">
+  Ver más ›
+</a>
     </div>
 
     <div v-if="cargando" class="estado-mensaje">
