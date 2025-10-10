@@ -15,40 +15,17 @@
               <img src="@/assets/logo.png" alt="Librería Logo">
               <span>Mundo de papel</span>
             </router-link>
-            
-            <!-- Dropdown de Categorías (solo desktop) -->
-            <div class="dropdown d-none d-lg-block">
-              <button class="btn btn-categorias dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-grid-3x3-gap me-2"></i>
-                Categorías
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <router-link to="/libros" class="dropdown-item">
-                    <i class="bi bi-collection me-2"></i>
-                    Todos los Libros
-                  </router-link>
-                </li>
-                <li><hr class="dropdown-divider"></li>
-                <li v-for="categoria in categoriasStore.categorias" :key="categoria.id">
-                  <router-link :to="`/libros/categoria/${categoria.id}`" class="dropdown-item">
-                    <i class="bi bi-bookmark me-2"></i>
-                    {{ categoria.nombre }}
-                  </router-link>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
 
         <!-- Centro: Logo (móvil) y Buscador (desktop) -->
-        <div class="col">
-          <div class="d-flex justify-content-center">
-            <router-link to="/" class="navbar-brand-minimalista d-lg-none">
+        <div class="col d-flex justify-content-center align-items-center">
+          <div style="width:100%;max-width:500px;display:flex;justify-content:center;">
+            <router-link to="/" class="navbar-brand-minimalista d-lg-none me-2">
               <img src="@/assets/logo.png" alt="Librería Logo">
               <span class="d-none d-sm-inline">Mundo de papel</span>
             </router-link>
-            <div class="buscador-wrapper d-none d-lg-block">
+            <div class="buscador-wrapper d-none d-lg-block" style="flex:1;">
               <i class="bi bi-search"></i>
               <input 
                 type="text" 
@@ -60,12 +37,50 @@
           </div>
         </div>
 
-        <!-- Derecha: Iconos -->
+        <!-- Derecha: Iconos y Categorías (desktop) -->
         <div class="col-auto">
           <div class="d-flex align-items-center gap-2">
             <button @click="openSearch" class="btn-icon d-lg-none">
               <i class="bi bi-search"></i>
             </button>
+
+            <!-- Botón Categorías solo desktop -->
+            <div class="dropdown d-none d-lg-block mega-menu-categorias me-2">
+              <button class="btn btn-categorias dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Categorías
+              </button>
+              <div class="dropdown-menu mega-menu p-4">
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <router-link to="/libros" class="dropdown-item fw-bold">
+                      <i class="bi bi-collection me-2"></i>
+                      Todos los Libros
+                    </router-link>
+                    <hr class="dropdown-divider my-2">
+                  </div>
+                  <template v-for="categoria in categoriasStore.categorias" :key="categoria.id">
+                    <div class="col-6 col-md-4 col-lg-3 mb-2">
+                      <div class="fw-bold mb-1">
+                        <i class="bi bi-bookmark me-2"></i>
+                        {{ categoria.nombre }}
+                      </div>
+                      <ul class="list-unstyled ms-2">
+                        <li v-if="categoria.subcategorias && categoria.subcategorias.length" v-for="sub in categoria.subcategorias" :key="sub.id">
+                          <router-link :to="`/libros/categoria/${sub.id}`" class="dropdown-item py-1 px-2">
+                            {{ sub.nombre }}
+                          </router-link>
+                        </li>
+                        <li v-else>
+                          <router-link :to="`/libros/categoria/${categoria.id}`" class="dropdown-item py-1 px-2">
+                            {{ categoria.nombre }}
+                          </router-link>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
 
             <!-- Iconos de usuario -->
             <div v-if="authStore.isAuthenticated" class="dropdown d-md-block">
@@ -128,26 +143,47 @@
     </div>
     <!-- Body -->
     <div class="mobile-menu-body">
-      <router-link v-if="!authStore.isAuthenticated" to="/login" @click="closeMobileMenu" class="mobile-menu-link auth-link">Iniciar Sesión</router-link>
+      <router-link v-if="!authStore.isAuthenticated" to="/login" @click="closeMobileMenu" class="mobile-menu-link auth-link btn-iniciar-sesion-movil">
+        <i class="bi bi-person-circle me-2"></i>
+        INICIAR SESIÓN
+      </router-link>
       <router-link v-if="authStore.isAuthenticated" to="/perfil" @click="closeMobileMenu" class="mobile-menu-link auth-link">Mi Perfil</router-link>
       
       <hr>
       
       <h5>Categorías</h5>
-      <router-link to="/libros" @click="closeMobileMenu" class="mobile-menu-link">Todos los Libros</router-link>
-      <router-link 
-        v-for="categoria in categoriasStore.categorias" 
-        :key="categoria.id"
-        :to="`/libros/categoria/${categoria.id}`" 
-        @click="closeMobileMenu"
-        class="mobile-menu-link"
-      >
-        {{ categoria.nombre }}
-      </router-link>
+      <div class="categorias-acordeon">
+        <router-link to="/libros" @click="closeMobileMenu" class="categoria-item">
+          TODOS LOS LIBROS
+        </router-link>
+        <div v-for="categoria in categoriasStore.categorias" :key="categoria.id">
+          <template v-if="categoria.subcategorias && categoria.subcategorias.length">
+            <div class="categoria-item" :class="{ open: categoriaAbierta === categoria.id }" @click="categoriaAbierta = categoriaAbierta === categoria.id ? null : categoria.id">
+              {{ categoria.nombre }}
+              <span class="arrow">&#9662;</span>
+            </div>
+            <transition name="fade">
+              <div v-show="categoriaAbierta === categoria.id" class="subcategorias-list">
+                <router-link v-for="sub in categoria.subcategorias" :key="sub.id" :to="`/libros/categoria/${sub.id}`" @click="closeMobileMenu" class="mobile-menu-link subcategoria-link">
+                  {{ sub.nombre }}
+                </router-link>
+              </div>
+            </transition>
+          </template>
+          <template v-else>
+            <router-link :to="`/libros/categoria/${categoria.id}`" @click="closeMobileMenu" class="categoria-item">
+              {{ categoria.nombre }}
+            </router-link>
+          </template>
+        </div>
+      </div>
 
       <hr>
 
-      <router-link to="/favoritos" @click="closeMobileMenu" class="mobile-menu-link">Mis Favoritos</router-link>
+      <router-link to="/favoritos" @click="closeMobileMenu" class="mobile-menu-link auth-link">
+        <i class="bi bi-heart-fill me-2"></i>
+        Mis Favoritos
+      </router-link>
       <a v-if="authStore.isAuthenticated" href="#" @click="cerrarSesionYMenu" class="mobile-menu-link">Cerrar Sesión</a>
     </div>
   </div>
@@ -169,6 +205,8 @@ const terminoBusqueda = ref('')
 const searchOverlayOpen = ref(false)
 const mobileMenuOpen = ref(false)
 const searchInput = ref(null)
+// Estado para el acordeón móvil
+const categoriaAbierta = ref(null)
 
 onMounted(() => {
   categoriasStore.cargarCategorias()
@@ -219,17 +257,121 @@ function cerrarSesion() {
 </script>
 
 <style scoped>
+/* --- Categorías acordeón móvil tipo Crisol --- */
+.categorias-acordeon {
+  margin: 0;
+  padding: 0;
+}
+.categoria-item {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+  margin-bottom: 1rem;
+  padding: 1.2rem 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2d3a4a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  transition: box-shadow 0.2s;
+  text-decoration: none;
+}
+.categoria-item:active,
+.categoria-item.open {
+  box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+}
+.categoria-item .arrow {
+  font-size: 1.3rem;
+  color: #b0b8c1;
+  transition: transform 0.2s;
+}
+.categoria-item.open .arrow {
+  transform: rotate(180deg);
+}
+.subcategorias-list {
+  padding-left: 1.5rem;
+  padding-bottom: 0.7rem;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #4a5568;
+}
+@media (min-width: 992px) {
+  .categorias-acordeon {
+    display: none;
+  }
+}
+/* Mega menú de categorías estilo Crisol */
+ .mega-menu-categorias .dropdown-menu.mega-menu {
+  width: 650px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border: 1px solid #e5e5e5;
+}
+/* Ajuste de columnas para nombres largos */
+.mega-menu-categorias .dropdown-menu.mega-menu .col-6,
+.mega-menu-categorias .dropdown-menu.mega-menu .col-md-4,
+.mega-menu-categorias .dropdown-menu.mega-menu .col-lg-3 {
+  min-width: 200px;
+  max-width: 220px;
+  word-break: break-word;
+}
+.mega-menu-categorias .dropdown-item.fw-bold,
+.mega-menu-categorias .fw-bold.mb-1 {
+  font-size: 1.1em;
+  color: #1a1a1a;
+  white-space: normal;
+  word-break: break-word;
+  border-left: 3px solid #0cc3dd;
+  padding-left: 0.5em;
+}
+.mega-menu-categorias .dropdown-item.py-1 {
+  font-size: 0.98em;
+  color: #444;
+}
+.mega-menu-categorias .dropdown-item.py-1:hover {
+  background: #ffffff;
+  color: #0cc3dd;
+}
+/* Submenús anidados para Bootstrap 5 */
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -0.125rem;
+  margin-left: 0.1rem;
+  display: none;
+  min-width: 180px;
+}
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+.dropdown-submenu > .dropdown-item.dropdown-toggle::after {
+  content: "\25B6";
+  float: right;
+  margin-left: 0.5em;
+  font-size: 0.7em;
+}
 /* --- Estructura Principal del Navbar --- */
 .navbar-minimalista {
-  background-color: #fff;
-  border-bottom: 1px solid #e9ecef;
-  height: 70px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+  height: 80px;
   padding: 0 1rem;
   position: sticky;
   top: 0;
   z-index: 1020;
   display: flex;
   align-items: center; /* Centrar verticalmente */
+  box-shadow: 0 8px 32px 0 rgba(44, 62, 80, 0.18), 0 2px 0 rgba(44,62,80,0.10);
 }
 
 .navbar-minimalista .container-fluid {
@@ -275,9 +417,9 @@ function cerrarSesion() {
 
 /* --- Botón de Categorías --- */
 .btn-categorias {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  color: #2c3e50;
+  background-color: #2c3e50;
+  
+  color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -289,7 +431,7 @@ function cerrarSesion() {
 
 .btn-categorias:hover {
   background-color: #e9ecef;
-  border-color: #adb5bd;
+  border:#2c3e50 solid 1px;
   color: #2c3e50;
 }
 
@@ -302,6 +444,8 @@ function cerrarSesion() {
   position: relative;
   width: 100%;
   max-width: 450px;
+  margin: 0 auto;
+  
 }
 
 .buscador-wrapper i {
@@ -311,20 +455,21 @@ function cerrarSesion() {
   transform: translateY(-50%);
   color: #6c757d;
   pointer-events: none;
+ 
 }
 
 .buscador-wrapper input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 3rem;
+  padding: 0.40rem 1rem 0.75rem 3rem;
   border-radius: 25px;
-  border: 1px solid #dee2e6;
+  border: 2px solid #2c3e50;
   background-color: #f8f9fa;
   transition: all 0.3s ease;
 }
 
 .buscador-wrapper input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #2c3e50;
   background-color: #fff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
@@ -336,10 +481,25 @@ function cerrarSesion() {
   color: #2c3e50;
   font-size: 1.5rem;
   padding: 0.5rem;
-  border-radius: 50%;
+  border-radius: 100%;
+  width: 44px;
+  height: 44px;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+  padding: 0;
+}
+.btn-icon i {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   position: relative;
   transition: background-color 0.3s ease;
 }
@@ -353,8 +513,8 @@ function cerrarSesion() {
 }
 
 .btn-icon:hover {
-  background-color: #f8f9fa;
-  color: #007bff;
+  background-color: #2c3e50;
+  color: #fff;
 }
 
 .badge-carrito {
@@ -469,6 +629,7 @@ function cerrarSesion() {
 .mobile-menu-body {
   padding: 1rem;
   overflow-y: auto;
+  background: #f5f7f9;
 }
 
 .mobile-menu-link {
@@ -485,12 +646,34 @@ function cerrarSesion() {
 }
 
 .mobile-menu-link.auth-link {
-  font-weight: 600;
-  background-color: #f8f9fa;
-  text-align: center;
-  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0cc3dd !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.2rem;
+  
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: none;
+  transition: background 0.2s, color 0.2s;
+  opacity: 1 !important;
+  filter: none !important;
+  box-shadow: none;
+  gap: 0.7rem;
 }
-
+.mobile-menu-link.auth-link:hover {
+  background: #0bb6c1 !important;
+  color: #fff;
+  opacity: 1 !important;
+}
+.mobile-menu-link.auth-link i {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
 .mobile-menu hr {
   margin: 1rem 0;
 }
@@ -500,6 +683,21 @@ function cerrarSesion() {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   border: 1px solid #e9ecef;
+}
+
+/* --- Transiciones --- */
+.fade-enter-active, .fade-leave-active {
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+.fade-enter-to, .fade-leave-from {
+  max-height: 500px;
+  opacity: 1;
+  overflow: hidden;
 }
 
 /* --- Responsive --- */
@@ -589,4 +787,32 @@ function cerrarSesion() {
     display: flex !important;
   }
 }
+
+/* --- Subrayado animado para enlaces de subcategoría en menú móvil --- */
+.subcategoria-link {
+  position: relative;
+  transition: color 0.2s;
+}
+.subcategoria-link:hover, .subcategoria-link:focus {
+  color: #00b4d8 !important;
+}
+.subcategoria-link::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0.2rem;
+  width: 0;
+  height: 2px;
+  background: #00b4d8;
+  transition: width 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.subcategoria-link:hover::after, .subcategoria-link:focus::after {
+  width: 100%;
+}
+
+
+
 </style>
+
+
