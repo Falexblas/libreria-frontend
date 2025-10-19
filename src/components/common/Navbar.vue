@@ -1,7 +1,7 @@
 <template>
   <!-- Navbar Minimalista -->
   <nav class="navbar-minimalista">
-    <div class="container-fluid">
+    <div class="container">
       <!-- Contenido del Navbar con Bootstrap Grid -->
       <div class="row w-100 align-items-center gx-3">
 
@@ -379,6 +379,13 @@ function cerrarSesion() {
   display: flex;
   align-items: center;
 }
+.navbar-minimalista .container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* para que .badge-carrito se posicione dentro */
+}
 
 /* --- Logo --- */
 .navbar-brand-minimalista {
@@ -517,10 +524,10 @@ function cerrarSesion() {
   color: #fff;
 }
 
-.badge-carrito {
+.navbar-minimalista .container .badge-carrito {
   position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
+  top: 1rem;
+  right: 1.3rem;
   background-color: #dc3545;
   color: white;
   font-size: 0.6rem;
