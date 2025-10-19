@@ -59,15 +59,15 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import LibroCard from '@/components/libros/LibroCard.vue'
 import { useCategoriasStore } from '@/stores/categorias'
+import { useLibrosStore } from '@/stores/libros'
 
 const route = useRoute()
 const categoriasStore = useCategoriasStore()
+const librosStore = useLibrosStore()
 
 // Estado reactivo
-const libros = ref([])
-const todosLosLibros = ref([]) // Guardamos todos los libros para filtrar
-const cargando = ref(false)
-const error = ref(null)
+const cargando = computed(() => librosStore.cargando)
+const error = computed(() => librosStore.error)
 
 // Computed para obtener la categoría actual
 const categoriaActual = computed(() => {
@@ -82,76 +82,25 @@ const nombreCategoria = computed(() => {
   return categoria ? categoria.nombre : 'Categoría no encontrada'
 })
 
-// Computed para libros filtrados (ya no necesita filtrar, el backend lo hace)
+// Computed para libros filtrados desde el store
 const librosFiltrados = computed(() => {
-  // El backend ya devuelve los libros filtrados por categoría
-  return todosLosLibros.value
+  if (!categoriaActual.value) {
+    // Si no hay categoría, mostrar todos los libros
+    return librosStore.todosLosLibros
+  }
+  // Filtrar por categoría usando el computed del store
+  return librosStore.librosPorCategoria(categoriaActual.value)
 })
 
 // Métodos
 async function cargarLibros() {
-  cargando.value = true
-  error.value = null
-  
   try {
-    // Construir URL según si hay categoría o no
-    const url = categoriaActual.value 
-      ? `http://localhost:8080/api/libros/categoria/${categoriaActual.value}`
-      : 'http://localhost:8080/api/libros'
-    
-    console.log(`📡 Cargando libros desde: ${url}`)
-    
-    // Cargar desde el backend
-    const response = await fetch(url)
-    
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`)
+    // Cargar todos los libros si no están en caché
+    if (!librosStore.cargaInicial) {
+      await librosStore.cargarTodosLosLibros()
     }
-    
-    const data = await response.json()
-    console.log(`✅ ${data.length} elementos recibidos del backend`)
-    
-    // Debug: verificar si son libros o autores
-    if (data.length > 0) {
-      const primerElemento = data[0]
-      console.log('🔍 Primer elemento recibido:', primerElemento)
-      console.log('🔍 Estructura completa del libro:', JSON.stringify(primerElemento, null, 2))
-      console.log('🔍 categoria_id:', primerElemento.categoria_id)
-      console.log('🔍 categoriaId:', primerElemento.categoriaId)
-      console.log('🔍 categoria:', primerElemento.categoria)
-      
-      // Verificar si es un libro (tiene titulo) o un autor (tiene nombre/apellido sin titulo)
-      if (primerElemento.titulo) {
-        console.log('✅ Datos correctos: son libros')
-      } else if (primerElemento.nombre && primerElemento.apellido && !primerElemento.titulo) {
-        console.error('❌ ERROR: El backend está devolviendo autores en lugar de libros')
-        console.log('💡 Verifica que el endpoint sea /api/libros y no /api/autores')
-      }
-      
-      // Verificar que portadaUrl tenga una URL válida
-      if (primerElemento.portadaUrl && !primerElemento.portadaUrl.startsWith('http')) {
-        console.warn('⚠️ portadaUrl no parece ser una URL completa:', primerElemento.portadaUrl)
-      }
-    }
-    
-    // Filtrar solo elementos que parezcan libros (tienen titulo)
-    const librosValidos = data.filter(item => item.titulo)
-    
-    if (librosValidos.length !== data.length) {
-      console.warn(`⚠️ Se filtraron ${data.length - librosValidos.length} elementos que no son libros`)
-    }
-    
-    todosLosLibros.value = librosValidos.length > 0 ? librosValidos : data
-    
   } catch (err) {
     console.error('Error al cargar libros:', err)
-    error.value = err.message
-    
-    // Sin datos de prueba - solo mostrar error
-    todosLosLibros.value = []
-    
-  } finally {
-    cargando.value = false
   }
 }
 

@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router'
 import Navbar from '@/components/common/Navbar.vue'
 import Footer from '@/components/common/Footer.vue'
 import CarritoSidebar from '@/components/carrito/CarritoSidebar.vue'
+import ChatBot from '@/components/ChatBot.vue'
 import { useCarritoStore } from '@/stores/carrito'
 
 const carritoStore = useCarritoStore()
@@ -24,6 +25,9 @@ onMounted(() => {
     
     <!-- Carrito Sidebar -->
     <CarritoSidebar />
+    
+    <!-- ChatBot -->
+    <ChatBot />
   </div>
 </template>
 

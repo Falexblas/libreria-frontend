@@ -1,34 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Navigation, Autoplay } from 'swiper/modules' // ← aquí
+import { Navigation, Autoplay } from 'swiper/modules'
+import { useLibrosStore } from '@/stores/libros'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
+import './SwiperCarousel.css'
 
- import './SwiperCarousel.css';
+const librosStore = useLibrosStore()
 
-const libros = ref([])
-const cargando = ref(true)
-const error = ref(false)
+// Filtrar libros de categoría Misterio (ID: 3)
+const libros = computed(() => librosStore.librosPorCategoria(3))
+const cargando = computed(() => librosStore.cargando)
+const error = computed(() => librosStore.error)
 
-const cargarLibros = async () => {
-  cargando.value = true
-  error.value = false
-  try {
-    const response = await fetch('http://localhost:8080/api/libros/categoria/3')
-    if (!response.ok) throw new Error('Error al cargar libros')
-    const data = await response.json()
-    libros.value = data
-    cargando.value = false
-  } catch (err) {
-    error.value = true
-    cargando.value = false
+// Cargar libros solo si no están en caché
+onMounted(async () => {
+  if (!librosStore.cargaInicial) {
+    await librosStore.cargarTodosLosLibros()
   }
-}
-
-onMounted(() => {
-  cargarLibros()
 })
 
 const modules = [Navigation, Autoplay]
@@ -52,7 +43,7 @@ const modules = [Navigation, Autoplay]
     
    <div v-else-if="error" class="estado-mensaje">
   <p>❌ Error al cargar los libros</p>
-  <button @click="cargarLibros" class="btn-retry">Reintentar</button>
+  <button @click="librosStore.cargarTodosLosLibros()" class="btn-retry">Reintentar</button>
 </div>
     <div v-else-if="libros.length === 0" class="estado-mensaje">
       <p>No hay libros disponibles</p>
