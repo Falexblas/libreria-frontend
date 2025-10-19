@@ -32,9 +32,9 @@ const modules = [Navigation, Autoplay]
         <span class="icon-star">★</span>
         <h2 class="section-title">Libros de Ficcion</h2>
       </div>
-      <a href="http://localhost:5173/libros/categoria/1" class="ver-mas-link">
-  Ver más ›
-</a>
+      <router-link to="/libros/categoria/1" class="ver-mas-link">
+        Ver más ›
+      </router-link>
     </div>
 
     <div v-if="cargando" class="estado-mensaje">

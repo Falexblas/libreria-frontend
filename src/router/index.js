@@ -31,6 +31,22 @@ const router = createRouter({
     // Aquí agregaremos más rutas:
     // /login, /registro, /carrito, /perfil, /admin, etc.
   ],
+  // Scroll automático al inicio en cada navegación
+  scrollBehavior(to, from, savedPosition) {
+    // Si hay una posición guardada (botón atrás del navegador), usarla
+    if (savedPosition) {
+      return savedPosition
+    }
+    // Si hay un hash (#section), ir a ese elemento
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+    // Por defecto, ir al inicio de la página
+    return { top: 0, behavior: 'smooth' }
+  }
 })
 
 export default router
