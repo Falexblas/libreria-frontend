@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LibrosView from '../views/LibrosView.vue'
 import LibroDetalleView from '../views/LibroDetalleView.vue'
+import CheckoutView from '../views/CheckoutView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       name: 'libro-detalle',
       component: LibroDetalleView,
       props: true
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: CheckoutView,
     },
     // Aquí agregaremos más rutas:
     // /login, /registro, /carrito, /perfil, /admin, etc.

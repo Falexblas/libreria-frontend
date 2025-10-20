@@ -141,8 +141,10 @@
 
 <script setup>
 import { useCarritoStore } from '@/stores/carrito'
+import { useRouter } from 'vue-router'
 
 const carritoStore = useCarritoStore()
+const router = useRouter()
 
 // Métodos
 function cerrarCarrito() {
@@ -162,9 +164,7 @@ function eliminarItem(itemId) {
 }
 
 function procederCompra() {
-  // Aquí implementarás la lógica de checkout
-  alert('¡Redirigiendo al checkout!')
-  console.log('Items a comprar:', carritoStore.items)
+  router.push('/checkout')
 }
 
 function obtenerNombreAutor(autor) {

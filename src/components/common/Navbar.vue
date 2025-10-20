@@ -1,4 +1,12 @@
 <template>
+  <!-- Si estamos en modo checkout mostramos un banner superior que ocupa todo el ancho -->
+  <div v-if="checkoutMode" class="checkout-top-banner py-2">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="banner-left">Tu librería online abierta 24H</div>
+      <div class="banner-help small">¿Necesitas ayuda en tu compra? +1 234 567 8900</div>
+    </div>
+  </div>
+
   <!-- Navbar Minimalista -->
   <nav class="navbar-minimalista">
     <div class="container">
@@ -25,7 +33,7 @@
               <img src="@/assets/logo.png" alt="Librería Logo">
               <span class="d-none d-sm-inline">Mundo de papel</span>
             </router-link>
-            <div class="buscador-wrapper d-none d-lg-block" style="flex:1;">
+            <div v-if="!checkoutMode" class="buscador-wrapper d-none d-lg-block" style="flex:1;">
               <i class="bi bi-search"></i>
               <input 
                 type="text" 
@@ -45,7 +53,7 @@
             </button>
 
             <!-- Botón Categorías solo desktop -->
-            <div class="dropdown d-none d-lg-block mega-menu-categorias me-2">
+            <div v-if="!checkoutMode" class="dropdown d-none d-lg-block mega-menu-categorias me-2">
               <button class="btn btn-categorias dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 Categorías
               </button>
@@ -83,7 +91,7 @@
             </div>
 
             <!-- Iconos de usuario -->
-            <div v-if="authStore.isAuthenticated" class="dropdown d-md-block">
+            <div v-if="!checkoutMode && authStore.isAuthenticated" class="dropdown d-md-block">
               <a href="#" class="btn-icon" data-bs-toggle="dropdown">
                 <i class="bi bi-person-circle"></i>
               </a>
@@ -94,15 +102,15 @@
                 <li><a href="#" @click="cerrarSesion" class="dropdown-item">Cerrar Sesión</a></li>
               </ul>
             </div>
-            <router-link v-else to="/login" class="btn-icon d-md-block">
+            <router-link v-else to="/login" v-if="!checkoutMode" class="btn-icon d-md-block">
               <i class="bi bi-person-circle"></i>
             </router-link>
 
-            <router-link to="/favoritos" class="btn-icon d-md-block">
+            <router-link v-if="!checkoutMode" to="/favoritos" class="btn-icon d-md-block">
               <i class="bi bi-heart"></i>
             </router-link>
 
-            <button @click="carritoStore.abrirCarrito()" class="btn-icon">
+            <button v-if="!checkoutMode" @click="carritoStore.abrirCarrito()" class="btn-icon">
               <i class="bi bi-bag"></i>
               <span v-if="carritoStore.totalItems > 0" class="badge-carrito">{{ carritoStore.totalItems }}</span>
             </button>
@@ -191,6 +199,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
+import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCarritoStore } from '@/stores/carrito'
@@ -200,6 +209,11 @@ const router = useRouter()
 const authStore = useAuthStore()
 const carritoStore = useCarritoStore()
 const categoriasStore = useCategoriasStore()
+
+// Prop para activar comportamiento específico en checkout
+const props = defineProps({
+  checkoutMode: { type: Boolean, default: false }
+})
 
 const terminoBusqueda = ref('')
 const searchOverlayOpen = ref(false)
@@ -379,6 +393,19 @@ function cerrarSesion() {
   display: flex;
   align-items: center;
 }
+
+/* Banner superior para checkout */
+.checkout-top-banner {
+  background: #002e4d; /* conservamos azul primario */
+  color: #fff;
+  width: 100%;
+}
+.checkout-top-banner .banner-left { 
+  font-weight:700;
+  /* Tamaño de texto del banner superior en checkout - ajustar según sea necesario */
+  font-size: 0.9rem; /* ~18px */
+}
+.checkout-top-banner .banner-help { color: #fff; opacity:0.95 }
 .navbar-minimalista .container {
   height: 100%;
   display: flex;
