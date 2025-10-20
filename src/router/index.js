@@ -3,7 +3,9 @@ import HomeView from '../views/HomeView.vue'
 import LibrosView from '../views/LibrosView.vue'
 import LibroDetalleView from '../views/LibroDetalleView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
+import LoginView from '@/views/LoginView.vue'
 
+import RegisterView from '@/views/RegisterView.vue' // ← Importa la página de registro
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -33,6 +35,16 @@ const router = createRouter({
       path: '/checkout',
       name: 'checkout',
       component: CheckoutView,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterView
     },
     // Aquí agregaremos más rutas:
     // /login, /registro, /carrito, /perfil, /admin, etc.
