@@ -246,6 +246,7 @@
 
             <form class="mt-3">
               <div class="row g-3">
+                <!-- Fila 1: Departamento, Provincia, Distrito -->
                 <div class="col-12">
                   <div class="row g-2">
                     <div class="col-12 col-md-4">
@@ -282,32 +283,46 @@
 
                     <div class="col-12 col-md-4">
                       <label class="form-label">Provincia</label>
-                      <input type="text" v-model="entrega.provincia" class="form-control" placeholder="Provincia" />
+                      <select v-model="entrega.provincia" class="form-select" :disabled="!entrega.departamento">
+                        <option value="">{{ entrega.departamento ? 'Seleccione' : 'Primero seleccione departamento' }}</option>
+                        <option v-for="prov in provinciasDisponibles" :key="prov" :value="prov">{{ prov }}</option>
+                      </select>
                     </div>
 
                     <div class="col-12 col-md-4">
                       <label class="form-label">Distrito</label>
-                      <input type="text" v-model="entrega.distrito" class="form-control" placeholder="Distrito" />
+                      <select v-model="entrega.distrito" class="form-select" :disabled="!entrega.provincia">
+                        <option value="">{{ entrega.provincia ? 'Seleccione' : 'Primero seleccione provincia' }}</option>
+                        <option v-for="dist in distritosDisponibles" :key="dist" :value="dist">{{ dist }}</option>
+                      </select>
                     </div>
                   </div>
                 </div>
 
+                <!-- Fila 2: Dirección -->
                 <div class="col-12">
                   <label class="form-label">Dirección</label>
-                  <input type="text" v-model="entrega.direccion" class="form-control" placeholder="Dirección" />
+                  <input type="text" v-model="entrega.direccion" class="form-control" placeholder="Av/Jr/Calle, número, piso, etc." />
                 </div>
 
+                <!-- Fila 3: Referencia y Código Postal -->
                 <div class="col-12">
                   <div class="row g-2">
                     <div class="col-12 col-md-6">
                       <label class="form-label">Referencia</label>
-                      <input type="text" v-model="entrega.referencia" class="form-control" placeholder="Referencia (ej.: apto. 201)" />
+                      <input type="text" v-model="entrega.referencia" class="form-control" placeholder="Ej: Frente al parque, edificio azul" />
                     </div>
                     <div class="col-12 col-md-6">
                       <label class="form-label">Código postal</label>
-                      <input type="text" v-model="entrega.codigoPostal" class="form-control" placeholder="Código postal" />
+                      <input type="text" v-model="entrega.codigoPostal" class="form-control" placeholder="15001" />
                     </div>
                   </div>
+                </div>
+
+                <!-- Fila 4: Nota adicional -->
+                <div class="col-12">
+                  <label class="form-label">Nota adicional (opcional)</label>
+                  <textarea v-model="entrega.nota" class="form-control order-note" rows="2" placeholder="Ej: Llamar antes de entregar, dejar con portería"></textarea>
                 </div>
               </div>
 
@@ -336,10 +351,6 @@
             </div>
 
             <div class="mt-2">
-              <div class="mb-3">
-                <label class="form-label small text-muted">Agrega una nota a tu pedido</label>
-                <textarea v-model="entrega.nota" class="form-control order-note" rows="3" placeholder=""></textarea>
-              </div>
               <div class="d-flex justify-content-between small text-muted mb-1">
                 <div>Subtotal</div>
                 <div>S/{{ carritoStore.subtotal.toFixed(2) }}</div>
@@ -425,7 +436,16 @@
               </div>
 
               <div class="d-grid">
-                <button class="btn btn-primary py-3">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</button>
+                <button 
+                  @click="procesarPago" 
+                  :disabled="procesandoPago"
+                  class="btn btn-primary py-3">
+                  <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</span>
+                  <span v-else>
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Procesando...
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -481,7 +501,16 @@
               </div>
 
               <div class="d-grid">
-                <button :class="['btn py-3', isYapeComplete ? 'btn-yape-ready' : 'btn-secondary']" :disabled="!isYapeComplete">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</button>
+                <button 
+                  @click="procesarPago"
+                  :class="['btn py-3', isYapeComplete && !procesandoPago ? 'btn-yape-ready' : 'btn-secondary']" 
+                  :disabled="!isYapeComplete || procesandoPago">
+                  <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</span>
+                  <span v-else>
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Procesando...
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -533,16 +562,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useCarritoStore } from '@/stores/carrito'
+import { useAuthStore } from '@/stores/auth'
 import LogoYape from '@/assets/LogoYape.webp'
 
 const carritoStore = useCarritoStore()
+const authStore = useAuthStore()
 
 // Estado del paso actual: 1=Carrito,2=Datos,3=Entrega,4=Pago
 const step = ref(1)
 
-const entrega = reactive({ direccion: '', referencia: '', codigoPostal: '', pais: 'Perú', departamento: '', provincia: '', distrito: '', nota: '' })
+const entrega = reactive({ direccion: '', referencia: '', codigoPostal: '', departamento: '', provincia: '', distrito: '', nota: '' })
 
 // Payment state
 const paymentMethod = ref('card')
@@ -558,6 +589,126 @@ const isYapeComplete = computed(() => {
 
 // Datos del usuario (sin validaciones aquí, el backend los manejará)
 const datos = reactive({ correo: '', nombre: '', apellidos: '', documento: '', telefono: '' })
+
+// ✅ Cargar datos del usuario autenticado desde el backend
+onMounted(async () => {
+  console.log('🔍 CheckoutView montado')
+  console.log('🔍 Usuario autenticado:', authStore.isAuthenticated)
+  console.log('🔍 Datos del usuario en store:', authStore.user)
+  console.log('🔍 Token:', authStore.token ? 'Existe' : 'No existe')
+  
+  if (authStore.isAuthenticated && authStore.user?.id) {
+    try {
+      const url = `http://localhost:8080/api/usuarios/${authStore.user.id}`
+      console.log('🔍 Haciendo petición a:', url)
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`
+        }
+      })
+      
+      console.log('🔍 Respuesta status:', response.status)
+      
+      if (response.ok) {
+        const usuario = await response.json()
+        console.log('🔍 Datos recibidos del backend:', usuario)
+        
+        // Rellenar automáticamente los campos del formulario
+        datos.correo = usuario.email || ''
+        datos.nombre = usuario.nombre || ''
+        datos.apellidos = usuario.apellido || ''
+        datos.telefono = usuario.telefono || ''
+        datos.documento = usuario.documento || ''  // ✅ Ahora sí existe en BD
+        
+        // También rellenar datos de entrega si existen
+        if (usuario.direccion) entrega.direccion = usuario.direccion
+        if (usuario.referenciaDireccion) entrega.referencia = usuario.referenciaDireccion
+        if (usuario.codigoPostal) entrega.codigoPostal = usuario.codigoPostal
+        if (usuario.departamento) entrega.departamento = usuario.departamento
+        if (usuario.provincia) entrega.provincia = usuario.provincia
+        if (usuario.distrito) entrega.distrito = usuario.distrito
+        if (usuario.notas) entrega.nota = usuario.notas
+        
+        console.log('✅ Datos del usuario cargados automáticamente')
+        console.log('✅ Formulario rellenado:', datos)
+      } else {
+        console.error('❌ Error en la respuesta:', response.status, response.statusText)
+        const errorText = await response.text()
+        console.error('❌ Detalle del error:', errorText)
+      }
+    } catch (error) {
+      console.error('❌ Error al cargar datos del usuario:', error)
+    }
+  } else {
+    console.log('⚠️ Usuario no autenticado o sin ID')
+  }
+})
+
+// ========================================
+// Datos de ubicación: Provincias y Distritos por Departamento
+// ========================================
+const ubicacionPeru = {
+  'Lima': {
+    provincias: ['Lima', 'Barranca', 'Cajatambo', 'Canta', 'Cañete', 'Huaral', 'Huarochirí', 'Huaura', 'Oyón', 'Yauyos'],
+    distritos: {
+      'Lima': ['Cercado de Lima', 'Miraflores', 'San Isidro', 'Surco', 'La Molina', 'San Borja', 'Barranco', 'San Miguel', 'Jesús María', 'Lince', 'Magdalena', 'Pueblo Libre', 'Breña', 'Rímac', 'Los Olivos', 'Independencia', 'San Martín de Porres', 'Comas', 'Carabayllo', 'Puente Piedra', 'Santa Rosa', 'Ancón', 'San Juan de Lurigancho', 'Lurigancho-Chosica', 'Ate', 'El Agustino', 'Santa Anita', 'La Victoria', 'San Luis', 'Surquillo', 'Chorrillos', 'Villa María del Triunfo', 'Villa El Salvador', 'San Juan de Miraflores', 'Lurín', 'Pachacámac', 'Punta Hermosa', 'Punta Negra', 'San Bartolo', 'Santa María del Mar', 'Pucusana', 'Cieneguilla'],
+      'Barranca': ['Barranca', 'Paramonga', 'Pativilca', 'Supe', 'Supe Puerto'],
+      'Cañete': ['San Vicente de Cañete', 'Asia', 'Calango', 'Cerro Azul', 'Chilca', 'Coayllo', 'Imperial', 'Lunahuaná', 'Mala', 'Nuevo Imperial', 'Pacarán', 'Quilmaná', 'San Antonio', 'San Luis', 'Santa Cruz de Flores', 'Zúñiga']
+    }
+  },
+  'Arequipa': {
+    provincias: ['Arequipa', 'Camaná', 'Caravelí', 'Castilla', 'Caylloma', 'Condesuyos', 'Islay', 'La Unión'],
+    distritos: {
+      'Arequipa': ['Cercado', 'Alto Selva Alegre', 'Cayma', 'Cerro Colorado', 'Characato', 'Chiguata', 'Jacobo Hunter', 'José Luis Bustamante y Rivero', 'La Joya', 'Mariano Melgar', 'Miraflores', 'Mollebaya', 'Paucarpata', 'Pocsi', 'Polobaya', 'Quequeña', 'Sabandia', 'Sachaca', 'San Juan de Siguas', 'San Juan de Tarucani', 'Santa Isabel de Siguas', 'Santa Rita de Siguas', 'Socabaya', 'Tiabaya', 'Uchumayo', 'Vitor', 'Yanahuara', 'Yarabamba', 'Yura'],
+      'Camaná': ['Camaná', 'José María Quimper', 'Mariano Nicolás Valcárcel', 'Mariscal Cáceres', 'Nicolás de Piérola', 'Ocoña', 'Quilca', 'Samuel Pastor']
+    }
+  },
+  'Cusco': {
+    provincias: ['Cusco', 'Acomayo', 'Anta', 'Calca', 'Canas', 'Canchis', 'Chumbivilcas', 'Espinar', 'La Convención', 'Paruro', 'Paucartambo', 'Quispicanchi', 'Urubamba'],
+    distritos: {
+      'Cusco': ['Cusco', 'Ccorca', 'Poroy', 'San Jerónimo', 'San Sebastián', 'Santiago', 'Saylla', 'Wanchaq'],
+      'Urubamba': ['Urubamba', 'Chinchero', 'Huayllabamba', 'Machupicchu', 'Maras', 'Ollantaytambo', 'Yucay']
+    }
+  },
+  'La Libertad': {
+    provincias: ['Trujillo', 'Ascope', 'Bolívar', 'Chepén', 'Julcán', 'Otuzco', 'Pacasmayo', 'Pataz', 'Sánchez Carrión', 'Santiago de Chuco', 'Gran Chimú', 'Virú'],
+    distritos: {
+      'Trujillo': ['Trujillo', 'El Porvenir', 'Florencia de Mora', 'Huanchaco', 'La Esperanza', 'Laredo', 'Moche', 'Poroto', 'Salaverry', 'Simbal', 'Víctor Larco Herrera'],
+      'Ascope': ['Ascope', 'Casa Grande', 'Chicama', 'Chocope', 'Magdalena de Cao', 'Paiján', 'Rázuri', 'Santiago de Cao']
+    }
+  },
+  'Piura': {
+    provincias: ['Piura', 'Ayabaca', 'Huancabamba', 'Morropón', 'Paita', 'Sechura', 'Sullana', 'Talara'],
+    distritos: {
+      'Piura': ['Piura', 'Castilla', 'Catacaos', 'Cura Mori', 'El Tallán', 'La Arena', 'La Unión', 'Las Lomas', 'Tambo Grande'],
+      'Sullana': ['Sullana', 'Bellavista', 'Ignacio Escudero', 'Lancones', 'Marcavelica', 'Miguel Checa', 'Querecotillo', 'Salitral']
+    }
+  }
+}
+
+// Computed: Provincias disponibles según departamento seleccionado
+const provinciasDisponibles = computed(() => {
+  if (!entrega.departamento) return []
+  return ubicacionPeru[entrega.departamento]?.provincias || []
+})
+
+// Computed: Distritos disponibles según provincia seleccionada
+const distritosDisponibles = computed(() => {
+  if (!entrega.departamento || !entrega.provincia) return []
+  return ubicacionPeru[entrega.departamento]?.distritos[entrega.provincia] || []
+})
+
+// Watch: Limpiar provincia cuando cambia departamento
+watch(() => entrega.departamento, () => {
+  entrega.provincia = ''
+  entrega.distrito = ''
+})
+
+// Watch: Limpiar distrito cuando cambia provincia
+watch(() => entrega.provincia, () => {
+  entrega.distrito = ''
+})
 
 function finalizarCompra() {
   // Avanzar al paso de Datos dentro de la misma vista
@@ -585,6 +736,157 @@ function obtenerNombreAutor(autor) {
     if (autor.nombre) return autor.nombre
   }
   return 'Autor desconocido'
+}
+
+// ========================================
+// PROCESAR PAGO Y CREAR ORDEN
+// ========================================
+const procesandoPago = ref(false)
+
+async function procesarPago() {
+  // Validar que todos los datos estén completos
+  if (!datos.correo || !datos.nombre || !datos.telefono) {
+    alert('Por favor completa todos los datos de identificación')
+    step.value = 2
+    return
+  }
+
+  if (!entrega.departamento || !entrega.provincia || !entrega.distrito || !entrega.direccion) {
+    alert('Por favor completa todos los datos de envío')
+    step.value = 3
+    return
+  }
+
+  if (!paymentMethod.value) {
+    alert('Por favor selecciona un método de pago')
+    return
+  }
+
+  // Validar datos de pago según el método
+  if (paymentMethod.value === 'card') {
+    if (!card.number || !card.expiry || !card.cvv || !card.firstName || !card.lastName) {
+      alert('Por favor completa todos los datos de la tarjeta')
+      return
+    }
+  } else if (paymentMethod.value === 'yape') {
+    if (!isYapeComplete.value) {
+      alert('Por favor completa el teléfono y código de aprobación de Yape')
+      return
+    }
+  }
+
+  procesandoPago.value = true
+
+  try {
+    // Preparar items del carrito
+    const items = carritoStore.items.map(item => ({
+      libroId: item.id,
+      cantidad: item.cantidad,
+      precioUnitario: item.precio
+    }))
+
+    // Preparar datos de la orden
+    const ordenData = {
+      // Items del carrito
+      items: items,
+      
+      // Datos de pago
+      metodoPago: paymentMethod.value === 'card' ? 'tarjeta' : 'yape',
+      
+      // Datos de envío
+      direccionEnvio: entrega.direccion,
+      ciudadEnvio: entrega.distrito,
+      codigoPostalEnvio: entrega.codigoPostal || '',
+      telefonoContacto: datos.telefono,
+      notas: entrega.nota || '',
+      
+      // Datos adicionales de ubicación
+      departamento: entrega.departamento,
+      provincia: entrega.provincia,
+      distrito: entrega.distrito,
+      referencia: entrega.referencia || ''
+    }
+
+    console.log('📦 Enviando orden:', ordenData)
+
+    // Enviar al backend
+    const response = await fetch('http://localhost:8080/api/ordenes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify(ordenData)
+    })
+
+    const result = await response.json()
+
+    if (response.ok && result.success) {
+      console.log('✅ Orden creada exitosamente:', result)
+      
+      // Guardar datos del checkout en el perfil del usuario
+      await guardarDatosEnPerfil()
+      
+      // Limpiar carrito en el store
+      carritoStore.vaciarCarrito()
+      
+      // Mostrar mensaje de éxito
+      alert(`¡Compra exitosa! 🎉\n\nNúmero de orden: ${result.ordenId}\n\nGracias por tu compra. Serás redirigido a tus pedidos.`)
+      
+      // Redirigir a la página de pedidos para ver el estado
+      window.location.href = '/pedidos'
+      
+    } else {
+      console.error('❌ Error al crear orden:', result)
+      alert(`Error al procesar el pago: ${result.message || 'Intenta nuevamente'}`)
+    }
+
+  } catch (error) {
+    console.error('❌ Error al procesar pago:', error)
+    alert('Error de conexión. Por favor intenta nuevamente.')
+  } finally {
+    procesandoPago.value = false
+  }
+}
+
+// Guardar datos del checkout en el perfil del usuario
+async function guardarDatosEnPerfil() {
+  try {
+    const perfilData = {
+      telefono: datos.telefono,
+      documento: datos.documento || '',  // ← Agregar documento
+      direccion: entrega.direccion,
+      departamento: entrega.departamento,
+      provincia: entrega.provincia,
+      distrito: entrega.distrito,
+      codigoPostal: entrega.codigoPostal || '',
+      notas: entrega.referencia || ''
+    }
+
+    console.log('💾 Guardando datos en perfil:', perfilData)
+
+    const response = await fetch('http://localhost:8080/api/usuarios/perfil', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify(perfilData)
+    })
+
+    if (response.ok) {
+      console.log('✅ Datos guardados en perfil exitosamente')
+      
+      // Actualizar el usuario en el store
+      const usuarioActualizado = await response.json()
+      authStore.updateUser(usuarioActualizado)
+    } else {
+      console.warn('⚠️ No se pudieron guardar los datos en el perfil')
+    }
+  } catch (error) {
+    console.error('❌ Error al guardar datos en perfil:', error)
+    // No mostramos error al usuario porque la orden ya se creó exitosamente
+  }
 }
 </script>
 

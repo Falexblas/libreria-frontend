@@ -92,6 +92,11 @@ export const useCarritoStore = defineStore('carrito', () => {
     guardarEnLocalStorage()
   }
 
+  function vaciarCarrito() {
+    items.value = []
+    guardarEnLocalStorage()
+  }
+
   function abrirCarrito() {
     mostrarCarrito.value = true
   }
@@ -161,6 +166,7 @@ export const useCarritoStore = defineStore('carrito', () => {
     disminuirCantidad,
     actualizarCantidad,
     limpiarCarrito,
+    vaciarCarrito,
     abrirCarrito,
     cerrarCarrito,
     toggleCarrito,

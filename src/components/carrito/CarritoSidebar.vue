@@ -164,7 +164,13 @@ function eliminarItem(itemId) {
 }
 
 function procederCompra() {
-  router.push('/checkout')
+  // Primero cerrar el carrito
+  carritoStore.cerrarCarrito()
+  
+  // Pequeño delay para que la animación de cierre se vea suave
+  setTimeout(() => {
+    router.push('/checkout')
+  }, 300) // 300ms = duración de la animación de cierre
 }
 
 function obtenerNombreAutor(autor) {

@@ -144,8 +144,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const email = ref("")
 const password = ref("")
@@ -186,19 +188,22 @@ const handleSubmit = async () => {
     if (response.ok) {
       const data = await response.json()
       
-      if (data && data.token) {
+      if (data && data.token && data.user) {
         success.value = "✓ Login exitoso"
         
-        // IMPORTANTE: En producción, NO uses localStorage en Claude.ai
-        // Esta es una versión para tu proyecto local
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem("token", data.token)
-          localStorage.setItem("usuario", JSON.stringify(data))
-        }
+        // Guardar en el store de Pinia (que también guarda en localStorage)
+        authStore.login(data.user, data.token)
         
-        // Redirigir después de un breve delay
+        // Redirigir según el rol del usuario
         setTimeout(() => {
-          router.push("/")
+          // Verificar si el usuario es administrador
+          const isAdmin = data.user.rol?.nombre === 'ADMIN' || data.user.rol === 'ADMIN'
+          
+          if (isAdmin) {
+            router.push("/admin")
+          } else {
+            router.push("/")
+          }
         }, 1500)
       } else {
         error.value = "Usuario o contraseña incorrectos"

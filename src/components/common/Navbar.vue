@@ -92,14 +92,21 @@
 
             <!-- Iconos de usuario -->
             <div v-if="!checkoutMode && authStore.isAuthenticated" class="dropdown d-md-block">
-              <a href="#" class="btn-icon" data-bs-toggle="dropdown">
+              <a href="#" class="btn-user-dropdown d-flex align-items-center gap-2" data-bs-toggle="dropdown">
                 <i class="bi bi-person-circle"></i>
+                <span class="user-name d-none d-lg-inline">{{ authStore.nombreUsuario }}</span>
+                <i class="bi bi-chevron-down d-none d-lg-inline" style="font-size: 0.75rem;"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><router-link to="/perfil" class="dropdown-item">Mi Perfil</router-link></li>
-                <li><router-link to="/pedidos" class="dropdown-item">Mis Pedidos</router-link></li>
+                <li class="dropdown-header">
+                  <div class="fw-bold">{{ authStore.nombreUsuario }}</div>
+                  <div class="text-muted small">{{ authStore.user?.email }}</div>
+                </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a href="#" @click="cerrarSesion" class="dropdown-item">Cerrar Sesión</a></li>
+                <li><router-link to="/perfil" class="dropdown-item"><i class="bi bi-person me-2"></i>Mi Perfil</router-link></li>
+                <li><router-link to="/pedidos" class="dropdown-item"><i class="bi bi-box-seam me-2"></i>Mis Pedidos</router-link></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a href="#" @click="cerrarSesion" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
               </ul>
             </div>
             <router-link v-else to="/login" v-if="!checkoutMode" class="btn-icon d-md-block">
@@ -713,10 +720,61 @@ function cerrarSesion() {
 }
 
 /* --- Dropdown de Usuario --- */
+.btn-user-dropdown {
+  background: none;
+  border: none;
+  color: #2c3e50;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-user-dropdown:hover {
+  background-color: #f8f9fa;
+  color: #2c3e50;
+}
+
+.btn-user-dropdown .user-name {
+  font-weight: 600;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-user-dropdown i.bi-person-circle {
+  font-size: 1.5rem;
+}
+
 .dropdown-menu {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   border: 1px solid #e9ecef;
+  min-width: 250px;
+}
+
+.dropdown-header {
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  padding-left: 1.25rem;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: #fff5f5;
+  color: #dc3545 !important;
 }
 
 /* --- Transiciones --- */

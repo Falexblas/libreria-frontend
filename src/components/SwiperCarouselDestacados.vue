@@ -10,8 +10,10 @@ import './SwiperCarousel.css'
 
 const librosStore = useLibrosStore()
 
-// Usar todos los libros del store
-const libros = computed(() => librosStore.todosLosLibros)
+// Filtrar solo libros destacados
+const libros = computed(() => {
+  return librosStore.todosLosLibros.filter(libro => libro.destacado === true)
+})
 const cargando = computed(() => librosStore.cargando)
 const error = computed(() => librosStore.error)
 

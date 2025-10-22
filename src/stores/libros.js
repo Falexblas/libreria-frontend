@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { libroService } from '@/services/libroService'
 
 export const useLibrosStore = defineStore('libros', () => {
   // Cache de todos los libros
@@ -34,13 +35,9 @@ export const useLibrosStore = defineStore('libros', () => {
     
     try {
       console.log('📡 Cargando TODOS los libros desde el backend...')
-      const response = await fetch('http://localhost:8080/api/libros')
+      const response = await libroService.obtenerTodos()
       
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`)
-      }
-      
-      const data = await response.json()
+      const data = response.data
       console.log(`✅ ${data.length} libros cargados y almacenados en caché`)
       
       // Filtramos solo elementos válidos

@@ -21,10 +21,10 @@
       </div>
 
       <h2 class="h3 fw-semibold text-primary">
-        ¡Regístrate!
+        ¡Regístrate en 30 segundos!
       </h2>
       <p class="text-muted small mt-2">
-        Completa el formulario para crear tu cuenta
+        Solo necesitamos lo básico. El resto lo completas después 😊
       </p>
     </div>
 
@@ -36,35 +36,33 @@
       {{ success }}
     </div>
 
-    <!-- Nombre y Apellido -->
-    <div class="row mb-3">
-      <div class="col-12 col-md-6">
-        <label class="form-label fw-medium">
-          Nombre <span class="text-danger">*</span>
-        </label>
-        <input
-          v-model="form.nombre"
-          placeholder="Tu nombre"
-          type="text"
-          required
-          :disabled="loading"
-          class="form-control form-control-lg"
-        />
-      </div>
+    <!-- Nombre -->
+    <div class="mb-3">
+      <label class="form-label fw-medium">
+        Nombre <span class="text-danger">*</span>
+      </label>
+      <input
+        v-model="form.nombre"
+        placeholder="Tu nombre"
+        type="text"
+        required
+        :disabled="loading"
+        class="form-control form-control-lg"
+      />
+    </div>
 
-      <div class="col-12 col-md-6">
-        <label class="form-label fw-medium">
-          Apellido <span class="text-danger">*</span>
-        </label>
-        <input
-          v-model="form.apellido"
-          placeholder="Tu apellido"
-          type="text"
-          required
-          :disabled="loading"
-          class="form-control form-control-lg"
-        />
-      </div>
+    <!-- Apellido (Opcional) -->
+    <div class="mb-3">
+      <label class="form-label fw-medium">
+        Apellido <span class="text-muted small">(opcional)</span>
+      </label>
+      <input
+        v-model="form.apellido"
+        placeholder="Tu apellido"
+        type="text"
+        :disabled="loading"
+        class="form-control form-control-lg"
+      />
     </div>
 
     <!-- Correo -->
@@ -132,61 +130,14 @@
       <small class="d-block text-muted mt-1">La contraseña debe tener al menos 6 caracteres</small>
     </div>
 
-    <!-- Teléfono y Ciudad -->
-    <div class="row mb-3">
-      <div class="col-12 col-md-6">
-        <label class="form-label fw-medium">
-          Teléfono
-        </label>
-        <input
-          v-model="form.telefono"
-          placeholder="999 999 999"
-          type="tel"
-          :disabled="loading"
-          class="form-control form-control-lg"
-        />
+    <!-- Nota informativa -->
+    <div class="alert alert-info d-flex align-items-start" role="alert">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-2 mt-1 flex-shrink-0" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </svg>
+      <div class="small">
+        <strong>¡Listo!</strong> Podrás completar tu teléfono, dirección y demás datos en tu perfil o durante tu primera compra.
       </div>
-
-      <div class="col-12 col-md-6">
-        <label class="form-label fw-medium">
-          Ciudad
-        </label>
-        <input
-          v-model="form.ciudad"
-          placeholder="Tu ciudad"
-          type="text"
-          :disabled="loading"
-          class="form-control form-control-lg"
-        />
-      </div>
-    </div>
-
-    <!-- Dirección -->
-    <div class="mb-3">
-      <label class="form-label fw-medium">
-        Dirección
-      </label>
-      <input
-        v-model="form.direccion"
-        placeholder="Calle, número, distrito"
-        type="text"
-        :disabled="loading"
-        class="form-control form-control-lg"
-      />
-    </div>
-
-    <!-- Código Postal -->
-    <div class="mb-3">
-      <label class="form-label fw-medium">
-        Código Postal
-      </label>
-      <input
-        v-model="form.codigoPostal"
-        placeholder="15001"
-        type="text"
-        :disabled="loading"
-        class="form-control form-control-lg"
-      />
     </div>
 
     <!-- Botón de envío -->
@@ -220,14 +171,9 @@ const router = useRouter()
 
 const form = reactive({
   nombre: "",
-  apellido: "",
+  apellido: "",  // Opcional
   email: "",
-  password: "",
-  telefono: "",
-  direccion: "",
-  ciudad: "",
-  codigoPostal: "",
-  rol: { id: 1, nombre: "USER" }
+  password: ""
 })
 
 const showPassword = ref(false)
@@ -236,7 +182,8 @@ const success = ref("")
 const loading = ref(false)
 
 const validateForm = () => {
-  if (!form.nombre || !form.apellido || !form.email || !form.password) {
+  // Solo validar campos OBLIGATORIOS
+  if (!form.nombre || !form.email || !form.password) {
     error.value = "Por favor completa todos los campos obligatorios"
     return false
   }

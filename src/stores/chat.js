@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { chatService } from '@/services/chatService'
 
 export const useChatStore = defineStore('chat', () => {
   // Estado
@@ -41,9 +41,7 @@ export const useChatStore = defineStore('chat', () => {
     error.value = null
 
     try {
-      const response = await api.post('/chat/preguntar', {
-        mensaje: pregunta
-      })
+      const response = await chatService.enviarPregunta(pregunta)
 
       // Agregar respuesta del bot
       agregarMensajeBot(

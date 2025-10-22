@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { categoriaService } from '@/services/categoriaService'
+
 
 export const useCategoriasStore = defineStore('categorias', () => {
   const categorias = ref([])
