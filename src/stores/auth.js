@@ -1,5 +1,12 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { useFavoritosStore } from './favoritos'
+
+// Función para capitalizar texto (Primera letra mayúscula, resto minúscula)
+function capitalizar(texto) {
+  if (!texto) return ''
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
@@ -8,10 +15,25 @@ export const useAuthStore = defineStore('auth', () => {
   // Computed para verificar autenticación
   const isAuthenticated = computed(() => !!token.value)
   
-  // Computed para obtener el nombre del usuario
+  // Computed para obtener el nombre completo del usuario
   const nombreUsuario = computed(() => {
     if (!user.value) return ''
-    return user.value.nombre || user.value.username || user.value.email?.split('@')[0] || 'Usuario'
+    
+    // Construir nombre completo con nombre y apellido capitalizados
+    const nombre = capitalizar(user.value.nombre || '')
+    const apellido = capitalizar(user.value.apellido || '')
+    
+    if (nombre && apellido) {
+      return `${nombre} ${apellido}`
+    } else if (nombre) {
+      return nombre
+    } else if (user.value.username) {
+      return capitalizar(user.value.username)
+    } else if (user.value.email) {
+      return capitalizar(user.value.email.split('@')[0])
+    }
+    
+    return 'Usuario'
   })
 
   // Inicializar desde localStorage al cargar
@@ -40,6 +62,10 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('usuario', JSON.stringify(userData))
     
     console.log('✅ Usuario autenticado:', userData)
+    
+    // Cargar favoritos después del login
+    const favoritosStore = useFavoritosStore()
+    favoritosStore.cargarFavoritos()
   }
 
   function logout() {
@@ -49,6 +75,10 @@ export const useAuthStore = defineStore('auth', () => {
     // Limpiar localStorage
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
+    
+    // Limpiar favoritos
+    const favoritosStore = useFavoritosStore()
+    favoritosStore.favoritos = []
     
     console.log('🚪 Sesión cerrada')
   }

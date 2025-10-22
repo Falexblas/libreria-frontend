@@ -214,19 +214,20 @@ import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 
+// Inicializar con datos del authStore inmediatamente
 const perfil = reactive({
-  nombre: '',
-  apellido: '',
-  email: '',
-  telefono: '',
-  documento: '',
-  direccion: '',
-  referenciaDireccion: '',
-  departamento: '',
-  provincia: '',
-  distrito: '',
-  codigoPostal: '',
-  notas: ''
+  nombre: authStore.user?.nombre || '',
+  apellido: authStore.user?.apellido || '',
+  email: authStore.user?.email || '',
+  telefono: authStore.user?.telefono || '',
+  documento: authStore.user?.documento || '',
+  direccion: authStore.user?.direccion || '',
+  referenciaDireccion: authStore.user?.referenciaDireccion || '',
+  departamento: authStore.user?.departamento || '',
+  provincia: authStore.user?.provincia || '',
+  distrito: authStore.user?.distrito || '',
+  codigoPostal: authStore.user?.codigoPostal || '',
+  notas: authStore.user?.notas || ''
 })
 
 const passwordForm = reactive({
@@ -391,9 +392,13 @@ const cambiarPassword = async () => {
   }
 }
 
-// Cargar datos al montar
+// Cargar datos al montar (en segundo plano para sincronizar con el backend)
 onMounted(() => {
-  cargarDatos()
+  // Solo recargar si el usuario ya tiene datos básicos
+  // Esto evita el parpadeo de campos vacíos
+  if (authStore.user?.id) {
+    cargarDatos()
+  }
 })
 </script>
 

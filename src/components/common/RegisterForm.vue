@@ -1,30 +1,12 @@
 <template>
   <form @submit.prevent="handleSubmit" class="px-3">
     <!-- Encabezado -->
-    <div class="text-center mb-5">
-      <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white p-3 rounded-circle mb-3" style="width: 60px; height: 60px;">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-          />
-        </svg>
-      </div>
-
-      <h2 class="h3 fw-semibold text-primary">
-        ¡Regístrate en 30 segundos!
+    <div class="text-center mb-4">
+      <h2 class="h4 fw-bold text-primary mb-2">
+        Crear Cuenta
       </h2>
-      <p class="text-muted small mt-2">
-        Solo necesitamos lo básico. El resto lo completas después 😊
+      <p class="text-muted small">
+        Completa los siguientes datos para registrarte
       </p>
     </div>
 
@@ -36,33 +18,33 @@
       {{ success }}
     </div>
 
-    <!-- Nombre -->
-    <div class="mb-3">
-      <label class="form-label fw-medium">
-        Nombre <span class="text-danger">*</span>
-      </label>
-      <input
-        v-model="form.nombre"
-        placeholder="Tu nombre"
-        type="text"
-        required
-        :disabled="loading"
-        class="form-control form-control-lg"
-      />
-    </div>
-
-    <!-- Apellido (Opcional) -->
-    <div class="mb-3">
-      <label class="form-label fw-medium">
-        Apellido <span class="text-muted small">(opcional)</span>
-      </label>
-      <input
-        v-model="form.apellido"
-        placeholder="Tu apellido"
-        type="text"
-        :disabled="loading"
-        class="form-control form-control-lg"
-      />
+    <!-- Nombre y Apellido en una fila -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="form-label fw-medium">
+          Nombre <span class="text-danger">*</span>
+        </label>
+        <input
+          v-model="form.nombre"
+          placeholder="Tu nombre"
+          type="text"
+          required
+          :disabled="loading"
+          class="form-control"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-medium">
+          Apellido
+        </label>
+        <input
+          v-model="form.apellido"
+          placeholder="Tu apellido"
+          type="text"
+          :disabled="loading"
+          class="form-control"
+        />
+      </div>
     </div>
 
     <!-- Correo -->
@@ -76,7 +58,7 @@
         type="email"
         required
         :disabled="loading"
-        class="form-control form-control-lg"
+        class="form-control"
       />
     </div>
 
@@ -92,7 +74,7 @@
           placeholder="Mínimo 6 caracteres"
           required
           :disabled="loading"
-          class="form-control form-control-lg"
+          class="form-control"
         />
         <button
           type="button"
@@ -127,23 +109,12 @@
           </svg>
         </button>
       </div>
-      <small class="d-block text-muted mt-1">La contraseña debe tener al menos 6 caracteres</small>
-    </div>
-
-    <!-- Nota informativa -->
-    <div class="alert alert-info d-flex align-items-start" role="alert">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-2 mt-1 flex-shrink-0" viewBox="0 0 16 16">
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-      </svg>
-      <div class="small">
-        <strong>¡Listo!</strong> Podrás completar tu teléfono, dirección y demás datos en tu perfil o durante tu primera compra.
-      </div>
     </div>
 
     <!-- Botón de envío -->
     <button
       type="submit"
-      class="w-100 btn btn-primary btn-lg mt-3"
+      class="w-100 btn btn-primary btn-lg mt-4"
       :disabled="loading"
     >
       <span v-if="!loading">Crear cuenta</span>
@@ -168,6 +139,12 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// Función para capitalizar texto (Primera letra mayúscula, resto minúscula)
+const capitalizar = (texto) => {
+  if (!texto) return ''
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+}
 
 const form = reactive({
   nombre: "",
@@ -213,12 +190,20 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
+    // Capitalizar nombre y apellido antes de enviar
+    const datosRegistro = {
+      nombre: capitalizar(form.nombre.trim()),
+      apellido: form.apellido ? capitalizar(form.apellido.trim()) : '',
+      email: form.email.trim().toLowerCase(),
+      password: form.password
+    }
+
     const response = await fetch(
       "http://localhost:8080/api/auth/register",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(datosRegistro),
       }
     )
 

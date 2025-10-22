@@ -98,34 +98,92 @@
             <div class="card-header">
               <h5 class="mb-0">Órdenes Recientes</h5>
             </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-hover">
+            <div class="card-body p-0">
+              <div class="table-responsive" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+                <table class="table table-hover table-compact">
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Cliente</th>
-                      <th>Fecha</th>
-                      <th>Total</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
+                      <th style="width: 60px;">ID</th>
+                      <th style="width: 150px;">Cliente</th>
+                      <th style="width: 100px;">Fecha</th>
+                      <th style="width: 100px;">Total</th>
+                      <th style="width: 120px;">Estado</th>
+                      <th style="width: 100px;">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="orden in ordenesRecientes" :key="orden.id">
-                      <td>#{{ orden.id }}</td>
-                      <td>{{ orden.usuario?.nombre }} {{ orden.usuario?.apellido }}</td>
-                      <td>{{ formatearFecha(orden.fechaPedido) }}</td>
-                      <td class="fw-bold">S/{{ orden.total.toFixed(2) }}</td>
+                      <td class="text-muted">#{{ orden.id }}</td>
+                      <td class="text-truncate" style="max-width: 150px;">
+                        {{ orden.usuario?.nombre }} {{ orden.usuario?.apellido }}
+                      </td>
+                      <td class="small">{{ formatearFechaCorta(orden.fechaPedido) }}</td>
+                      <td class="fw-bold text-primary">S/{{ orden.total.toFixed(2) }}</td>
                       <td>
                         <span :class="['badge', getBadgeClass(orden.estado)]">
-                          {{ orden.estado }}
+                          {{ getEstadoTexto(orden.estado) }}
                         </span>
                       </td>
                       <td>
-                        <button class="btn btn-sm btn-outline-primary">
-                          <i class="fas fa-eye"></i>
-                        </button>
+                        <div class="d-flex gap-1">
+                          <!-- Dropdown para cambiar estado -->
+                          <div class="dropdown">
+                            <button 
+                              class="btn btn-sm btn-outline-secondary" 
+                              type="button" 
+                              :id="'dropdown-' + orden.id"
+                              data-bs-toggle="dropdown" 
+                              aria-expanded="false"
+                              title="Cambiar estado"
+                            >
+                              <i class="fas fa-edit"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" :aria-labelledby="'dropdown-' + orden.id">
+                              <li>
+                                <a 
+                                  class="dropdown-item" 
+                                  href="#" 
+                                  @click.prevent="cambiarEstado(orden.id, 'pendiente')"
+                                  :class="{ active: orden.estado === 'pendiente' }"
+                                >
+                                  <span class="badge bg-warning text-dark me-2">●</span>
+                                  Pendiente
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  class="dropdown-item" 
+                                  href="#" 
+                                  @click.prevent="cambiarEstado(orden.id, 'enviando')"
+                                  :class="{ active: orden.estado === 'enviando' }"
+                                >
+                                  <span class="badge bg-info text-white me-2">●</span>
+                                  En camino
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  class="dropdown-item" 
+                                  href="#" 
+                                  @click.prevent="cambiarEstado(orden.id, 'entregado')"
+                                  :class="{ active: orden.estado === 'entregado' }"
+                                >
+                                  <span class="badge bg-success text-white me-2">●</span>
+                                  Entregado
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                          
+                          <!-- Botón ver detalles -->
+                          <button 
+                            class="btn btn-sm btn-outline-primary" 
+                            title="Ver detalles"
+                            @click="verDetalleOrden(orden.id)"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -139,36 +197,891 @@
         <div v-if="currentView === 'libros'" class="libros-view">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h4>Gestión de Libros</h4>
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" @click="abrirModalLibro()">
               <i class="fas fa-plus me-2"></i>
               Agregar Libro
             </button>
           </div>
-          <p class="text-muted">Aquí podrás gestionar todos los libros del catálogo</p>
+
+          <!-- Tabla de Libros -->
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+                <table class="table table-hover table-compact">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">ID</th>
+                      <th style="width: 80px;">Portada</th>
+                      <th style="width: 250px;">Título</th>
+                      <th style="width: 150px;">Autor</th>
+                      <th style="width: 100px;">Precio</th>
+                      <th style="width: 80px;">Stock</th>
+                      <th style="width: 100px;">Estado</th>
+                      <th style="width: 120px;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="cargandoLibros" class="text-center">
+                      <td colspan="8" class="py-5">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Cargando...</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-else-if="libros.length === 0">
+                      <td colspan="8" class="text-center text-muted py-4">
+                        <i class="fas fa-book-open me-2"></i>
+                        No hay libros registrados
+                      </td>
+                    </tr>
+                    <tr v-else v-for="libro in libros" :key="libro.id">
+                      <td class="text-muted">#{{ libro.id }}</td>
+                      <td>
+                        <img 
+                          :src="libro.portadaUrl || 'https://via.placeholder.com/50x70?text=Sin+Imagen'" 
+                          alt="Portada"
+                          class="libro-portada-mini"
+                        />
+                      </td>
+                      <td class="text-truncate" style="max-width: 250px;">{{ libro.titulo }}</td>
+                      <td>{{ libro.autor?.nombre }} {{ libro.autor?.apellido }}</td>
+                      <td class="fw-bold text-primary">S/{{ libro.precio.toFixed(2) }}</td>
+                      <td>
+                        <span :class="['badge', libro.stock > 10 ? 'bg-success' : libro.stock > 0 ? 'bg-warning text-dark' : 'bg-danger']">
+                          {{ libro.stock }}
+                        </span>
+                      </td>
+                      <td>
+                        <span :class="['badge', libro.activo ? 'bg-success' : 'bg-secondary']">
+                          {{ libro.activo ? 'Activo' : 'Inactivo' }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="d-flex gap-1">
+                          <button 
+                            class="btn btn-sm btn-outline-primary" 
+                            title="Editar"
+                            @click="abrirModalLibro(libro)"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            title="Eliminar"
+                            @click="eliminarLibro(libro.id)"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Gestión de Órdenes -->
         <div v-if="currentView === 'ordenes'" class="ordenes-view">
-          <h4 class="mb-4">Gestión de Órdenes</h4>
-          <p class="text-muted">Aquí podrás gestionar todas las órdenes</p>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4>Gestión de Órdenes</h4>
+            <div class="d-flex gap-2">
+              <!-- Filtros por estado -->
+              <select class="form-select form-select-sm" v-model="filtroEstadoOrden" style="width: auto;">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="enviando">En camino</option>
+                <option value="entregado">Entregado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tabla de Órdenes -->
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+                <table class="table table-hover table-compact">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">ID</th>
+                      <th style="width: 150px;">Cliente</th>
+                      <th style="width: 150px;">Email</th>
+                      <th style="width: 100px;">Fecha</th>
+                      <th style="width: 100px;">Total</th>
+                      <th style="width: 120px;">Estado</th>
+                      <th style="width: 200px;">Dirección</th>
+                      <th style="width: 120px;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="cargandoTodasOrdenes" class="text-center">
+                      <td colspan="8" class="py-5">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Cargando...</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-else-if="ordenesFiltradas.length === 0">
+                      <td colspan="8" class="text-center text-muted py-4">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        No hay órdenes {{ filtroEstadoOrden ? `con estado "${filtroEstadoOrden}"` : 'registradas' }}
+                      </td>
+                    </tr>
+                    <tr v-else v-for="orden in ordenesFiltradas" :key="orden.id">
+                      <td class="text-muted">#{{ orden.id }}</td>
+                      <td class="text-truncate" style="max-width: 150px;">
+                        {{ orden.usuario?.nombre }} {{ orden.usuario?.apellido }}
+                      </td>
+                      <td class="text-truncate small" style="max-width: 150px;">
+                        {{ orden.usuario?.email }}
+                      </td>
+                      <td class="small">{{ formatearFechaCorta(orden.fechaPedido) }}</td>
+                      <td class="fw-bold text-primary">S/{{ orden.total.toFixed(2) }}</td>
+                      <td>
+                        <span :class="['badge', getBadgeClass(orden.estado)]">
+                          {{ getEstadoTexto(orden.estado) }}
+                        </span>
+                      </td>
+                      <td class="text-truncate small" style="max-width: 200px;">
+                        {{ orden.direccionEnvio }}
+                      </td>
+                      <td>
+                        <div class="d-flex gap-1">
+                          <!-- Dropdown para cambiar estado -->
+                          <div class="dropdown">
+                            <button 
+                              class="btn btn-sm btn-outline-secondary" 
+                              type="button" 
+                              :id="'dropdown-orden-' + orden.id"
+                              data-bs-toggle="dropdown" 
+                              aria-expanded="false"
+                              title="Cambiar estado"
+                            >
+                              <i class="fas fa-edit"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" :aria-labelledby="'dropdown-orden-' + orden.id">
+                              <li>
+                                <a 
+                                  class="dropdown-item" 
+                                  href="#" 
+                                  @click.prevent="cambiarEstado(orden.id, 'pendiente')"
+                                  :class="{ active: orden.estado === 'pendiente' }"
+                                >
+                                  <span class="badge bg-warning text-dark me-2">●</span>
+                                  Pendiente
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  class="dropdown-item" 
+                                  href="#" 
+                                  @click.prevent="cambiarEstado(orden.id, 'enviando')"
+                                  :class="{ active: orden.estado === 'enviando' }"
+                                >
+                                  <span class="badge bg-info text-white me-2">●</span>
+                                  En camino
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  class="dropdown-item" 
+                                  href="#" 
+                                  @click.prevent="cambiarEstado(orden.id, 'entregado')"
+                                  :class="{ active: orden.estado === 'entregado' }"
+                                >
+                                  <span class="badge bg-success text-white me-2">●</span>
+                                  Entregado
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                          
+                          <!-- Botón ver detalles -->
+                          <button 
+                            class="btn btn-sm btn-outline-primary" 
+                            title="Ver detalles"
+                            @click="verDetalleOrden(orden.id)"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Gestión de Usuarios -->
         <div v-if="currentView === 'usuarios'" class="usuarios-view">
-          <h4 class="mb-4">Gestión de Usuarios</h4>
-          <p class="text-muted">Aquí podrás gestionar todos los usuarios</p>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4>Gestión de Usuarios</h4>
+            <button class="btn btn-primary" @click="abrirModalUsuario()">
+              <i class="fas fa-user-plus me-2"></i>
+              Agregar Usuario
+            </button>
+          </div>
+
+          <!-- Tabla de Usuarios -->
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+                <table class="table table-hover table-compact">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">ID</th>
+                      <th style="width: 150px;">Nombre</th>
+                      <th style="width: 150px;">Apellido</th>
+                      <th style="width: 200px;">Email</th>
+                      <th style="width: 100px;">Rol</th>
+                      <th style="width: 100px;">Estado</th>
+                      <th style="width: 120px;">Fecha Registro</th>
+                      <th style="width: 120px;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="cargandoUsuarios" class="text-center">
+                      <td colspan="8" class="py-5">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Cargando...</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-else-if="usuarios.length === 0">
+                      <td colspan="8" class="text-center text-muted py-4">
+                        <i class="fas fa-users me-2"></i>
+                        No hay usuarios registrados
+                      </td>
+                    </tr>
+                    <tr v-else v-for="usuario in usuarios" :key="usuario.id">
+                      <td class="text-muted">#{{ usuario.id }}</td>
+                      <td>{{ usuario.nombre }}</td>
+                      <td>{{ usuario.apellido }}</td>
+                      <td class="text-truncate" style="max-width: 200px;">{{ usuario.email }}</td>
+                      <td>
+                        <span :class="['badge', usuario.rol?.nombre === 'ADMIN' || usuario.rol === 'ADMIN' ? 'bg-danger' : 'bg-primary']">
+                          {{ usuario.rol?.nombre || usuario.rol || 'USER' }}
+                        </span>
+                      </td>
+                      <td>
+                        <span :class="['badge', usuario.activo ? 'bg-success' : 'bg-secondary']">
+                          {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+                        </span>
+                      </td>
+                      <td class="small">{{ formatearFechaCorta(usuario.fechaRegistro) }}</td>
+                      <td>
+                        <div class="d-flex gap-1">
+                          <button 
+                            class="btn btn-sm btn-outline-primary" 
+                            title="Editar"
+                            @click="abrirModalUsuario(usuario)"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            title="Eliminar"
+                            @click="eliminarUsuario(usuario.id)"
+                            :disabled="usuario.id === authStore.user?.id"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Reportes -->
         <div v-if="currentView === 'reportes'" class="reportes-view">
           <h4 class="mb-4">Reportes y Estadísticas</h4>
-          <p class="text-muted">Aquí podrás ver reportes detallados</p>
+
+          <!-- Resumen de Estadísticas -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                  <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>S/{{ reportes.ventasTotales?.toFixed(2) || '0.00' }}</h3>
+                  <p>Ventas Totales</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                  <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>{{ reportes.totalOrdenes || 0 }}</h3>
+                  <p>Órdenes Totales</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                  <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>{{ reportes.totalLibros || 0 }}</h3>
+                  <p>Libros en Catálogo</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>{{ reportes.totalUsuarios || 0 }}</h3>
+                  <p>Usuarios Registrados</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráficos -->
+          <div class="row g-4">
+            <!-- Gráfico de Ventas por Mes -->
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Ventas por Mes
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="ventasPorMesChart" height="100"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gráfico de Estado de Órdenes -->
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Estado de Órdenes
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="estadoOrdenesChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top 5 Libros Más Vendidos -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-trophy me-2"></i>
+                    Top 5 Libros Más Vendidos
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="topLibrosChart" height="150"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categorías Más Populares -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-tags me-2"></i>
+                    Categorías Más Populares
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="categoriasChart" height="150"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Configuración -->
         <div v-if="currentView === 'configuracion'" class="configuracion-view">
-          <h4 class="mb-4">Configuración</h4>
-          <p class="text-muted">Aquí podrás configurar el sistema</p>
+          <h4 class="mb-4">Configuración del Sistema</h4>
+
+          <div class="row g-4">
+            <!-- Notificaciones -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-bell me-2"></i>
+                    Notificaciones
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" v-model="configuracion.notifNuevaOrden" id="notifNuevaOrden">
+                    <label class="form-check-label" for="notifNuevaOrden">
+                      Notificar nuevas órdenes
+                    </label>
+                  </div>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" v-model="configuracion.notifStockBajo" id="notifStockBajo">
+                    <label class="form-check-label" for="notifStockBajo">
+                      Alertar stock bajo (menos de 10 unidades)
+                    </label>
+                  </div>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" v-model="configuracion.notifNuevoUsuario" id="notifNuevoUsuario">
+                    <label class="form-check-label" for="notifNuevoUsuario">
+                      Notificar nuevos usuarios registrados
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cambiar Contraseña -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-lock me-2"></i>
+                    Cambiar Contraseña
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Contraseña Actual</label>
+                    <input type="password" class="form-control" v-model="cambioPassword.actual" placeholder="••••••">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Nueva Contraseña</label>
+                    <input type="password" class="form-control" v-model="cambioPassword.nueva" placeholder="••••••" minlength="6">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Confirmar Nueva Contraseña</label>
+                    <input type="password" class="form-control" v-model="cambioPassword.confirmar" placeholder="••••••">
+                  </div>
+                  <button 
+                    class="btn btn-primary w-100" 
+                    @click="cambiarPassword"
+                    :disabled="!cambioPassword.actual || !cambioPassword.nueva || cambioPassword.nueva !== cambioPassword.confirmar"
+                  >
+                    <i class="fas fa-key me-2"></i>
+                    Cambiar Contraseña
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalle de Orden -->
+    <div v-if="mostrarModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-receipt me-2"></i>
+              Detalle de Orden #{{ ordenSeleccionada?.id }}
+            </h5>
+            <button type="button" class="btn-close" @click="cerrarModal"></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="cargandoDetalle" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+            <div v-else-if="ordenSeleccionada">
+              <!-- Información del Cliente -->
+              <div class="mb-4">
+                <h6 class="text-muted mb-3">Información del Cliente</h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <strong>Nombre:</strong> {{ ordenSeleccionada.usuario?.nombre }} {{ ordenSeleccionada.usuario?.apellido }}
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Email:</strong> {{ ordenSeleccionada.usuario?.email }}
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Teléfono:</strong> {{ ordenSeleccionada.telefonoContacto || 'N/A' }}
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Fecha:</strong> {{ formatearFecha(ordenSeleccionada.fechaPedido) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Información de Envío -->
+              <div class="mb-4">
+                <h6 class="text-muted mb-3">Información de Envío</h6>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <strong>Dirección:</strong> {{ ordenSeleccionada.direccionEnvio }}
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Ciudad:</strong> {{ ordenSeleccionada.ciudadEnvio }}
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Código Postal:</strong> {{ ordenSeleccionada.codigoPostalEnvio || 'N/A' }}
+                  </div>
+                  <div class="col-12" v-if="ordenSeleccionada.notas">
+                    <strong>Notas:</strong> {{ ordenSeleccionada.notas }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Productos -->
+              <div class="mb-4">
+                <h6 class="text-muted mb-3">Productos</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Libro</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-end">Precio Unit.</th>
+                        <th class="text-end">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-if="detallesOrden.length === 0">
+                        <td colspan="4" class="text-center text-muted py-4">
+                          <i class="fas fa-box-open me-2"></i>
+                          No se encontraron productos para esta orden
+                        </td>
+                      </tr>
+                      <tr v-for="detalle in detallesOrden" :key="detalle.id">
+                        <td>{{ detalle.libro?.titulo || 'N/A' }}</td>
+                        <td class="text-center">{{ detalle.cantidad }}</td>
+                        <td class="text-end">S/{{ detalle.precioUnitario?.toFixed(2) || '0.00' }}</td>
+                        <td class="text-end fw-bold">S/{{ ((detalle.cantidad || 0) * (detalle.precioUnitario || 0)).toFixed(2) }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td class="text-end"><strong class="text-primary fs-5">S/{{ ordenSeleccionada.total.toFixed(2) }}</strong></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Estado y Método de Pago -->
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <strong>Estado:</strong>
+                  <span :class="['badge ms-2', getBadgeClass(ordenSeleccionada.estado)]">
+                    {{ getEstadoTexto(ordenSeleccionada.estado) }}
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <strong>Método de Pago:</strong> {{ ordenSeleccionada.metodoPago || 'N/A' }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="cerrarModal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Agregar/Editar Libro -->
+    <div v-if="mostrarModalLibro" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-book me-2"></i>
+              {{ libroEditando ? 'Editar Libro' : 'Agregar Nuevo Libro' }}
+            </h5>
+            <button type="button" class="btn-close" @click="cerrarModalLibro"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="guardarLibro">
+              <div class="row g-3">
+                <!-- Título -->
+                <div class="col-12">
+                  <label class="form-label">Título <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    v-model="libroForm.titulo" 
+                    required
+                    placeholder="Ej: Cien años de soledad"
+                  />
+                </div>
+
+                <!-- Autor -->
+                <div class="col-md-6">
+                  <label class="form-label">Autor <span class="text-danger">*</span></label>
+                  <select class="form-select" v-model.number="libroForm.autorId" required>
+                    <option value="">Seleccionar autor</option>
+                    <option v-for="autor in autores" :key="autor.id" :value="autor.id">
+                      {{ autor.nombre }} {{ autor.apellido }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Categoría -->
+                <div class="col-md-6">
+                  <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                  <select class="form-select" v-model.number="libroForm.categoriaId" required>
+                    <option value="">Seleccionar categoría</option>
+                    <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.id">
+                      {{ categoria.nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Precio -->
+                <div class="col-md-4">
+                  <label class="form-label">Precio (S/) <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    class="form-control" 
+                    v-model="libroForm.precio" 
+                    required
+                    min="0"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <!-- Stock -->
+                <div class="col-md-4">
+                  <label class="form-label">Stock <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    v-model="libroForm.stock" 
+                    required
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
+
+                <!-- Estado -->
+                <div class="col-md-4">
+                  <label class="form-label">Estado</label>
+                  <select class="form-select" v-model="libroForm.activo">
+                    <option :value="true">Activo</option>
+                    <option :value="false">Inactivo</option>
+                  </select>
+                </div>
+
+                <!-- ISBN -->
+                <div class="col-md-6">
+                  <label class="form-label">ISBN</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    v-model="libroForm.isbn" 
+                    placeholder="978-3-16-148410-0"
+                  />
+                </div>
+
+                <!-- Año de Publicación -->
+                <div class="col-md-6">
+                  <label class="form-label">Año de Publicación</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    v-model="libroForm.anioPublicacion" 
+                    min="1000"
+                    :max="new Date().getFullYear()"
+                    placeholder="2024"
+                  />
+                </div>
+
+                <!-- URL de Portada -->
+                <div class="col-12">
+                  <label class="form-label">URL de Portada</label>
+                  <input 
+                    type="url" 
+                    class="form-control" 
+                    v-model="libroForm.portadaUrl" 
+                    placeholder="https://ejemplo.com/portada.jpg"
+                  />
+                  <div class="form-text">URL de la imagen de portada del libro</div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="col-12">
+                  <label class="form-label">Descripción</label>
+                  <textarea 
+                    class="form-control" 
+                    v-model="libroForm.descripcion" 
+                    rows="3"
+                    placeholder="Descripción del libro..."
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="cerrarModalLibro">Cancelar</button>
+            <button type="button" class="btn btn-primary" @click="guardarLibro" :disabled="guardandoLibro">
+              <span v-if="guardandoLibro">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Guardando...
+              </span>
+              <span v-else>
+                <i class="fas fa-save me-2"></i>
+                {{ libroEditando ? 'Actualizar' : 'Guardar' }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Agregar/Editar Usuario -->
+    <div v-if="mostrarModalUsuario" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-user me-2"></i>
+              {{ usuarioEditando ? 'Editar Usuario' : 'Agregar Nuevo Usuario' }}
+            </h5>
+            <button type="button" class="btn-close" @click="cerrarModalUsuario"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="guardarUsuario">
+              <div class="row g-3">
+                <!-- Nombre -->
+                <div class="col-md-6">
+                  <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    v-model="usuarioForm.nombre" 
+                    required
+                    placeholder="Ej: Juan"
+                  />
+                </div>
+
+                <!-- Apellido -->
+                <div class="col-md-6">
+                  <label class="form-label">Apellido <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    v-model="usuarioForm.apellido" 
+                    required
+                    placeholder="Ej: Pérez"
+                  />
+                </div>
+
+                <!-- Email -->
+                <div class="col-12">
+                  <label class="form-label">Email <span class="text-danger">*</span></label>
+                  <input 
+                    type="email" 
+                    class="form-control" 
+                    v-model="usuarioForm.email" 
+                    required
+                    placeholder="ejemplo@correo.com"
+                    :disabled="!!usuarioEditando"
+                  />
+                  <div class="form-text" v-if="usuarioEditando">El email no se puede modificar</div>
+                </div>
+
+                <!-- Contraseña (solo al crear) -->
+                <div class="col-md-6" v-if="!usuarioEditando">
+                  <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+                  <input 
+                    type="password" 
+                    class="form-control" 
+                    v-model="usuarioForm.password" 
+                    :required="!usuarioEditando"
+                    placeholder="Mínimo 6 caracteres"
+                    minlength="6"
+                  />
+                </div>
+
+                <!-- Confirmar Contraseña (solo al crear) -->
+                <div class="col-md-6" v-if="!usuarioEditando">
+                  <label class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                  <input 
+                    type="password" 
+                    class="form-control" 
+                    v-model="usuarioForm.confirmPassword" 
+                    :required="!usuarioEditando"
+                    placeholder="Repetir contraseña"
+                  />
+                </div>
+
+                <!-- Rol -->
+                <div class="col-md-6">
+                  <label class="form-label">Rol <span class="text-danger">*</span></label>
+                  <select class="form-select" v-model="usuarioForm.rol" required>
+                    <option value="USER">Usuario Normal</option>
+                    <option value="ADMIN">Administrador</option>
+                  </select>
+                  <div class="form-text">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Los administradores tienen acceso total al sistema
+                  </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="col-md-6">
+                  <label class="form-label">Estado</label>
+                  <select class="form-select" v-model="usuarioForm.activo">
+                    <option :value="true">Activo</option>
+                    <option :value="false">Inactivo</option>
+                  </select>
+                </div>
+
+                <!-- Alerta de contraseñas -->
+                <div class="col-12" v-if="!usuarioEditando && usuarioForm.password && usuarioForm.confirmPassword && usuarioForm.password !== usuarioForm.confirmPassword">
+                  <div class="alert alert-danger mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Las contraseñas no coinciden
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="cerrarModalUsuario">Cancelar</button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="guardarUsuario" 
+              :disabled="guardandoUsuario || (!usuarioEditando && usuarioForm.password !== usuarioForm.confirmPassword)"
+            >
+              <span v-if="guardandoUsuario">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Guardando...
+              </span>
+              <span v-else>
+                <i class="fas fa-save me-2"></i>
+                {{ usuarioEditando ? 'Actualizar' : 'Crear Usuario' }}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -176,7 +1089,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -202,6 +1115,76 @@ const stats = ref({
 })
 
 const ordenesRecientes = ref([])
+const mostrarModal = ref(false)
+const ordenSeleccionada = ref(null)
+const detallesOrden = ref([])
+const cargandoDetalle = ref(false)
+
+// Variables para gestión de libros
+const libros = ref([])
+const cargandoLibros = ref(false)
+const mostrarModalLibro = ref(false)
+const libroEditando = ref(null)
+const guardandoLibro = ref(false)
+const autores = ref([])
+const categorias = ref([])
+
+const libroForm = ref({
+  titulo: '',
+  autorId: '',
+  categoriaId: '',
+  precio: 0,
+  stock: 0,
+  activo: true,
+  isbn: '',
+  anioPublicacion: null,
+  portadaUrl: '',
+  descripcion: ''
+})
+
+// Variables para gestión de órdenes
+const todasLasOrdenes = ref([])
+const cargandoTodasOrdenes = ref(false)
+const filtroEstadoOrden = ref('')
+
+// Variables para gestión de usuarios
+const usuarios = ref([])
+const cargandoUsuarios = ref(false)
+const mostrarModalUsuario = ref(false)
+const usuarioEditando = ref(null)
+const guardandoUsuario = ref(false)
+
+const usuarioForm = ref({
+  nombre: '',
+  apellido: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  rol: 'USER',
+  activo: true
+})
+
+// Variables para reportes
+const reportes = ref({
+  ventasTotales: 0,
+  totalOrdenes: 0,
+  totalLibros: 0,
+  totalUsuarios: 0
+})
+let chartInstances = {}
+
+// Variables para configuración
+const configuracion = ref({
+  notifNuevaOrden: true,
+  notifStockBajo: true,
+  notifNuevoUsuario: false
+})
+
+const cambioPassword = ref({
+  actual: '',
+  nueva: '',
+  confirmar: ''
+})
 
 const currentViewTitle = computed(() => {
   const item = menuItems.find(m => m.id === currentView.value)
@@ -220,6 +1203,13 @@ const currentViewDescription = computed(() => {
   return descriptions[currentView.value] || ''
 })
 
+const ordenesFiltradas = computed(() => {
+  if (!filtroEstadoOrden.value) {
+    return todasLasOrdenes.value
+  }
+  return todasLasOrdenes.value.filter(orden => orden.estado === filtroEstadoOrden.value)
+})
+
 // Verificar que el usuario sea admin
 onMounted(async () => {
   const isAdmin = authStore.user?.rol?.nombre === 'ADMIN' || authStore.user?.rol === 'ADMIN'
@@ -232,6 +1222,23 @@ onMounted(async () => {
 
   await cargarEstadisticas()
   await cargarOrdenesRecientes()
+  await cargarAutores()
+  await cargarCategorias()
+})
+
+// Cargar datos cuando se cambia de vista
+watch(currentView, (newView) => {
+  if (newView === 'libros') {
+    cargarLibros()
+  } else if (newView === 'ordenes') {
+    cargarTodasLasOrdenes()
+  } else if (newView === 'usuarios') {
+    cargarUsuarios()
+  } else if (newView === 'reportes') {
+    cargarReportes()
+  } else if (newView === 'configuracion') {
+    cargarConfiguracion()
+  }
 })
 
 async function cargarEstadisticas() {
@@ -276,6 +1283,15 @@ function formatearFecha(fecha) {
   })
 }
 
+function formatearFechaCorta(fecha) {
+  if (!fecha) return 'N/A'
+  const date = new Date(fecha)
+  return date.toLocaleDateString('es-PE', {
+    day: '2-digit',
+    month: 'short'
+  })
+}
+
 function getBadgeClass(estado) {
   const clases = {
     'pendiente': 'bg-warning text-dark',
@@ -283,6 +1299,676 @@ function getBadgeClass(estado) {
     'entregado': 'bg-success text-white'
   }
   return clases[estado] || 'bg-secondary'
+}
+
+function getEstadoTexto(estado) {
+  const textos = {
+    'pendiente': 'Pendiente',
+    'enviando': 'En camino',
+    'entregado': 'Entregado'
+  }
+  return textos[estado] || estado
+}
+
+async function cambiarEstado(ordenId, nuevoEstado) {
+  try {
+    const response = await fetch(`http://localhost:8080/api/admin/ordenes/${ordenId}/estado`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify({ estado: nuevoEstado })
+    })
+
+    if (response.ok) {
+      // Actualizar el estado en la lista de órdenes recientes
+      const ordenReciente = ordenesRecientes.value.find(o => o.id === ordenId)
+      if (ordenReciente) {
+        ordenReciente.estado = nuevoEstado
+      }
+      
+      // Actualizar el estado en la lista de todas las órdenes
+      const ordenCompleta = todasLasOrdenes.value.find(o => o.id === ordenId)
+      if (ordenCompleta) {
+        ordenCompleta.estado = nuevoEstado
+      }
+      
+      // Si el modal está abierto y es la misma orden, actualizar también
+      if (ordenSeleccionada.value && ordenSeleccionada.value.id === ordenId) {
+        ordenSeleccionada.value.estado = nuevoEstado
+      }
+      
+      // Mostrar mensaje de éxito
+      alert(`✅ Estado actualizado a: ${nuevoEstado === 'pendiente' ? 'Pendiente' : nuevoEstado === 'enviando' ? 'En camino' : 'Entregado'}`)
+    } else {
+      alert('❌ Error al actualizar el estado')
+    }
+  } catch (error) {
+    console.error('Error al cambiar estado:', error)
+    alert('❌ Error de conexión')
+  }
+}
+
+async function verDetalleOrden(ordenId) {
+  mostrarModal.value = true
+  cargandoDetalle.value = true
+  
+  try {
+    // Obtener datos de la orden
+    const responseOrden = await fetch(`http://localhost:8080/api/admin/ordenes/${ordenId}`, {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseOrden.ok) {
+      ordenSeleccionada.value = await responseOrden.json()
+      console.log('📦 Orden seleccionada:', ordenSeleccionada.value)
+    } else {
+      console.error('❌ Error al obtener orden:', responseOrden.status)
+    }
+    
+    // Obtener detalles de la orden (usando endpoint de admin)
+    const responseDetalles = await fetch(`http://localhost:8080/api/admin/ordenes/${ordenId}/detalles`, {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseDetalles.ok) {
+      detallesOrden.value = await responseDetalles.json()
+      console.log('📚 Detalles de la orden:', detallesOrden.value)
+    } else {
+      console.error('❌ Error al obtener detalles:', responseDetalles.status)
+      const errorText = await responseDetalles.text()
+      console.error('❌ Detalle del error:', errorText)
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar detalles:', error)
+    alert('❌ Error al cargar los detalles de la orden')
+  } finally {
+    cargandoDetalle.value = false
+  }
+}
+
+function cerrarModal() {
+  mostrarModal.value = false
+  ordenSeleccionada.value = null
+  detallesOrden.value = []
+}
+
+// ========================================
+// CRUD DE LIBROS
+// ========================================
+
+async function cargarLibros() {
+  cargandoLibros.value = true
+  try {
+    const response = await fetch('http://localhost:8080/api/libros')
+    if (response.ok) {
+      libros.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error al cargar libros:', error)
+  } finally {
+    cargandoLibros.value = false
+  }
+}
+
+async function cargarAutores() {
+  try {
+    const response = await fetch('http://localhost:8080/api/autores', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    if (response.ok) {
+      autores.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error al cargar autores:', error)
+  }
+}
+
+async function cargarCategorias() {
+  try {
+    const response = await fetch('http://localhost:8080/api/categorias', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    if (response.ok) {
+      categorias.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error al cargar categorías:', error)
+  }
+}
+
+function abrirModalLibro(libro = null) {
+  if (libro) {
+    // Editar libro existente
+    libroEditando.value = libro
+    libroForm.value = {
+      titulo: libro.titulo,
+      autorId: libro.autor?.id || '',
+      categoriaId: libro.categoria?.id || '',
+      precio: libro.precio,
+      stock: libro.stock,
+      activo: libro.activo,
+      isbn: libro.isbn || '',
+      anioPublicacion: libro.anioPublicacion || null,
+      portadaUrl: libro.portadaUrl || '',
+      descripcion: libro.descripcion || ''
+    }
+  } else {
+    // Agregar nuevo libro
+    libroEditando.value = null
+    libroForm.value = {
+      titulo: '',
+      autorId: '',
+      categoriaId: '',
+      precio: 0,
+      stock: 0,
+      activo: true,
+      isbn: '',
+      anioPublicacion: null,
+      portadaUrl: '',
+      descripcion: ''
+    }
+  }
+  mostrarModalLibro.value = true
+}
+
+function cerrarModalLibro() {
+  mostrarModalLibro.value = false
+  libroEditando.value = null
+}
+
+async function guardarLibro() {
+  guardandoLibro.value = true
+  
+  try {
+    const libroData = {
+      titulo: libroForm.value.titulo,
+      autor: { id: libroForm.value.autorId },
+      categoria: { id: libroForm.value.categoriaId },
+      precio: parseFloat(libroForm.value.precio),
+      stock: parseInt(libroForm.value.stock),
+      activo: libroForm.value.activo,
+      isbn: libroForm.value.isbn || null,
+      anioPublicacion: libroForm.value.anioPublicacion || null,
+      portadaUrl: libroForm.value.portadaUrl || null,
+      descripcion: libroForm.value.descripcion || null
+    }
+
+    let response
+    if (libroEditando.value) {
+      // Actualizar libro existente
+      response = await fetch(`http://localhost:8080/api/libros/${libroEditando.value.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(libroData)
+      })
+    } else {
+      // Crear nuevo libro
+      response = await fetch('http://localhost:8080/api/libros', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(libroData)
+      })
+    }
+
+    if (response.ok) {
+      alert(`✅ Libro ${libroEditando.value ? 'actualizado' : 'creado'} exitosamente`)
+      cerrarModalLibro()
+      await cargarLibros()
+    } else {
+      const error = await response.text()
+      alert(`❌ Error: ${error}`)
+    }
+  } catch (error) {
+    console.error('Error al guardar libro:', error)
+    alert('❌ Error de conexión')
+  } finally {
+    guardandoLibro.value = false
+  }
+}
+
+async function eliminarLibro(libroId) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este libro?')) {
+    return
+  }
+
+  try {
+    const response = await fetch(`http://localhost:8080/api/libros/${libroId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (response.ok) {
+      alert('✅ Libro eliminado exitosamente')
+      await cargarLibros()
+    } else {
+      alert('❌ Error al eliminar el libro')
+    }
+  } catch (error) {
+    console.error('Error al eliminar libro:', error)
+    alert('❌ Error de conexión')
+  }
+}
+
+// ========================================
+// GESTIÓN DE ÓRDENES
+// ========================================
+
+async function cargarTodasLasOrdenes() {
+  cargandoTodasOrdenes.value = true
+  try {
+    const response = await fetch('http://localhost:8080/api/admin/ordenes', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    if (response.ok) {
+      todasLasOrdenes.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error al cargar órdenes:', error)
+  } finally {
+    cargandoTodasOrdenes.value = false
+  }
+}
+
+// ========================================
+// GESTIÓN DE USUARIOS
+// ========================================
+
+async function cargarUsuarios() {
+  cargandoUsuarios.value = true
+  try {
+    const response = await fetch('http://localhost:8080/api/admin/usuarios', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    if (response.ok) {
+      usuarios.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error al cargar usuarios:', error)
+  } finally {
+    cargandoUsuarios.value = false
+  }
+}
+
+function abrirModalUsuario(usuario = null) {
+  if (usuario) {
+    // Editar usuario existente
+    usuarioEditando.value = usuario
+    usuarioForm.value = {
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      email: usuario.email,
+      password: '',
+      confirmPassword: '',
+      rol: usuario.rol?.nombre || usuario.rol || 'USER',
+      activo: usuario.activo
+    }
+  } else {
+    // Agregar nuevo usuario
+    usuarioEditando.value = null
+    usuarioForm.value = {
+      nombre: '',
+      apellido: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      rol: 'USER',
+      activo: true
+    }
+  }
+  mostrarModalUsuario.value = true
+}
+
+function cerrarModalUsuario() {
+  mostrarModalUsuario.value = false
+  usuarioEditando.value = null
+}
+
+async function guardarUsuario() {
+  // Validar contraseñas si es un nuevo usuario
+  if (!usuarioEditando.value && usuarioForm.value.password !== usuarioForm.value.confirmPassword) {
+    alert('❌ Las contraseñas no coinciden')
+    return
+  }
+
+  guardandoUsuario.value = true
+  
+  try {
+    const usuarioData = {
+      nombre: usuarioForm.value.nombre,
+      apellido: usuarioForm.value.apellido,
+      email: usuarioForm.value.email,
+      rol: usuarioForm.value.rol,
+      activo: usuarioForm.value.activo
+    }
+
+    // Solo incluir password si es un nuevo usuario
+    if (!usuarioEditando.value) {
+      usuarioData.password = usuarioForm.value.password
+    }
+
+    let response
+    if (usuarioEditando.value) {
+      // Actualizar usuario existente
+      response = await fetch(`http://localhost:8080/api/admin/usuarios/${usuarioEditando.value.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(usuarioData)
+      })
+    } else {
+      // Crear nuevo usuario
+      response = await fetch('http://localhost:8080/api/admin/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(usuarioData)
+      })
+    }
+
+    if (response.ok) {
+      alert(`✅ Usuario ${usuarioEditando.value ? 'actualizado' : 'creado'} exitosamente`)
+      cerrarModalUsuario()
+      await cargarUsuarios()
+    } else {
+      const error = await response.text()
+      alert(`❌ Error: ${error}`)
+    }
+  } catch (error) {
+    console.error('Error al guardar usuario:', error)
+    alert('❌ Error de conexión')
+  } finally {
+    guardandoUsuario.value = false
+  }
+}
+
+async function eliminarUsuario(usuarioId) {
+  // Evitar que el admin se elimine a sí mismo
+  if (usuarioId === authStore.user?.id) {
+    alert('❌ No puedes eliminar tu propio usuario')
+    return
+  }
+
+  if (!confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+    return
+  }
+
+  try {
+    const response = await fetch(`http://localhost:8080/api/admin/usuarios/${usuarioId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (response.ok) {
+      alert('✅ Usuario eliminado exitosamente')
+      await cargarUsuarios()
+    } else {
+      alert('❌ Error al eliminar el usuario')
+    }
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error)
+    alert('❌ Error de conexión')
+  }
+}
+
+// ========================================
+// REPORTES Y GRÁFICOS
+// ========================================
+
+async function cargarReportes() {
+  try {
+    // Cargar estadísticas generales
+    const responseStats = await fetch('http://localhost:8080/api/admin/estadisticas', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseStats.ok) {
+      reportes.value = await responseStats.json()
+    }
+
+    // Esperar un momento para que el DOM se actualice
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    // Crear los gráficos
+    crearGraficos()
+  } catch (error) {
+    console.error('Error al cargar reportes:', error)
+  }
+}
+
+function crearGraficos() {
+  // Destruir gráficos existentes
+  Object.values(chartInstances).forEach(chart => {
+    if (chart) chart.destroy()
+  })
+  chartInstances = {}
+
+  // Importar Chart.js dinámicamente
+  import('chart.js/auto').then(({ default: Chart }) => {
+    // Gráfico de Ventas por Mes
+    const ctxVentas = document.getElementById('ventasPorMesChart')
+    if (ctxVentas) {
+      chartInstances.ventas = new Chart(ctxVentas, {
+        type: 'line',
+        data: {
+          labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+          datasets: [{
+            label: 'Ventas (S/)',
+            data: [1200, 1900, 3000, 5000, 2300, 3200, 4100, 3800, 4500, 5200, 4800, 6000],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+    }
+
+    // Gráfico de Estado de Órdenes (Pie)
+    const ctxEstado = document.getElementById('estadoOrdenesChart')
+    if (ctxEstado) {
+      chartInstances.estado = new Chart(ctxEstado, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pendiente', 'En camino', 'Entregado'],
+          datasets: [{
+            data: [30, 45, 125],
+            backgroundColor: [
+              'rgba(255, 206, 86, 0.8)',
+              'rgba(54, 162, 235, 0.8)',
+              'rgba(75, 192, 192, 0.8)'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      })
+    }
+
+    // Gráfico de Top 5 Libros
+    const ctxLibros = document.getElementById('topLibrosChart')
+    if (ctxLibros) {
+      chartInstances.libros = new Chart(ctxLibros, {
+        type: 'bar',
+        data: {
+          labels: ['Sapiens', '1984', 'Cien años...', 'El Principito', 'After'],
+          datasets: [{
+            label: 'Unidades Vendidas',
+            data: [45, 38, 32, 28, 25],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.8)',
+              'rgba(54, 162, 235, 0.8)',
+              'rgba(255, 206, 86, 0.8)',
+              'rgba(75, 192, 192, 0.8)',
+              'rgba(153, 102, 255, 0.8)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+    }
+
+    // Gráfico de Categorías
+    const ctxCategorias = document.getElementById('categoriasChart')
+    if (ctxCategorias) {
+      chartInstances.categorias = new Chart(ctxCategorias, {
+        type: 'bar',
+        data: {
+          labels: ['Ficción', 'Romance', 'Ciencia', 'Historia', 'Autoayuda'],
+          datasets: [{
+            label: 'Ventas por Categoría',
+            data: [65, 59, 45, 38, 32],
+            backgroundColor: 'rgba(153, 102, 255, 0.8)',
+            borderColor: 'rgba(153, 102, 255, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+    }
+  }).catch(error => {
+    console.error('Error al cargar Chart.js:', error)
+    alert('⚠️ Por favor instala las dependencias: npm install chart.js vue-chartjs')
+  })
+}
+
+// ========================================
+// CONFIGURACIÓN
+// ========================================
+
+async function cargarConfiguracion() {
+  try {
+    const response = await fetch('http://localhost:8080/api/admin/configuracion', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (response.ok) {
+      const config = await response.json()
+      configuracion.value = { ...configuracion.value, ...config }
+    }
+  } catch (error) {
+    console.error('Error al cargar configuración:', error)
+    // Si no existe endpoint, usar valores por defecto
+  }
+}
+
+async function cambiarPassword() {
+  if (cambioPassword.value.nueva !== cambioPassword.value.confirmar) {
+    alert('❌ Las contraseñas no coinciden')
+    return
+  }
+
+  if (cambioPassword.value.nueva.length < 6) {
+    alert('❌ La contraseña debe tener al menos 6 caracteres')
+    return
+  }
+
+  try {
+    const response = await fetch('http://localhost:8080/api/admin/cambiar-password', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify({
+        passwordActual: cambioPassword.value.actual,
+        passwordNueva: cambioPassword.value.nueva
+      })
+    })
+
+    if (response.ok) {
+      alert('✅ Contraseña cambiada exitosamente')
+      cambioPassword.value = { actual: '', nueva: '', confirmar: '' }
+    } else {
+      const error = await response.text()
+      alert(`❌ Error: ${error}`)
+    }
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error)
+    alert('❌ Error de conexión')
+  }
 }
 
 function cerrarSesion() {
@@ -456,6 +2142,59 @@ function cerrarSesion() {
   color: #374151;
   font-size: 0.875rem;
   text-transform: uppercase;
+}
+
+/* Tabla compacta */
+.table-compact {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+.table-compact thead {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.table-compact td,
+.table-compact th {
+  padding: 0.75rem 0.5rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-compact .text-truncate {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-compact .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+}
+
+/* Dropdown menu */
+.dropdown-item.active {
+  background-color: #e7f3ff;
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Portada de libro mini */
+.libro-portada-mini {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Responsive */

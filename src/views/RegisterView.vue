@@ -11,16 +11,6 @@
     <div class="form-wrapper">
       <div class="card border-info shadow-lg">
         <div class="card-body p-5 p-md-6">
-          <!-- Header -->
-          <div class="text-center mb-5">
-            <h1 class="h2 fw-bold text-primary mb-2">
-              Bienvenido a LibroStore
-            </h1>
-            <p class="text-muted">
-              Crea tu cuenta y comienza tu aventura de lectura
-            </p>
-          </div>
-
           <!-- Formulario -->
           <RegisterForm />
         </div>
@@ -124,7 +114,7 @@ import RegisterForm from '../components/common/RegisterForm.vue'
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 800px;
+  max-width: 550px;
 }
 
 /* Card personalizada */

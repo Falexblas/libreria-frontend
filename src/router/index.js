@@ -7,6 +7,7 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import PedidosView from '@/views/PedidosView.vue'
+import FavoritosView from '@/views/FavoritosView.vue'
 import AdminDashboardView from '@/views/AdminDashboardView.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -61,6 +62,11 @@ const router = createRouter({
       name: 'pedidos',
       component: PedidosView,
       meta: { requiresAuth: true }  // Requiere autenticación
+    },
+    {
+      path: '/favoritos',
+      name: 'favoritos',
+      component: FavoritosView
     },
     {
       path: '/admin',

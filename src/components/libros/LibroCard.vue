@@ -78,9 +78,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCarritoStore } from '@/stores/carrito'
+import { useFavoritosStore } from '@/stores/favoritos'
+import Swal from 'sweetalert2'
 
 // Props
 const props = defineProps({
@@ -101,13 +103,14 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['agregar-carrito', 'ver-detalles', 'toggle-favorito'])
+const emit = defineEmits(['agregar-carrito', 'ver-detalles'])
 
 const router = useRouter()
 const carritoStore = useCarritoStore()
+const favoritosStore = useFavoritosStore()
 
-// Estado reactivo
-const esFavorito = ref(false)
+// Computed para verificar si es favorito
+const esFavorito = computed(() => favoritosStore.esFavorito(props.libro.id))
 
 // Computed properties para manejar los datos correctamente
 const tituloLibro = computed(() => {
@@ -204,39 +207,26 @@ function agregarAlCarrito() {
     // Agregar directamente al store del carrito
     carritoStore.agregarAlCarrito(props.libro)
     
+    // Mostrar alerta de éxito
+    Swal.fire({
+      icon: 'success',
+      title: '¡Agregado al carrito!',
+      text: `"${props.libro.titulo}" fue agregado al carrito`,
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end'
+    })
+    
     // También emitir el evento para compatibilidad
     emit('agregar-carrito', props.libro)
   }
 }
 
 function toggleFavorito() {
-  esFavorito.value = !esFavorito.value
-  emit('toggle-favorito', {
-    libro: props.libro,
-    esFavorito: esFavorito.value
-  })
-  
-  // Guardar en localStorage
-  const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]')
-  if (esFavorito.value) {
-    if (!favoritos.includes(props.libro.id)) {
-      favoritos.push(props.libro.id)
-    }
-  } else {
-    const index = favoritos.indexOf(props.libro.id)
-    if (index > -1) {
-      favoritos.splice(index, 1)
-    }
-  }
-  localStorage.setItem('favoritos', JSON.stringify(favoritos))
+  // Usar el store de favoritos que maneja todo (validación, alertas, persistencia)
+  favoritosStore.toggleFavorito(props.libro)
 }
-
-// Lifecycle
-onMounted(() => {
-  // Verificar si el libro está en favoritos al montar el componente
-  const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]')
-  esFavorito.value = favoritos.includes(props.libro.id)
-})
 </script>
 
 <style scoped>

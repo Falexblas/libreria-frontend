@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import Navbar from '@/components/common/Navbar.vue'
 import Footer from '@/components/common/Footer.vue'
@@ -9,6 +9,9 @@ import { useCarritoStore } from '@/stores/carrito'
 
 const carritoStore = useCarritoStore()
 const route = useRoute()
+
+// Verificar si estamos en una ruta de admin
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
 // Inicializar carrito al montar la app
 onMounted(() => {
@@ -22,13 +25,14 @@ onMounted(() => {
     <main class="flex-grow-1">
       <RouterView />
     </main>
-    <Footer class="flex-shrink-0" />
+    <!-- Footer solo para usuarios normales -->
+    <Footer v-if="!isAdminRoute" class="flex-shrink-0" />
     
-    <!-- Carrito Sidebar -->
-    <CarritoSidebar />
+    <!-- Carrito Sidebar solo para usuarios normales -->
+    <CarritoSidebar v-if="!isAdminRoute" />
     
-    <!-- ChatBot -->
-    <ChatBot />
+    <!-- ChatBot solo para usuarios normales -->
+    <ChatBot v-if="!isAdminRoute" />
   </div>
 </template>
 

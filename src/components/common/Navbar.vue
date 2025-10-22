@@ -33,7 +33,7 @@
               <img src="@/assets/logo.png" alt="Librería Logo">
               <span class="d-none d-sm-inline">Mundo de papel</span>
             </router-link>
-            <div v-if="!checkoutMode" class="buscador-wrapper d-none d-lg-block" style="flex:1;">
+            <div v-if="!checkoutMode && !isAdmin" class="buscador-wrapper d-none d-lg-block" style="flex:1;">
               <i class="bi bi-search"></i>
               <input 
                 type="text" 
@@ -48,12 +48,12 @@
         <!-- Derecha: Iconos y Categorías (desktop) -->
         <div class="col-auto">
           <div class="d-flex align-items-center gap-2">
-            <button @click="openSearch" class="btn-icon d-lg-none">
+            <button v-if="!isAdmin" @click="openSearch" class="btn-icon d-lg-none">
               <i class="bi bi-search"></i>
             </button>
 
             <!-- Botón Categorías solo desktop -->
-            <div v-if="!checkoutMode" class="dropdown d-none d-lg-block mega-menu-categorias me-2">
+            <div v-if="!checkoutMode && !isAdmin" class="dropdown d-none d-lg-block mega-menu-categorias me-2">
               <button class="btn btn-categorias dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 Categorías
               </button>
@@ -94,17 +94,21 @@
             <div v-if="!checkoutMode && authStore.isAuthenticated" class="dropdown d-md-block">
               <a href="#" class="btn-user-dropdown d-flex align-items-center gap-2" data-bs-toggle="dropdown">
                 <i class="bi bi-person-circle"></i>
-                <span class="user-name d-none d-lg-inline">{{ authStore.nombreUsuario }}</span>
+                <span class="user-name d-block d-lg-inline">{{ authStore.nombreUsuario }}</span>
                 <i class="bi bi-chevron-down d-none d-lg-inline" style="font-size: 0.75rem;"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li class="dropdown-header">
                   <div class="fw-bold">{{ authStore.nombreUsuario }}</div>
                   <div class="text-muted small">{{ authStore.user?.email }}</div>
+                  <span v-if="isAdmin" class="badge bg-danger mt-1">ADMIN</span>
                 </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><router-link to="/perfil" class="dropdown-item"><i class="bi bi-person me-2"></i>Mi Perfil</router-link></li>
-                <li><router-link to="/pedidos" class="dropdown-item"><i class="bi bi-box-seam me-2"></i>Mis Pedidos</router-link></li>
+                <!-- Opciones de ADMIN -->
+                <li v-if="isAdmin"><router-link to="/admin" class="dropdown-item"><i class="bi bi-shield-lock me-2"></i>Panel Admin</router-link></li>
+                <!-- Opciones de USER -->
+                <li v-if="!isAdmin"><router-link to="/perfil" class="dropdown-item"><i class="bi bi-person me-2"></i>Mi Perfil</router-link></li>
+                <li v-if="!isAdmin"><router-link to="/pedidos" class="dropdown-item"><i class="bi bi-box-seam me-2"></i>Mis Pedidos</router-link></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a href="#" @click="cerrarSesion" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
               </ul>
@@ -113,11 +117,13 @@
               <i class="bi bi-person-circle"></i>
             </router-link>
 
-            <router-link v-if="!checkoutMode" to="/favoritos" class="btn-icon d-md-block">
+            <!-- Favoritos y Carrito solo para usuarios normales -->
+            <router-link v-if="!checkoutMode && !isAdmin" to="/favoritos" class="btn-icon d-md-block position-relative">
               <i class="bi bi-heart"></i>
+              <span v-if="favoritosStore.totalFavoritos > 0" class="badge-carrito">{{ favoritosStore.totalFavoritos }}</span>
             </router-link>
 
-            <button v-if="!checkoutMode" @click="carritoStore.abrirCarrito()" class="btn-icon">
+            <button v-if="!checkoutMode && !isAdmin" @click="carritoStore.abrirCarrito()" class="btn-icon position-relative">
               <i class="bi bi-bag"></i>
               <span v-if="carritoStore.totalItems > 0" class="badge-carrito">{{ carritoStore.totalItems }}</span>
             </button>
@@ -205,16 +211,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCarritoStore } from '@/stores/carrito'
+import { useFavoritosStore } from '@/stores/favoritos'
 import { useCategoriasStore } from '@/stores/categorias'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const carritoStore = useCarritoStore()
+const favoritosStore = useFavoritosStore()
 const categoriasStore = useCategoriasStore()
 
 // Prop para activar comportamiento específico en checkout
@@ -228,6 +236,12 @@ const mobileMenuOpen = ref(false)
 const searchInput = ref(null)
 // Estado para el acordeón móvil
 const categoriaAbierta = ref(null)
+
+// Computed para verificar si el usuario es ADMIN
+const isAdmin = computed(() => {
+  const rol = authStore.user?.rol
+  return rol === 'ADMIN' || (typeof rol === 'object' && rol?.nombre === 'ADMIN')
+})
 
 onMounted(() => {
   categoriasStore.cargarCategorias()
@@ -351,14 +365,20 @@ function cerrarSesion() {
   word-break: break-word;
   border-left: 3px solid #0cc3dd;
   padding-left: 0.5em;
+  text-decoration: none !important;
+}
+.mega-menu-categorias .dropdown-item.fw-bold:hover {
+  text-decoration: none !important;
 }
 .mega-menu-categorias .dropdown-item.py-1 {
   font-size: 0.98em;
   color: #444;
+  text-decoration: none !important;
 }
 .mega-menu-categorias .dropdown-item.py-1:hover {
   background: #ffffff;
   color: #0cc3dd;
+  text-decoration: none !important;
 }
 /* Submenús anidados para Bootstrap 5 */
 .dropdown-submenu {
@@ -532,6 +552,10 @@ function cerrarSesion() {
   line-height: 1;
   vertical-align: middle;
   padding: 0;
+  text-decoration: none !important;
+}
+.btn-icon:hover {
+  text-decoration: none !important;
 }
 .btn-icon i {
   margin: 0;
@@ -765,16 +789,19 @@ function cerrarSesion() {
 .dropdown-item {
   padding: 0.75rem 1rem;
   transition: all 0.2s ease;
+  text-decoration: none !important;
 }
 
 .dropdown-item:hover {
   background-color: #f8f9fa;
   padding-left: 1.25rem;
+  text-decoration: none !important;
 }
 
 .dropdown-item.text-danger:hover {
   background-color: #fff5f5;
   color: #dc3545 !important;
+  text-decoration: none !important;
 }
 
 /* --- Transiciones --- */

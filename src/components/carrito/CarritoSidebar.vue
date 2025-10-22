@@ -141,9 +141,12 @@
 
 <script setup>
 import { useCarritoStore } from '@/stores/carrito'
+import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 const carritoStore = useCarritoStore()
+const authStore = useAuthStore()
 const router = useRouter()
 
 // Métodos
@@ -164,7 +167,30 @@ function eliminarItem(itemId) {
 }
 
 function procederCompra() {
-  // Primero cerrar el carrito
+  // Validar si el usuario está autenticado
+  if (!authStore.isAuthenticated) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Inicia sesión para continuar',
+      text: 'Debes iniciar sesión para proceder con la compra',
+      confirmButtonText: 'Ir a Iniciar Sesión',
+      confirmButtonColor: '#0d6efd',
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Cerrar carrito y redirigir al login
+        carritoStore.cerrarCarrito()
+        setTimeout(() => {
+          router.push('/login')
+        }, 300)
+      }
+    })
+    return
+  }
+
+  // Si está autenticado, proceder con la compra
   carritoStore.cerrarCarrito()
   
   // Pequeño delay para que la animación de cierre se vea suave

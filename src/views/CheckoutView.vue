@@ -562,11 +562,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCarritoStore } from '@/stores/carrito'
 import { useAuthStore } from '@/stores/auth'
 import LogoYape from '@/assets/LogoYape.webp'
 
+const router = useRouter()
 const carritoStore = useCarritoStore()
 const authStore = useAuthStore()
 
@@ -623,15 +625,26 @@ onMounted(async () => {
         
         // También rellenar datos de entrega si existen
         if (usuario.direccion) entrega.direccion = usuario.direccion
-        if (usuario.referenciaDireccion) entrega.referencia = usuario.referenciaDireccion
         if (usuario.codigoPostal) entrega.codigoPostal = usuario.codigoPostal
-        if (usuario.departamento) entrega.departamento = usuario.departamento
-        if (usuario.provincia) entrega.provincia = usuario.provincia
-        if (usuario.distrito) entrega.distrito = usuario.distrito
-        if (usuario.notas) entrega.nota = usuario.notas
+        
+        // Cargar ubicación con nextTick para asegurar que los selects se actualicen
+        if (usuario.departamento) {
+          entrega.departamento = usuario.departamento
+          await nextTick()  // Esperar a que se actualicen las provincias
+          if (usuario.provincia) {
+            entrega.provincia = usuario.provincia
+            await nextTick()  // Esperar a que se actualicen los distritos
+            if (usuario.distrito) {
+              entrega.distrito = usuario.distrito
+            }
+          }
+        }
+        
+        if (usuario.notas) entrega.referencia = usuario.notas  // ← Corregido: notas va a referencia
         
         console.log('✅ Datos del usuario cargados automáticamente')
         console.log('✅ Formulario rellenado:', datos)
+        console.log('✅ Datos de entrega:', entrega)
       } else {
         console.error('❌ Error en la respuesta:', response.status, response.statusText)
         const errorText = await response.text()
@@ -824,17 +837,21 @@ async function procesarPago() {
     if (response.ok && result.success) {
       console.log('✅ Orden creada exitosamente:', result)
       
-      // Guardar datos del checkout en el perfil del usuario
-      await guardarDatosEnPerfil()
-      
       // Limpiar carrito en el store
       carritoStore.vaciarCarrito()
+      
+      // Guardar datos del checkout en el perfil del usuario (sin bloquear el flujo)
+      guardarDatosEnPerfil().catch(err => {
+        console.warn('⚠️ No se pudieron guardar los datos en el perfil, pero la orden se creó correctamente:', err)
+      })
       
       // Mostrar mensaje de éxito
       alert(`¡Compra exitosa! 🎉\n\nNúmero de orden: ${result.ordenId}\n\nGracias por tu compra. Serás redirigido a tus pedidos.`)
       
-      // Redirigir a la página de pedidos para ver el estado
-      window.location.href = '/pedidos'
+      // Redirigir a la página de pedidos después de un pequeño delay
+      setTimeout(() => {
+        router.push('/pedidos')
+      }, 100)
       
     } else {
       console.error('❌ Error al crear orden:', result)

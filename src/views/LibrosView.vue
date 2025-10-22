@@ -45,7 +45,6 @@
               :libro="libro"
               @agregar-carrito="agregarAlCarrito"
               @ver-detalles="verDetalles"
-              @toggle-favorito="toggleFavorito"
             />
           </div>
         </div>
@@ -106,21 +105,12 @@ async function cargarLibros() {
 
 function agregarAlCarrito(libro) {
   console.log('Agregar al carrito:', libro)
-  // Aquí implementarás la lógica del carrito
-  alert(`¡${libro.titulo} agregado al carrito!`)
+  // La alerta ya se muestra en LibroCard.vue con SweetAlert2
 }
 
 function verDetalles(libro) {
   console.log('Ver detalles:', libro)
-  // Navegar a la página de detalles del libro
-  alert(`Ver detalles de: ${libro.titulo}`)
-}
-
-function toggleFavorito(data) {
-  console.log('Toggle favorito:', data)
-  // Manejar favoritos
-  const mensaje = data.esFavorito ? 'agregado a' : 'removido de'
-  alert(`${data.libro.titulo} ${mensaje} favoritos`)
+  // La navegación ya se maneja en LibroCard.vue
 }
 
 // Watcher para reaccionar a cambios de ruta y recargar libros
