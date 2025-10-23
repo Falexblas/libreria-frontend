@@ -260,7 +260,7 @@
                         />
                       </td>
                       <td class="text-truncate" style="max-width: 250px;">{{ libro.titulo }}</td>
-                      <td>{{ libro.autor?.nombre }} {{ libro.autor?.apellido }}</td>
+                      <td>{{ obtenerAutoresNombres(libro) }}</td>
                       <td class="fw-bold text-primary">S/{{ libro.precio.toFixed(2) }}</td>
                       <td>
                         <span :class="['badge', libro.stock > 10 ? 'bg-success' : libro.stock > 0 ? 'bg-warning text-dark' : 'bg-danger']">
@@ -847,15 +847,59 @@
                   />
                 </div>
 
-                <!-- Autor -->
+                <!-- Autores (Múltiples) -->
                 <div class="col-md-6">
-                  <label class="form-label">Autor <span class="text-danger">*</span></label>
-                  <select class="form-select" v-model.number="libroForm.autorId" required>
-                    <option value="">Seleccionar autor</option>
-                    <option v-for="autor in autores" :key="autor.id" :value="autor.id">
-                      {{ autor.nombre }} {{ autor.apellido }}
-                    </option>
-                  </select>
+                  <label class="form-label">
+                    Autores <span class="text-danger">*</span>
+                    <small class="text-muted">(Puedes seleccionar múltiples)</small>
+                  </label>
+                  
+                  <!-- Select para agregar autores -->
+                  <div class="input-group mb-2">
+                    <select class="form-select" v-model.number="autorSeleccionado">
+                      <option value="">Seleccionar autor...</option>
+                      <option 
+                        v-for="autor in autoresDisponibles" 
+                        :key="autor.id" 
+                        :value="autor.id"
+                      >
+                        {{ autor.nombre }} {{ autor.apellido }}
+                      </option>
+                    </select>
+                    <button 
+                      class="btn btn-outline-primary" 
+                      type="button"
+                      @click="agregarAutor"
+                      :disabled="!autorSeleccionado"
+                    >
+                      <i class="fas fa-plus"></i> Agregar
+                    </button>
+                  </div>
+                  
+                  <!-- Lista de autores seleccionados -->
+                  <div v-if="libroForm.autoresIds && libroForm.autoresIds.length > 0" class="autores-seleccionados">
+                    <div 
+                      v-for="(autorId, index) in libroForm.autoresIds" 
+                      :key="autorId"
+                      class="autor-tag"
+                    >
+                      <span class="badge bg-primary me-1" v-if="index === 0">Principal</span>
+                      {{ obtenerNombreAutor(autorId) }}
+                      <button 
+                        type="button" 
+                        class="btn-close-autor"
+                        @click="eliminarAutor(index)"
+                        :disabled="libroForm.autoresIds.length === 1"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Mensaje si no hay autores -->
+                  <div v-else class="alert alert-warning py-2 px-3 mb-0">
+                    <small><i class="fas fa-exclamation-triangle me-1"></i> Debes agregar al menos un autor</small>
+                  </div>
                 </div>
 
                 <!-- Editorial -->
@@ -1172,12 +1216,48 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useAutores } from '@/composables/useAutores'
 import Swal from 'sweetalert2'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { obtenerAutores } = useAutores()
 
 const currentView = ref('dashboard')
+
+// Función helper para obtener nombres de autores
+const obtenerAutoresNombres = (libro) => {
+  return obtenerAutores(libro)
+}
+
+// Computed: Autores disponibles (excluye los ya seleccionados)
+const autoresDisponibles = computed(() => {
+  if (!libroForm.value.autoresIds || libroForm.value.autoresIds.length === 0) {
+    return autores.value
+  }
+  return autores.value.filter(autor => !libroForm.value.autoresIds.includes(autor.id))
+})
+
+// Función para obtener nombre de autor por ID
+const obtenerNombreAutor = (autorId) => {
+  const autor = autores.value.find(a => a.id === autorId)
+  return autor ? `${autor.nombre} ${autor.apellido}` : 'Autor desconocido'
+}
+
+// Función para agregar autor a la lista
+const agregarAutor = () => {
+  if (autorSeleccionado.value && !libroForm.value.autoresIds.includes(autorSeleccionado.value)) {
+    libroForm.value.autoresIds.push(autorSeleccionado.value)
+    autorSeleccionado.value = '' // Limpiar selección
+  }
+}
+
+// Función para eliminar autor de la lista
+const eliminarAutor = (index) => {
+  if (libroForm.value.autoresIds.length > 1) {
+    libroForm.value.autoresIds.splice(index, 1)
+  }
+}
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
@@ -1217,7 +1297,7 @@ const TIEMPO_CACHE_LIBROS = 5 * 60 * 1000 // 5 minutos en milisegundos
 
 const libroForm = ref({
   titulo: '',
-  autorId: '',
+  autoresIds: [],  // Cambiado: ahora es un array de IDs
   editorialId: '',
   categoriaId: '',
   precio: 0,
@@ -1232,6 +1312,9 @@ const libroForm = ref({
   portadaUrl: '',
   descripcion: ''
 })
+
+// Variable para el select de autores
+const autorSeleccionado = ref('')
 
 // Variables para gestión de órdenes
 const todasLasOrdenes = ref([])
@@ -1609,9 +1692,20 @@ function abrirModalLibro(libro = null) {
   if (libro) {
     // Editar libro existente
     libroEditando.value = libro
+    
+    // Obtener IDs de todos los autores
+    let autoresIds = []
+    if (libro.autores && Array.isArray(libro.autores) && libro.autores.length > 0) {
+      // Nuevo formato: array de autores
+      autoresIds = libro.autores.map(autor => autor.id)
+    } else if (libro.autor) {
+      // Formato antiguo: objeto autor
+      autoresIds = [libro.autor.id]
+    }
+    
     libroForm.value = {
       titulo: libro.titulo,
-      autorId: libro.autor?.id || '',
+      autoresIds: autoresIds,
       editorialId: libro.editorial?.id || '',
       categoriaId: libro.categoria?.id || '',
       precio: libro.precio,
@@ -1631,7 +1725,7 @@ function abrirModalLibro(libro = null) {
     libroEditando.value = null
     libroForm.value = {
       titulo: '',
-      autorId: '',
+      autoresIds: [],
       editorialId: '',
       categoriaId: '',
       precio: 0,
@@ -1656,12 +1750,18 @@ function cerrarModalLibro() {
 }
 
 async function guardarLibro() {
+  // Validar que haya al menos un autor
+  if (!libroForm.value.autoresIds || libroForm.value.autoresIds.length === 0) {
+    alert('❌ Debes agregar al menos un autor')
+    return
+  }
+  
   guardandoLibro.value = true
   
   try {
     const libroData = {
       titulo: libroForm.value.titulo,
-      autor: { id: libroForm.value.autorId },
+      autores: libroForm.value.autoresIds.map(id => ({ id })), // Array de autores
       editorial: libroForm.value.editorialId ? { id: libroForm.value.editorialId } : null,
       categoria: { id: libroForm.value.categoriaId },
       precio: parseFloat(libroForm.value.precio),
@@ -2581,5 +2681,64 @@ function cerrarSesion() {
     align-items: flex-start;
     gap: 1rem;
   }
+}
+
+/* Estilos para autores múltiples */
+.autores-seleccionados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 0.375rem;
+  border: 1px solid #dee2e6;
+  min-height: 50px;
+}
+
+.autor-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.autor-tag:hover {
+  border-color: #0d6efd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-close-autor {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.btn-close-autor:hover:not(:disabled) {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-close-autor:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.autor-tag .badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
 }
 </style>

@@ -123,7 +123,15 @@ const tituloLibro = computed(() => {
 })
 
 const autorCompleto = computed(() => {
-  // Si el objeto libro tiene una propiedad autor que es un objeto
+  // Si tiene array de autores (nuevo formato N:M)
+  if (props.libro.autores && Array.isArray(props.libro.autores) && props.libro.autores.length > 0) {
+    return props.libro.autores
+      .map(autor => `${autor.nombre || ''} ${autor.apellido || ''}`.trim())
+      .filter(nombre => nombre)
+      .join(', ') || 'Autor desconocido'
+  }
+  
+  // Si el objeto libro tiene una propiedad autor que es un objeto (formato antiguo)
   if (props.libro.autor && typeof props.libro.autor === 'object') {
     const autor = props.libro.autor
     if (autor.nombre && autor.apellido) {

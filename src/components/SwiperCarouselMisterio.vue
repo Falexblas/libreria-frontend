@@ -3,12 +3,14 @@ import { computed, onMounted } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Autoplay } from 'swiper/modules'
 import { useLibrosStore } from '@/stores/libros'
+import { useAutores } from '@/composables/useAutores'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
 import './SwiperCarousel.css'
 
 const librosStore = useLibrosStore()
+const { obtenerAutores } = useAutores()
 
 // Filtrar libros de categoría Misterio (ID: 3)
 const libros = computed(() => librosStore.librosPorCategoria(3))
@@ -82,7 +84,7 @@ const modules = [Navigation, Autoplay]
             
             <div class="libro-info">
               <h3 class="libro-titulo">{{ libro.titulo }}</h3>
-              <p class="libro-autor">{{ libro.autor?.nombre }} {{ libro.autor?.apellido }}</p>
+              <p class="libro-autor">{{ obtenerAutores(libro) }}</p>
               
               <div class="libro-precios">
                 <span class="precio-actual">S/ {{ (libro.precio * (1 - libro.descuento / 100)).toFixed(2) }}</span>
