@@ -135,9 +135,6 @@
                 >
                   <LibroCard
                     :libro="libro"
-                    @agregar-carrito="agregarAlCarrito"
-                    @ver-detalles="verDetalles"
-                    @toggle-favorito="toggleFavorito"
                   />
                 </div>
               </div>
@@ -376,17 +373,6 @@ async function cargarLibros() {
   } catch (err) {
     console.error("Error al cargar libros:", err);
   }
-}
-
-function agregarAlCarrito(libro) {
-  alert(`¡${libro.titulo} agregado al carrito!`);
-}
-function verDetalles(libro) {
-  alert(`Ver detalles de: ${libro.titulo}`);
-}
-function toggleFavorito(data) {
-  const mensaje = data.esFavorito ? "agregado a" : "removido de";
-  alert(`${data.libro.titulo} ${mensaje} favoritos`);
 }
 
 watch(

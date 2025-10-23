@@ -112,7 +112,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="orden in ordenesRecientes" :key="orden.id">
+                    <tr v-for="orden in ordenesRecientesOrdenadas" :key="orden.id">
                       <td class="text-muted">#{{ orden.id }}</td>
                       <td class="text-truncate" style="max-width: 150px;">
                         {{ orden.usuario?.nombre }} {{ orden.usuario?.apellido }}
@@ -196,11 +196,27 @@
         <!-- Gestión de Libros -->
         <div v-if="currentView === 'libros'" class="libros-view">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4>Gestión de Libros</h4>
-            <button class="btn btn-primary" @click="abrirModalLibro()">
-              <i class="fas fa-plus me-2"></i>
-              Agregar Libro
-            </button>
+            <div>
+              <h4 class="mb-1">Gestión de Libros</h4>
+              <small class="text-muted" v-if="ultimaCargaLibros">
+                <i class="fas fa-clock me-1"></i>
+                Última actualización: {{ formatearTiempoCache(ultimaCargaLibros) }}
+              </small>
+            </div>
+            <div class="d-flex gap-2">
+              <button 
+                class="btn btn-outline-secondary" 
+                @click="cargarLibros(true)"
+                :disabled="cargandoLibros"
+                title="Refrescar datos"
+              >
+                <i class="fas fa-sync-alt" :class="{ 'fa-spin': cargandoLibros }"></i>
+              </button>
+              <button class="btn btn-primary" @click="abrirModalLibro()">
+                <i class="fas fa-plus me-2"></i>
+                Agregar Libro
+              </button>
+            </div>
           </div>
 
           <!-- Tabla de Libros -->
@@ -234,7 +250,7 @@
                         No hay libros registrados
                       </td>
                     </tr>
-                    <tr v-else v-for="libro in libros" :key="libro.id">
+                    <tr v-else v-for="libro in librosOrdenados" :key="libro.id">
                       <td class="text-muted">#{{ libro.id }}</td>
                       <td>
                         <img 
@@ -456,7 +472,7 @@
                         No hay usuarios registrados
                       </td>
                     </tr>
-                    <tr v-else v-for="usuario in usuarios" :key="usuario.id">
+                    <tr v-else v-for="usuario in usuariosOrdenados" :key="usuario.id">
                       <td class="text-muted">#{{ usuario.id }}</td>
                       <td>{{ usuario.nombre }}</td>
                       <td>{{ usuario.apellido }}</td>
@@ -842,6 +858,17 @@
                   </select>
                 </div>
 
+                <!-- Editorial -->
+                <div class="col-md-6">
+                  <label class="form-label">Editorial</label>
+                  <select class="form-select" v-model.number="libroForm.editorialId">
+                    <option value="">Seleccionar editorial</option>
+                    <option v-for="editorial in editoriales" :key="editorial.id" :value="editorial.id">
+                      {{ editorial.nombre }}
+                    </option>
+                  </select>
+                </div>
+
                 <!-- Categoría -->
                 <div class="col-md-6">
                   <label class="form-label">Categoría <span class="text-danger">*</span></label>
@@ -854,7 +881,7 @@
                 </div>
 
                 <!-- Precio -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label class="form-label">Precio (S/) <span class="text-danger">*</span></label>
                   <input 
                     type="number" 
@@ -867,8 +894,22 @@
                   />
                 </div>
 
+                <!-- Descuento -->
+                <div class="col-md-3">
+                  <label class="form-label">Descuento (%)</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    class="form-control" 
+                    v-model="libroForm.descuento" 
+                    min="0"
+                    max="100"
+                    placeholder="0.00"
+                  />
+                </div>
+
                 <!-- Stock -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label class="form-label">Stock <span class="text-danger">*</span></label>
                   <input 
                     type="number" 
@@ -881,7 +922,7 @@
                 </div>
 
                 <!-- Estado -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label class="form-label">Estado</label>
                   <select class="form-select" v-model="libroForm.activo">
                     <option :value="true">Activo</option>
@@ -890,7 +931,7 @@
                 </div>
 
                 <!-- ISBN -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <label class="form-label">ISBN</label>
                   <input 
                     type="text" 
@@ -900,17 +941,56 @@
                   />
                 </div>
 
-                <!-- Año de Publicación -->
-                <div class="col-md-6">
-                  <label class="form-label">Año de Publicación</label>
+                <!-- Páginas -->
+                <div class="col-md-4">
+                  <label class="form-label">Páginas</label>
                   <input 
                     type="number" 
                     class="form-control" 
-                    v-model="libroForm.anioPublicacion" 
-                    min="1000"
-                    :max="new Date().getFullYear()"
-                    placeholder="2024"
+                    v-model="libroForm.paginas" 
+                    min="1"
+                    placeholder="320"
                   />
+                </div>
+
+                <!-- Idioma -->
+                <div class="col-md-4">
+                  <label class="form-label">Idioma</label>
+                  <select class="form-select" v-model="libroForm.idioma">
+                    <option value="Español">Español</option>
+                    <option value="Inglés">Inglés</option>
+                    <option value="Francés">Francés</option>
+                    <option value="Alemán">Alemán</option>
+                    <option value="Italiano">Italiano</option>
+                    <option value="Portugués">Portugués</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+
+                <!-- Fecha de Publicación -->
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de Publicación</label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    v-model="libroForm.fechaPublicacion"
+                  />
+                </div>
+
+                <!-- Destacado -->
+                <div class="col-md-6">
+                  <label class="form-label">Destacado</label>
+                  <div class="form-check form-switch mt-2">
+                    <input 
+                      class="form-check-input" 
+                      type="checkbox" 
+                      v-model="libroForm.destacado"
+                      id="destacadoSwitch"
+                    >
+                    <label class="form-check-label" for="destacadoSwitch">
+                      Mostrar en sección destacados
+                    </label>
+                  </div>
                 </div>
 
                 <!-- URL de Portada -->
@@ -1092,6 +1172,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import Swal from 'sweetalert2'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -1128,16 +1209,26 @@ const libroEditando = ref(null)
 const guardandoLibro = ref(false)
 const autores = ref([])
 const categorias = ref([])
+const editoriales = ref([])
+
+// Caché para libros (optimización)
+const ultimaCargaLibros = ref(null)
+const TIEMPO_CACHE_LIBROS = 5 * 60 * 1000 // 5 minutos en milisegundos
 
 const libroForm = ref({
   titulo: '',
   autorId: '',
+  editorialId: '',
   categoriaId: '',
   precio: 0,
+  descuento: 0,
   stock: 0,
   activo: true,
+  destacado: false,
   isbn: '',
-  anioPublicacion: null,
+  paginas: null,
+  idioma: 'Español',
+  fechaPublicacion: '',
   portadaUrl: '',
   descripcion: ''
 })
@@ -1169,7 +1260,11 @@ const reportes = ref({
   ventasTotales: 0,
   totalOrdenes: 0,
   totalLibros: 0,
-  totalUsuarios: 0
+  totalUsuarios: 0,
+  ventasPorMes: [],
+  estadoOrdenes: {},
+  topLibros: [],
+  categorias: []
 })
 let chartInstances = {}
 
@@ -1203,11 +1298,25 @@ const currentViewDescription = computed(() => {
   return descriptions[currentView.value] || ''
 })
 
+// Computed properties para ordenar listas por ID
+const librosOrdenados = computed(() => {
+  return [...libros.value].sort((a, b) => a.id - b.id)
+})
+
+const usuariosOrdenados = computed(() => {
+  return [...usuarios.value].sort((a, b) => a.id - b.id)
+})
+
+const ordenesRecientesOrdenadas = computed(() => {
+  return [...ordenesRecientes.value].sort((a, b) => a.id - b.id)
+})
+
 const ordenesFiltradas = computed(() => {
-  if (!filtroEstadoOrden.value) {
-    return todasLasOrdenes.value
+  let ordenes = todasLasOrdenes.value
+  if (filtroEstadoOrden.value) {
+    ordenes = ordenes.filter(orden => orden.estado === filtroEstadoOrden.value)
   }
-  return todasLasOrdenes.value.filter(orden => orden.estado === filtroEstadoOrden.value)
+  return [...ordenes].sort((a, b) => a.id - b.id)
 })
 
 // Verificar que el usuario sea admin
@@ -1224,6 +1333,7 @@ onMounted(async () => {
   await cargarOrdenesRecientes()
   await cargarAutores()
   await cargarCategorias()
+  await cargarEditoriales()
 })
 
 // Cargar datos cuando se cambia de vista
@@ -1290,6 +1400,26 @@ function formatearFechaCorta(fecha) {
     day: '2-digit',
     month: 'short'
   })
+}
+
+function formatearTiempoCache(timestamp) {
+  if (!timestamp) return 'Nunca'
+  
+  const ahora = Date.now()
+  const diferencia = ahora - timestamp
+  const segundos = Math.floor(diferencia / 1000)
+  const minutos = Math.floor(segundos / 60)
+  
+  if (minutos < 1) {
+    return 'Hace menos de 1 minuto'
+  } else if (minutos === 1) {
+    return 'Hace 1 minuto'
+  } else if (minutos < 60) {
+    return `Hace ${minutos} minutos`
+  } else {
+    const horas = Math.floor(minutos / 60)
+    return `Hace ${horas} hora${horas > 1 ? 's' : ''}`
+  }
 }
 
 function getBadgeClass(estado) {
@@ -1402,12 +1532,26 @@ function cerrarModal() {
 // CRUD DE LIBROS
 // ========================================
 
-async function cargarLibros() {
+async function cargarLibros(forzarRecarga = false) {
+  // Verificar si hay datos en caché y no han expirado
+  const ahora = Date.now()
+  const tiempoTranscurrido = ultimaCargaLibros.value ? ahora - ultimaCargaLibros.value : null
+  
+  // Si hay datos en caché, no han expirado y no se fuerza la recarga, usar caché
+  if (!forzarRecarga && libros.value.length > 0 && tiempoTranscurrido && tiempoTranscurrido < TIEMPO_CACHE_LIBROS) {
+    console.log('📚 Usando libros desde caché (válido por', Math.round((TIEMPO_CACHE_LIBROS - tiempoTranscurrido) / 1000), 'segundos más)')
+    return
+  }
+  
+  // Si no hay caché válido, cargar desde el servidor
+  console.log('🔄 Cargando libros desde el servidor...')
   cargandoLibros.value = true
   try {
     const response = await fetch('http://localhost:8080/api/libros')
     if (response.ok) {
       libros.value = await response.json()
+      ultimaCargaLibros.value = Date.now() // Actualizar timestamp del caché
+      console.log('✅ Libros cargados y guardados en caché')
     }
   } catch (error) {
     console.error('Error al cargar libros:', error)
@@ -1446,6 +1590,21 @@ async function cargarCategorias() {
   }
 }
 
+async function cargarEditoriales() {
+  try {
+    const response = await fetch('http://localhost:8080/api/editoriales', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    if (response.ok) {
+      editoriales.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error al cargar editoriales:', error)
+  }
+}
+
 function abrirModalLibro(libro = null) {
   if (libro) {
     // Editar libro existente
@@ -1453,12 +1612,17 @@ function abrirModalLibro(libro = null) {
     libroForm.value = {
       titulo: libro.titulo,
       autorId: libro.autor?.id || '',
+      editorialId: libro.editorial?.id || '',
       categoriaId: libro.categoria?.id || '',
       precio: libro.precio,
+      descuento: libro.descuento || 0,
       stock: libro.stock,
       activo: libro.activo,
+      destacado: libro.destacado || false,
       isbn: libro.isbn || '',
-      anioPublicacion: libro.anioPublicacion || null,
+      paginas: libro.paginas || null,
+      idioma: libro.idioma || 'Español',
+      fechaPublicacion: libro.fechaPublicacion || '',
       portadaUrl: libro.portadaUrl || '',
       descripcion: libro.descripcion || ''
     }
@@ -1468,12 +1632,17 @@ function abrirModalLibro(libro = null) {
     libroForm.value = {
       titulo: '',
       autorId: '',
+      editorialId: '',
       categoriaId: '',
       precio: 0,
+      descuento: 0,
       stock: 0,
       activo: true,
+      destacado: false,
       isbn: '',
-      anioPublicacion: null,
+      paginas: null,
+      idioma: 'Español',
+      fechaPublicacion: '',
       portadaUrl: '',
       descripcion: ''
     }
@@ -1493,12 +1662,17 @@ async function guardarLibro() {
     const libroData = {
       titulo: libroForm.value.titulo,
       autor: { id: libroForm.value.autorId },
+      editorial: libroForm.value.editorialId ? { id: libroForm.value.editorialId } : null,
       categoria: { id: libroForm.value.categoriaId },
       precio: parseFloat(libroForm.value.precio),
+      descuento: parseFloat(libroForm.value.descuento) || 0,
       stock: parseInt(libroForm.value.stock),
       activo: libroForm.value.activo,
+      destacado: libroForm.value.destacado || false,
       isbn: libroForm.value.isbn || null,
-      anioPublicacion: libroForm.value.anioPublicacion || null,
+      paginas: libroForm.value.paginas ? parseInt(libroForm.value.paginas) : null,
+      idioma: libroForm.value.idioma || 'Español',
+      fechaPublicacion: libroForm.value.fechaPublicacion || null,
       portadaUrl: libroForm.value.portadaUrl || null,
       descripcion: libroForm.value.descripcion || null
     }
@@ -1529,7 +1703,7 @@ async function guardarLibro() {
     if (response.ok) {
       alert(`✅ Libro ${libroEditando.value ? 'actualizado' : 'creado'} exitosamente`)
       cerrarModalLibro()
-      await cargarLibros()
+      await cargarLibros(true) // Forzar recarga para invalidar caché
     } else {
       const error = await response.text()
       alert(`❌ Error: ${error}`)
@@ -1543,9 +1717,32 @@ async function guardarLibro() {
 }
 
 async function eliminarLibro(libroId) {
-  if (!confirm('¿Estás seguro de que deseas eliminar este libro?')) {
+  // Confirmación con SweetAlert2
+  const result = await Swal.fire({
+    title: '¿Eliminar libro?',
+    text: 'Esta acción no se puede deshacer',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    reverseButtons: true
+  })
+
+  if (!result.isConfirmed) {
     return
   }
+
+  // Mostrar loading
+  Swal.fire({
+    title: 'Eliminando libro...',
+    text: 'Por favor espera',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading()
+    }
+  })
 
   try {
     const response = await fetch(`http://localhost:8080/api/libros/${libroId}`, {
@@ -1556,14 +1753,31 @@ async function eliminarLibro(libroId) {
     })
 
     if (response.ok) {
-      alert('✅ Libro eliminado exitosamente')
-      await cargarLibros()
+      await cargarLibros(true) // Forzar recarga para invalidar caché
+      
+      Swal.fire({
+        icon: 'success',
+        title: '¡Libro eliminado!',
+        text: 'El libro ha sido eliminado exitosamente',
+        timer: 2000,
+        showConfirmButton: false
+      })
     } else {
-      alert('❌ Error al eliminar el libro')
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo eliminar el libro',
+        confirmButtonText: 'OK'
+      })
     }
   } catch (error) {
     console.error('Error al eliminar libro:', error)
-    alert('❌ Error de conexión')
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: 'No se pudo conectar con el servidor',
+      confirmButtonText: 'OK'
+    })
   }
 }
 
@@ -1752,7 +1966,52 @@ async function cargarReportes() {
     })
     
     if (responseStats.ok) {
-      reportes.value = await responseStats.json()
+      const stats = await responseStats.json()
+      reportes.value = { ...reportes.value, ...stats }
+    }
+
+    // Cargar ventas por mes
+    const responseVentas = await fetch('http://localhost:8080/api/admin/reportes/ventas-por-mes', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseVentas.ok) {
+      reportes.value.ventasPorMes = await responseVentas.json()
+    }
+
+    // Cargar estado de órdenes
+    const responseEstado = await fetch('http://localhost:8080/api/admin/reportes/estado-ordenes', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseEstado.ok) {
+      reportes.value.estadoOrdenes = await responseEstado.json()
+    }
+
+    // Cargar top libros
+    const responseTopLibros = await fetch('http://localhost:8080/api/admin/reportes/top-libros', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseTopLibros.ok) {
+      reportes.value.topLibros = await responseTopLibros.json()
+    }
+
+    // Cargar categorías populares
+    const responseCategorias = await fetch('http://localhost:8080/api/admin/reportes/categorias-populares', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (responseCategorias.ok) {
+      reportes.value.categorias = await responseCategorias.json()
     }
 
     // Esperar un momento para que el DOM se actualice
@@ -1777,13 +2036,25 @@ function crearGraficos() {
     // Gráfico de Ventas por Mes
     const ctxVentas = document.getElementById('ventasPorMesChart')
     if (ctxVentas) {
+      // Preparar datos de ventas por mes
+      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+      const ventasData = reportes.value.ventasPorMes || []
+      
+      // Crear array de 12 meses con valores
+      const ventasPorMes = Array(12).fill(0)
+      ventasData.forEach(item => {
+        if (item.mes >= 1 && item.mes <= 12) {
+          ventasPorMes[item.mes - 1] = item.total || 0
+        }
+      })
+      
       chartInstances.ventas = new Chart(ctxVentas, {
         type: 'line',
         data: {
-          labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+          labels: meses,
           datasets: [{
             label: 'Ventas (S/)',
-            data: [1200, 1900, 3000, 5000, 2300, 3200, 4100, 3800, 4500, 5200, 4800, 6000],
+            data: ventasPorMes,
             borderColor: 'rgb(75, 192, 192)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             tension: 0.4,
@@ -1797,11 +2068,23 @@ function crearGraficos() {
             legend: {
               display: true,
               position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Ventas: S/' + context.parsed.y.toFixed(2)
+                }
+              }
             }
           },
           scales: {
             y: {
-              beginAtZero: true
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return 'S/' + value.toFixed(0)
+                }
+              }
             }
           }
         }
@@ -1811,18 +2094,40 @@ function crearGraficos() {
     // Gráfico de Estado de Órdenes (Pie)
     const ctxEstado = document.getElementById('estadoOrdenesChart')
     if (ctxEstado) {
+      const estadoData = reportes.value.estadoOrdenes || {}
+      const labels = []
+      const data = []
+      const colors = {
+        'PENDIENTE': 'rgba(255, 206, 86, 0.8)',
+        'EN_CAMINO': 'rgba(54, 162, 235, 0.8)',
+        'ENTREGADO': 'rgba(75, 192, 192, 0.8)',
+        'CANCELADO': 'rgba(255, 99, 132, 0.8)'
+      }
+      const backgroundColors = []
+      
+      // Mapeo de estados a nombres legibles
+      const estadoNombres = {
+        'PENDIENTE': 'Pendiente',
+        'EN_CAMINO': 'En camino',
+        'ENTREGADO': 'Entregado',
+        'CANCELADO': 'Cancelado'
+      }
+      
+      Object.entries(estadoData).forEach(([estado, cantidad]) => {
+        labels.push(estadoNombres[estado] || estado)
+        data.push(cantidad)
+        backgroundColors.push(colors[estado] || 'rgba(200, 200, 200, 0.8)')
+      })
+      
       chartInstances.estado = new Chart(ctxEstado, {
         type: 'doughnut',
         data: {
-          labels: ['Pendiente', 'En camino', 'Entregado'],
+          labels: labels,
           datasets: [{
-            data: [30, 45, 125],
-            backgroundColor: [
-              'rgba(255, 206, 86, 0.8)',
-              'rgba(54, 162, 235, 0.8)',
-              'rgba(75, 192, 192, 0.8)'
-            ],
-            borderWidth: 2
+            data: data,
+            backgroundColor: backgroundColors,
+            borderWidth: 2,
+            borderColor: '#fff'
           }]
         },
         options: {
@@ -1831,6 +2136,17 @@ function crearGraficos() {
           plugins: {
             legend: {
               position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || ''
+                  const value = context.parsed || 0
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0)
+                  const percentage = ((value / total) * 100).toFixed(1)
+                  return `${label}: ${value} (${percentage}%)`
+                }
+              }
             }
           }
         }
@@ -1840,21 +2156,32 @@ function crearGraficos() {
     // Gráfico de Top 5 Libros
     const ctxLibros = document.getElementById('topLibrosChart')
     if (ctxLibros) {
+      const topLibrosData = reportes.value.topLibros || []
+      const labels = topLibrosData.map(item => {
+        // Truncar títulos largos
+        const titulo = item.titulo || item.nombre || 'Sin título'
+        return titulo.length > 20 ? titulo.substring(0, 20) + '...' : titulo
+      })
+      const data = topLibrosData.map(item => item.cantidad || item.ventas || 0)
+      
+      const backgroundColors = [
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(54, 162, 235, 0.8)',
+        'rgba(255, 206, 86, 0.8)',
+        'rgba(75, 192, 192, 0.8)',
+        'rgba(153, 102, 255, 0.8)'
+      ]
+      
       chartInstances.libros = new Chart(ctxLibros, {
         type: 'bar',
         data: {
-          labels: ['Sapiens', '1984', 'Cien años...', 'El Principito', 'After'],
+          labels: labels,
           datasets: [{
             label: 'Unidades Vendidas',
-            data: [45, 38, 32, 28, 25],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.8)',
-              'rgba(54, 162, 235, 0.8)',
-              'rgba(255, 206, 86, 0.8)',
-              'rgba(75, 192, 192, 0.8)',
-              'rgba(153, 102, 255, 0.8)'
-            ],
-            borderWidth: 1
+            data: data,
+            backgroundColor: backgroundColors.slice(0, data.length),
+            borderWidth: 1,
+            borderColor: backgroundColors.slice(0, data.length).map(color => color.replace('0.8', '1'))
           }]
         },
         options: {
@@ -1863,11 +2190,21 @@ function crearGraficos() {
           plugins: {
             legend: {
               display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Vendidos: ' + context.parsed.y + ' unidades'
+                }
+              }
             }
           },
           scales: {
             y: {
-              beginAtZero: true
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
             }
           }
         }
@@ -1877,15 +2214,31 @@ function crearGraficos() {
     // Gráfico de Categorías
     const ctxCategorias = document.getElementById('categoriasChart')
     if (ctxCategorias) {
+      const categoriasData = reportes.value.categorias || []
+      const labels = categoriasData.map(item => item.nombre || item.categoria || 'Sin categoría')
+      const data = categoriasData.map(item => item.cantidad || item.ventas || 0)
+      
+      // Generar colores degradados para cada categoría
+      const generateColors = (count) => {
+        const colors = []
+        for (let i = 0; i < count; i++) {
+          const hue = (i * 360) / count
+          colors.push(`hsla(${hue}, 70%, 60%, 0.8)`)
+        }
+        return colors
+      }
+      
+      const backgroundColors = generateColors(data.length)
+      
       chartInstances.categorias = new Chart(ctxCategorias, {
         type: 'bar',
         data: {
-          labels: ['Ficción', 'Romance', 'Ciencia', 'Historia', 'Autoayuda'],
+          labels: labels,
           datasets: [{
             label: 'Ventas por Categoría',
-            data: [65, 59, 45, 38, 32],
-            backgroundColor: 'rgba(153, 102, 255, 0.8)',
-            borderColor: 'rgba(153, 102, 255, 1)',
+            data: data,
+            backgroundColor: backgroundColors,
+            borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
             borderWidth: 1
           }]
         },
@@ -1896,11 +2249,21 @@ function crearGraficos() {
           plugins: {
             legend: {
               display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Ventas: ' + context.parsed.x + ' unidades'
+                }
+              }
             }
           },
           scales: {
             x: {
-              beginAtZero: true
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
             }
           }
         }

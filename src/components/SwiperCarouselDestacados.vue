@@ -87,8 +87,8 @@ const modules = [Navigation, Autoplay]
               <p class="libro-autor">{{ libro.autor?.nombre }} {{ libro.autor?.apellido }}</p>
               
               <div class="libro-precios">
-                <span class="precio-actual">S/ {{ (libro.precio * (1 - libro.descuento / 100)).toFixed(2) }}</span>
-                <span v-if="libro.descuento > 0" class="precio-original">S/ {{ libro.precio.toFixed(2) }}</span>
+                <span class="precio-actual">S/ {{ libro.precio.toFixed(2) }}</span>
+                <span v-if="libro.descuento > 0" class="precio-original">S/ {{ (libro.precio / (1 - libro.descuento / 100)).toFixed(2) }}</span>
                 <span v-if="libro.descuento > 0" class="badge-porcentaje">-{{ libro.descuento }}%</span>
               </div>
             </div>

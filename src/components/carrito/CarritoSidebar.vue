@@ -117,11 +117,11 @@
         </div>
         <div class="resumen-linea">
           <span>Envío:</span>
-          <span class="precio-envio">Gratis</span>
+          <span class="precio-envio">S/{{ costoEnvio.toFixed(2) }}</span>
         </div>
         <div class="resumen-total">
           <span>Total:</span>
-          <span class="precio-total">S/{{ carritoStore.total.toFixed(2) }}</span>
+          <span class="precio-total">S/{{ totalConEnvio.toFixed(2) }}</span>
         </div>
       </div>
 
@@ -140,6 +140,7 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { useCarritoStore } from '@/stores/carrito'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
@@ -148,6 +149,14 @@ import Swal from 'sweetalert2'
 const carritoStore = useCarritoStore()
 const authStore = useAuthStore()
 const router = useRouter()
+
+// Costo de envío
+const costoEnvio = ref(8.00)
+
+// Total con envío
+const totalConEnvio = computed(() => {
+  return carritoStore.total + costoEnvio.value
+})
 
 // Métodos
 function cerrarCarrito() {
@@ -513,8 +522,8 @@ function handleImageError(event) {
 }
 
 .precio-envio {
-  color: #28a745;
-  font-weight: 500;
+  color: #0d6efd;
+  font-weight: 600;
 }
 
 .precio-subtotal,

@@ -39,7 +39,7 @@
               <div class="row align-items-center">
                 <div class="col-md-3">
                   <div class="small text-muted">N° de Pedido</div>
-                  <div class="fw-bold">#{{ pedidos.length - index }}</div>
+                  <div class="fw-bold">#{{ index + 1 }}</div>
                 </div>
                 <div class="col-md-3">
                   <div class="small text-muted">Fecha</div>
@@ -144,7 +144,11 @@
                   <i class="fas fa-eye me-1"></i>
                   Ver detalle
                 </button>
-                <button v-if="pedido.estado === 'entregado'" class="btn btn-sm btn-outline-success">
+                <button 
+                  v-if="pedido.estado === 'entregado'" 
+                  @click="descargarFactura(pedido.id)"
+                  class="btn btn-sm btn-outline-success"
+                >
                   <i class="fas fa-download me-1"></i>
                   Descargar factura
                 </button>
@@ -220,7 +224,12 @@
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="cerrarModal">Cerrar</button>
-            <button v-if="pedidoSeleccionado?.estado === 'entregado'" type="button" class="btn btn-success">
+            <button 
+              v-if="pedidoSeleccionado?.estado === 'entregado'" 
+              type="button" 
+              class="btn btn-success"
+              @click="descargarFactura(pedidoSeleccionado.id)"
+            >
               <i class="fas fa-download me-2"></i>
               Descargar Factura
             </button>
@@ -234,8 +243,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useFactura } from '@/composables/useFactura'
 
 const authStore = useAuthStore()
+const { descargarFactura } = useFactura()
 
 const pedidos = ref([])
 const cargando = ref(true)
@@ -259,8 +270,12 @@ async function cargarPedidos() {
     })
 
     if (response.ok) {
-      pedidos.value = await response.json()
-      console.log('✅ Pedidos cargados:', pedidos.value)
+      const data = await response.json()
+      // Ordenar por fecha: más antiguo primero
+      pedidos.value = data.sort((a, b) => {
+        return new Date(a.fechaPedido) - new Date(b.fechaPedido)
+      })
+      console.log('✅ Pedidos cargados y ordenados:', pedidos.value)
     } else {
       console.error('❌ Error al cargar pedidos')
     }
@@ -326,7 +341,7 @@ function getEstadoTexto(estado) {
 
 // Ver detalle del pedido
 async function verDetalle(pedido) {
-  const numeroPedido = pedidos.value.length - pedidos.value.indexOf(pedido)
+  const numeroPedido = pedidos.value.indexOf(pedido) + 1
   pedidoSeleccionado.value = { ...pedido, numeroPedido }
   mostrarModal.value = true
   

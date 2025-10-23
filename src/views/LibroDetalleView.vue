@@ -230,7 +230,9 @@
                       </div>
                       <div class="col-md-6">
                         <h6 class="fw-bold">Stock disponible:</h6>
-                        <p>{{ libro.stock || 'Más de 10' }} unidades disponibles</p>
+                        <p v-if="libro.stock === 0">Sin stock</p>
+                        <p v-else-if="libro.stock === 1">{{ libro.stock }} unidad disponible</p>
+                        <p v-else>{{ libro.stock }} unidades disponibles</p>
                       </div>
                     </div>
                   </div>
@@ -256,16 +258,17 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCarritoStore } from '@/stores/carrito'
+import { useFavoritosStore } from '@/stores/favoritos'
 import api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
 const carritoStore = useCarritoStore()
+const favoritosStore = useFavoritosStore()
 
 // Estado reactivo
 const libro = ref(null)
 const cantidad = ref(1)
-const enListaDeseos = ref(false)
 
 // Computed properties
 const autorCompleto = computed(() => {
@@ -316,6 +319,12 @@ const libroDisponible = computed(() => {
   
   // Verificar que esté activo Y tenga stock
   return libro.value.activo && (libro.value.stock > 0)
+})
+
+// Computed para verificar si está en favoritos
+const enListaDeseos = computed(() => {
+  if (!libro.value) return false
+  return favoritosStore.esFavorito(libro.value.id)
 })
 
 // Métodos
@@ -377,10 +386,9 @@ function decrementarCantidad() {
 }
 
 function toggleListaDeseos() {
-  enListaDeseos.value = !enListaDeseos.value
-  // Aquí podrías integrar con un store de lista de deseos
-  const mensaje = enListaDeseos.value ? 'añadido a' : 'removido de'
-  alert(`${libro.value.titulo} ${mensaje} la lista de deseos`)
+  if (libro.value) {
+    favoritosStore.toggleFavorito(libro.value)
+  }
 }
 
 // Lifecycle
