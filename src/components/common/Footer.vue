@@ -11,11 +11,19 @@
               Tu librería de confianza con la mejor selección de libros. 
               Descubre nuevos mundos a través de la lectura.
             </p>
-            <div class="redes-sociales">
-              <a href="https://facebook.com/bookify" target="_blank" class="red-social" title="Facebook">📘</a>
-              <a href="https://twitter.com/bookify" target="_blank" class="red-social" title="Twitter">🐦</a>
-              <a href="https://instagram.com/bookify" target="_blank" class="red-social" title="Instagram">📷</a>
-              <a href="https://youtube.com/bookify" target="_blank" class="red-social" title="YouTube">📺</a>
+            <div class="redes-sociales social-list">
+              <a href="https://facebook.com/bookify" target="_blank" class="red-social social-icon" title="Facebook" aria-label="Facebook">
+                <i class="bi bi-facebook"></i>
+              </a>
+              <a href="https://twitter.com/bookify" target="_blank" class="red-social social-icon" title="Twitter" aria-label="Twitter">
+                <i class="bi bi-twitter-x"></i>
+              </a>
+              <a href="https://instagram.com/bookify" target="_blank" class="red-social social-icon" title="Instagram" aria-label="Instagram">
+                <i class="bi bi-instagram"></i>
+              </a>
+              <a href="https://youtube.com/bookify" target="_blank" class="red-social social-icon" title="YouTube" aria-label="YouTube">
+                <i class="bi bi-youtube"></i>
+              </a>
             </div>
           </div>
 
@@ -35,21 +43,18 @@
           <div class="footer-seccion">
             <h4 class="footer-subtitulo">Contáctanos</h4>
             <div class="contacto-info">
+              
               <div class="contacto-item">
-                <span class="contacto-icono">📍</span>
-                <span class="contacto-texto">Av. Principal 123, Lima</span>
+                <span class="contacto-icono"><i class="bi bi-telephone"></i></span>
+                <span class="contacto-texto">(01) 644-9191</span>
               </div>
               <div class="contacto-item">
-                <span class="contacto-icono">📞</span>
-                <span class="contacto-texto">+1 234 567 8900</span>
-              </div>
-              <div class="contacto-item">
-                <span class="contacto-icono">✉️</span>
+                <span class="contacto-icono"><i class="bi bi-envelope-fill"></i></span>
                 <span class="contacto-texto">MundoDePapel@hotmail.com</span>
               </div>
               <div class="contacto-item">
-                <span class="contacto-icono">🕒</span>
-                <span class="contacto-texto">Lun - Vie: 9:00 - 18:00</span>
+                <span class="contacto-icono"><i class="bi bi-whatsapp"></i></span>
+                <span class="contacto-texto">+51 955 079 929</span>
               </div>
             </div>
           </div>
@@ -58,15 +63,13 @@
           <div class="footer-seccion">
             <h4 class="footer-subtitulo">Formas de Pago</h4>
             <div class="metodos-pago">
-              <div class="pago-iconos">
-                <span class="pago-icono" title="Tarjeta de crédito">💳</span>
-                <span class="pago-icono" title="Transferencia bancaria">🏦</span>
-                <span class="pago-icono" title="Pago móvil">📱</span>
-                <span class="pago-icono" title="Efectivo/Pago contra entrega">💰</span>
+              <!-- Imagen con métodos de pago (archivo en src/assets) -->
+              <div class="footer-payment-wrapper mt-2">
+                <img src="@/assets/footer-payment-methods.png" alt="Métodos de pago" class="footer-payment-img">
               </div>
             </div>
             <p class="footer-descripcion" style="font-size: 0.9rem; margin-top: 0.5rem;">
-              Paga de forma segura con tu método favorito.
+              Paga de forma segura.
             </p>
           </div>
         </div>
@@ -78,7 +81,7 @@
       <div class="container">
         <div class="footer-inferior-contenido">
           <div class="copyright">
-            <p>&copy; {{ añoActual }} Bookify. Todos los derechos reservados.</p>
+            <p>&copy; {{ añoActual }} Mundo de Papel. Todos los derechos reservados.</p>
           </div>
           <div class="enlaces-legales">
             <router-link to="/privacidad" class="enlace-legal">Política de Privacidad</router-link>
@@ -198,26 +201,36 @@ async function suscribirseNewsletter() {
   gap: 1rem;
 }
 
-.red-social {
+.social-list {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.social-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 45px;
-  height: 45px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  padding: 8px; /* un poco más de área clicable */
+  background: transparent; /* sin fondo */
+  border-radius: 0;
   text-decoration: none;
-  font-size: 1.3rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.4rem; /* mayor tamaño base */
+  color: #ffffff; /* icono blanco */
+  transition: transform 0.18s ease, color 0.18s ease;
+  box-shadow: none;
+  border: none;
 }
 
-.red-social:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+.social-icon i {
+  font-size: 1.6rem; /* iconos más grandes */
+  line-height: 1;
+  color: #fff;
+}
+
+.social-icon:hover {
+  transform: translateY(-3px) scale(1.08);
+  color: #e6e6e6;
 }
 
 /* Listas del footer */
@@ -256,8 +269,13 @@ async function suscribirseNewsletter() {
 }
 
 .contacto-icono {
-  font-size: 1.1rem;
-  width: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
+  font-size: 1.05rem;
 }
 
 .contacto-texto {
@@ -353,6 +371,23 @@ async function suscribirseNewsletter() {
   transform: scale(1.1) translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Imagen de métodos de pago en el footer */
+.footer-payment-wrapper {
+  margin-top: 0.5rem;
+}
+.footer-payment-img {
+  max-width: 160px; /* reducido según petición */
+  width: auto;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .footer-payment-img {
+    max-width: 120px;
+  }
 }
 
 /* Footer inferior */
