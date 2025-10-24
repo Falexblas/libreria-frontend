@@ -3,10 +3,10 @@
     <!-- Stepper -->
     <div class="mb-4">
       <div class="stepper d-flex align-items-center justify-content-between">
-    <div class="step d-flex flex-column align-items-center" :class="{ active: step === 1, completed: step > 1 }">
-          <div class="step-circle">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.44C8.89 16.37 9.5 18 11 18h8v-2h-7.42c-.14 0-.25-.11-.25-.25l.03-.12L13.1 13h4.45c.75 0 1.41-.41 1.75-1.03L21.82 6H6.21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
+      <div class="step d-flex flex-column align-items-center" :class="{ active: step === 1, completed: step > 1 }">
+            <div class="step-circle">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.44C8.89 16.37 9.5 18 11 18h8v-2h-7.42c-.14 0-.25-.11-.25-.25l.03-.12L13.1 13h4.45c.75 0 1.41-.41 1.75-1.03L21.82 6H6.21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
           <div class="step-label small mt-2 text-muted">Carrito</div>
         </div>
 
@@ -148,38 +148,42 @@
               </div>
             </div>
 
-            <form class="mt-3">
+            <form class="mt-3" @submit.prevent>
               <div class="row g-3">
                 <div class="col-12">
                   <label class="form-label">Correo</label>
-                  <input type="email" v-model="datos.correo" class="form-control" placeholder="correo@ejemplo.com" />
+                  <input type="email" v-model="datos.correo" class="form-control" placeholder="correo@ejemplo.com" @blur="datosTouched.correo = true" />
+                  <div v-if="errors.correo && datosTouched.correo" class="invalid-feedback d-block">{{ errors.correo }}</div>
                 </div>
 
                 <div class="col-12 col-md-6">
                   <label class="form-label">Nombre</label>
-                  <input type="text" v-model="datos.nombre" class="form-control" placeholder="Nombre" />
+                  <input type="text" v-model="datos.nombre" class="form-control" placeholder="Nombre" @blur="datosTouched.nombre = true" />
+                  <div v-if="errors.nombre && datosTouched.nombre" class="invalid-feedback d-block">{{ errors.nombre }}</div>
                 </div>
  
 
                 <div class="col-12 col-md-6">
                   <label class="form-label">Apellidos</label>
-                  <input type="text" v-model="datos.apellidos" class="form-control" placeholder="Apellidos" />
+                  <input type="text" v-model="datos.apellidos" class="form-control" placeholder="Apellidos" @blur="datosTouched.apellidos = true" />
+                  <div v-if="errors.apellidos && datosTouched.apellidos" class="invalid-feedback d-block">{{ errors.apellidos }}</div>
                 </div>
 
                 <div class="col-12 col-md-6">
                   <label class="form-label">Documento de identidad</label>
-                  <input type="text" v-model="datos.documento" class="form-control" placeholder="Número de documento" />
+                  <input type="text" v-model="datos.documento" class="form-control" placeholder="Número de documento" @blur="datosTouched.documento = true" />
+                  <div v-if="errors.documento && datosTouched.documento" class="invalid-feedback d-block">{{ errors.documento }}</div>
                 </div>
 
                 <div class="col-12 col-md-6">
                   <label class="form-label">Teléfono / Móvil</label>
-                  <input type="tel" v-model="datos.telefono" class="form-control" placeholder="999 999 999" />
+                  <input type="tel" v-model="datos.telefono" class="form-control" placeholder="999 999 999" @blur="datosTouched.telefono = true" @input="onDatosTelefonoInput" />
                 </div>
               </div>
 
               <div class="d-flex gap-2 mt-4">
                 <button type="button" class="btn btn-outline-secondary" @click="regresarPaso">Regresar</button>
-                <button type="button" class="btn btn-entrega" @click="avanzarPaso">IR A DATOS DE ENTREGA</button>
+                <button type="button" class="btn btn-entrega" @click="avanzarPaso" :disabled="!datosValid">IR A DATOS DE ENTREGA</button>
               </div>
             </form>
           </div>
@@ -244,7 +248,7 @@
               </div>
             </div>
 
-            <form class="mt-3">
+            <form class="mt-3" @submit.prevent>
               <div class="row g-3">
                 <!-- Fila 1: Departamento, Provincia, Distrito -->
                 <div class="col-12">
@@ -283,7 +287,7 @@
 
                     <div class="col-12 col-md-4">
                       <label class="form-label">Provincia</label>
-                      <select v-model="entrega.provincia" class="form-select" :disabled="!entrega.departamento">
+                      <select v-model="entrega.provincia" class="form-select" :disabled="!entrega.departamento" @change="entregaTouched.provincia = true" @blur="entregaTouched.provincia = true">
                         <option value="">{{ entrega.departamento ? 'Seleccione' : 'Primero seleccione departamento' }}</option>
                         <option v-for="prov in provinciasDisponibles" :key="prov" :value="prov">{{ prov }}</option>
                       </select>
@@ -291,7 +295,7 @@
 
                     <div class="col-12 col-md-4">
                       <label class="form-label">Distrito</label>
-                      <select v-model="entrega.distrito" class="form-select" :disabled="!entrega.provincia">
+                      <select v-model="entrega.distrito" class="form-select" :disabled="!entrega.provincia" @change="entregaTouched.distrito = true" @blur="entregaTouched.distrito = true">
                         <option value="">{{ entrega.provincia ? 'Seleccione' : 'Primero seleccione provincia' }}</option>
                         <option v-for="dist in distritosDisponibles" :key="dist" :value="dist">{{ dist }}</option>
                       </select>
@@ -302,7 +306,8 @@
                 <!-- Fila 2: Dirección -->
                 <div class="col-12">
                   <label class="form-label">Dirección</label>
-                  <input type="text" v-model="entrega.direccion" class="form-control" placeholder="Av/Jr/Calle, número, piso, etc." />
+                  <input type="text" v-model="entrega.direccion" class="form-control" placeholder="Av/Jr/Calle, número, piso, etc." @blur="entregaTouched.direccion = true" />
+                  <div v-if="errors.direccion && entregaTouched.direccion" class="invalid-feedback d-block">{{ errors.direccion }}</div>
                 </div>
 
                 <!-- Fila 3: Referencia y Código Postal -->
@@ -314,7 +319,8 @@
                     </div>
                     <div class="col-12 col-md-6">
                       <label class="form-label">Código postal</label>
-                      <input type="text" v-model="entrega.codigoPostal" class="form-control" placeholder="15001" />
+                      <input type="text" v-model="entrega.codigoPostal" class="form-control" placeholder="15001" @blur="entregaTouched.codigoPostal = true" />
+                      <div v-if="errors.codigoPostal && entregaTouched.codigoPostal" class="invalid-feedback d-block">{{ errors.codigoPostal }}</div>
                     </div>
                   </div>
                 </div>
@@ -328,7 +334,7 @@
 
               <div class="d-flex gap-2 mt-4">
                 <button type="button" class="btn btn-outline-secondary" @click="regresarPaso">Regresar</button>
-                <button type="button" class="btn btn-entrega" @click="avanzarPaso">IR A DATOS DE PAGO</button>
+                <button type="button" class="btn btn-entrega" @click="avanzarPaso" :disabled="!entregaValid">IR A DATOS DE PAGO</button>
               </div>
             </form>
           </div>
@@ -403,42 +409,48 @@
 
             <!-- Formulario Tarjeta -->
             <div v-if="paymentMethod === 'card'">
-              <div class="mb-3">
+                <div class="mb-3">
                 <label class="form-label">Número de tarjeta</label>
-                <input class="form-control" placeholder="Número de tarjeta" v-model="card.number" />
+                <input class="form-control" placeholder="1234 1234 1234 1234" v-model="card.number" @blur="cardTouched.number = true" @input="onCardNumberInput" inputmode="numeric" maxlength="19" />
+                <div v-if="cardErrors.number && cardTouched.number" class="invalid-feedback d-block">{{ cardErrors.number }}</div>
               </div>
 
               <div class="row g-2 mb-3">
                 <div class="col-6">
                   <label class="form-label">Caducidad</label>
-                  <input class="form-control" placeholder="MM/AA" v-model="card.expiry" />
+                  <input class="form-control" placeholder="MM/AA" v-model="card.expiry" @blur="cardTouched.expiry = true" @input="onCardExpiryInput" />
+                  <div v-if="cardErrors.expiry && cardTouched.expiry" class="invalid-feedback d-block">{{ cardErrors.expiry }}</div>
                 </div>
                 <div class="col-6">
                   <label class="form-label">CVV</label>
-                  <input class="form-control" placeholder="CVV" v-model="card.cvv" />
+                  <input class="form-control" placeholder="CVV" v-model="card.cvv" @blur="cardTouched.cvv = true" @input="onCvvInput" maxlength="3" inputmode="numeric" pattern="\d{3}" />
+                  <div v-if="cardErrors.cvv && cardTouched.cvv" class="invalid-feedback d-block">{{ cardErrors.cvv }}</div>
                 </div>
               </div>
 
               <div class="row g-2 mb-3">
                 <div class="col-6">
                   <label class="form-label">Nombres</label>
-                  <input class="form-control" placeholder="Nombres" v-model="card.firstName" />
+                  <input class="form-control" placeholder="Nombres" v-model="card.firstName" @blur="cardTouched.firstName = true" />
+                  <div v-if="cardErrors.firstName && cardTouched.firstName" class="invalid-feedback d-block">{{ cardErrors.firstName }}</div>
                 </div>
                 <div class="col-6">
                   <label class="form-label">Apellidos</label>
-                  <input class="form-control" placeholder="Apellidos" v-model="card.lastName" />
+                  <input class="form-control" placeholder="Apellidos" v-model="card.lastName" @blur="cardTouched.lastName = true" />
+                  <div v-if="cardErrors.lastName && cardTouched.lastName" class="invalid-feedback d-block">{{ cardErrors.lastName }}</div>
                 </div>
               </div>
 
               <div class="mb-3">
                 <label class="form-label">Correo electrónico</label>
-                <input class="form-control" placeholder="Correo electrónico" v-model="card.email" />
+                <input class="form-control" placeholder="Correo electrónico" v-model="card.email" @blur="cardTouched.email = true" />
+                <div v-if="cardErrors.email && cardTouched.email" class="invalid-feedback d-block">{{ cardErrors.email }}</div>
               </div>
 
               <div class="d-grid">
                 <button 
                   @click="procesarPago" 
-                  :disabled="procesandoPago"
+                  :disabled="procesandoPago || !cardValid"
                   class="btn btn-primary py-3">
                   <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</span>
                   <span v-else>
@@ -490,14 +502,16 @@
 
               <div class="mb-3">
                 <label class="form-label">Ingresa tu celular Yape</label>
-                <input class="form-control" placeholder="999 999 999" v-model="yape.phone" />
+                <input class="form-control" placeholder="999 999 999" v-model="yape.phone" @blur="yapeTouched.phone = true" @input="onYapePhoneInput" inputmode="numeric" maxlength="11" pattern="\d{9}" />
+                <div v-if="yapeTouched.phone && yapePhoneError" class="invalid-feedback d-block">{{ yapePhoneError }}</div>
               </div>
 
-              <div class="mb-3">
+                <div class="mb-3">
                 <label class="form-label">Código de aprobación</label>
                 <div class="d-flex gap-2 code-inputs">
-                  <input v-for="(d, i) in yape.code" :key="i" type="text" maxlength="1" class="form-control code-digit text-center" v-model="yape.code[i]" />
+                  <input v-for="(d, i) in yape.code" :key="i" type="text" maxlength="1" class="form-control code-digit text-center" v-model="yape.code[i]" @blur="yapeTouched.code = true" />
                 </div>
+                <div v-if="!yapeCodeValid && yapeTouched.code" class="invalid-feedback d-block">Este campo es obligatorio.</div>
               </div>
 
               <div class="d-grid">
@@ -582,11 +596,179 @@ const paymentMethod = ref('card')
 const card = reactive({ number: '', expiry: '', cvv: '', firstName: '', lastName: '', email: '' })
 const yape = reactive({ phone: '', code: ['', '', '', '', '', ''] })
 
-// Computed: true cuando el teléfono y los 6 dígitos del código están rellenados
+// Computed: true cuando el teléfono y los 6 dígitos del código están rellenados y tienen formato correcto
 const isYapeComplete = computed(() => {
-  const phoneOk = yape.phone && String(yape.phone).trim().length > 0
-  const codeOk = Array.isArray(yape.code) && yape.code.length === 6 && yape.code.every(c => c && String(c).trim().length === 1)
+  const phoneStr = String(yape.phone || '').replace(/\s+/g, '')
+  const phoneOk = /^9\d{8}$/.test(phoneStr)
+  const codeOk = Array.isArray(yape.code) && yape.code.length === 6 && yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
   return phoneOk && codeOk
+})
+
+// Errores y validaciones reactivas
+const errors = reactive({ correo: '', nombre: '', apellidos: '', documento: '', telefono: '', direccion: '', codigoPostal: '' })
+const cardErrors = reactive({ number: '', expiry: '', cvv: '', firstName: '', lastName: '', email: '' })
+
+// Flags 'touched' para mostrar errores solo después de interacción
+const datosTouched = reactive({ correo: false, nombre: false, apellidos: false, documento: false, telefono: false })
+const entregaTouched = reactive({ departamento: false, provincia: false, distrito: false, direccion: false, codigoPostal: false })
+const cardTouched = reactive({ number: false, expiry: false, cvv: false, firstName: false, lastName: false, email: false })
+const yapeTouched = reactive({ phone: false, code: false })
+
+function validarEmail(email) {
+  if (!email) return false
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i
+  return re.test(String(email).toLowerCase())
+}
+
+// Formatear teléfono agrupando cada 3 dígitos (ej: "999 999 999").
+// acepta un parámetro opcional maxDigits para truncar la entrada.
+function formatPhoneGrouped(value, maxDigits) {
+  let digits = String(value || '').replace(/\D+/g, '')
+  if (!digits) return ''
+  if (typeof maxDigits === 'number' && maxDigits > 0) digits = digits.slice(0, maxDigits)
+  // agrupar en bloques de 3
+  return digits.replace(/(.{1,3})/g, '$1 ').trim()
+}
+
+function onDatosTelefonoInput(e) {
+  // limitar a 9 dígitos para el teléfono de identificación
+  const formatted = formatPhoneGrouped(e.target.value, 9)
+  datos.telefono = formatted
+}
+
+function onYapePhoneInput(e) {
+  // limitar a 9 dígitos para Yape (número local) y formatear cada 3
+  const formatted = formatPhoneGrouped(e.target.value, 9)
+  yape.phone = formatted
+}
+
+// Formatear caducidad automáticamente: después de 2 dígitos insertar '/'
+// Limita a 4 dígitos (MMYY) y muestra como MM/YY. Evita permitir más caracteres.
+function onCardExpiryInput(e) {
+  // obtener sólo dígitos
+  let digits = String(e.target.value || '').replace(/\D+/g, '')
+  // limitar a 4 dígitos (MMYY)
+  digits = digits.slice(0, 4)
+
+  if (digits.length === 0) {
+    card.expiry = ''
+    return
+  }
+
+  if (digits.length <= 2) {
+    card.expiry = digits
+    return
+  }
+
+  // 3 o 4 dígitos => insertar '/'
+  const mm = digits.slice(0, 2)
+  const yy = digits.slice(2)
+  card.expiry = `${mm}/${yy}`
+}
+
+// Limitar CVV a 3 dígitos y permitir solo números
+function onCvvInput(e) {
+  const digits = String(e.target.value || '').replace(/\D+/g, '').slice(0, 3)
+  card.cvv = digits
+}
+
+// Formatear número de tarjeta en bloques de 4: "1234 1234 1234 1234"
+function formatCardNumber(value) {
+  const digits = String(value || '').replace(/\D+/g, '').slice(0, 16)
+  if (!digits) return ''
+  return digits.replace(/(.{1,4})/g, '$1 ').trim()
+}
+
+function onCardNumberInput(e) {
+  const formatted = formatCardNumber(e.target.value)
+  card.number = formatted
+}
+
+const datosValid = computed(() => {
+  // Limpiar mensajes
+  errors.correo = ''
+  errors.nombre = ''
+  errors.apellidos = ''
+  errors.documento = ''
+  errors.telefono = ''
+
+  let ok = true
+  if (!datos.correo) { errors.correo = 'Este campo es obligatorio.'; ok = false }
+  else if (!validarEmail(datos.correo)) { errors.correo = 'Correo inválido'; ok = false }
+
+  if (!datos.nombre || String(datos.nombre).trim().length < 2) { errors.nombre = 'Este campo es obligatorio.'; ok = false }
+  if (!datos.apellidos || String(datos.apellidos).trim().length < 2) { errors.apellidos = 'Este campo es obligatorio.'; ok = false }
+  if (!datos.documento) { errors.documento = 'Este campo es obligatorio.'; ok = false }
+  else {
+    const docClean = String(datos.documento || '').replace(/\s+/g, '')
+    if (!/^\d{8,20}$/.test(docClean)) {
+      errors.documento = 'Documento inválido. Debe tener 8 dígitos.'
+      ok = false
+    }
+  }
+
+  // Validar que el teléfono de identificación tenga exactamente 9 dígitos
+  const tel = String(datos.telefono || '').replace(/\D+/g, '')
+  if (!tel) { errors.telefono = 'Este campo es obligatorio.'; ok = false }
+  else if (!/^\d{9}$/.test(tel)) { errors.telefono = 'Teléfono inválido'; ok = false }
+  return ok
+})
+
+const entregaValid = computed(() => {
+  errors.direccion = ''
+  errors.codigoPostal = ''
+  let ok = true
+  if (!entrega.departamento) { ok = false }
+  if (!entrega.provincia) { ok = false }
+  if (!entrega.distrito) { ok = false }
+  if (!entrega.direccion || String(entrega.direccion).trim().length < 5) { errors.direccion = 'Dirección demasiado corta'; ok = false }
+  const cp = String(entrega.codigoPostal || '').trim()
+  if (!cp) { errors.codigoPostal = 'Este campo es obligatorio.'; ok = false }
+  else if (!/^\d{5}$/.test(cp)) { errors.codigoPostal = 'Código postal inválido. Debe tener 5 números.'; ok = false }
+  return ok
+})
+
+const cardValid = computed(() => {
+  // limpiar errores
+  cardErrors.number = ''
+  cardErrors.expiry = ''
+  cardErrors.cvv = ''
+  cardErrors.firstName = ''
+  cardErrors.lastName = ''
+  cardErrors.email = ''
+
+  let ok = true
+  const num = String(card.number || '').replace(/\s+/g, '')
+  if (!/^[0-9]{13,19}$/.test(num)) { cardErrors.number = 'Número de tarjeta inválido'; ok = false }
+  if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(String(card.expiry || '').trim())) { cardErrors.expiry = 'Formato MM/AA inválido'; ok = false }
+  if (!/^[0-9]{3}$/.test(String(card.cvv || '').trim())) { cardErrors.cvv = 'CVV inválido'; ok = false }
+  if (!card.firstName || String(card.firstName).trim().length < 2) { cardErrors.firstName = 'Nombre inválido'; ok = false }
+  if (!card.lastName || String(card.lastName).trim().length < 2) { cardErrors.lastName = 'Apellido inválido'; ok = false }
+  if (!validarEmail(card.email)) { cardErrors.email = 'Email inválido'; ok = false }
+  return ok
+})
+
+// Validaciones específicas para Yape (se usan también para mensajes de touched)
+const yapePhoneValid = computed(() => {
+  const phoneStr = String(yape.phone || '').replace(/\s+/g, '')
+  return /^9\d{8}$/.test(phoneStr)
+})
+
+const yapeCodeValid = computed(() => {
+  return Array.isArray(yape.code) && yape.code.length === 6 && yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
+})
+
+// Limpia el teléfono de Yape (sólo dígitos)
+const yapePhoneClean = computed(() => String(yape.phone || '').replace(/\D+/g, ''))
+
+// Error específico para el teléfono Yape mostrado después de touch/blur
+const yapePhoneError = computed(() => {
+  const s = yapePhoneClean.value
+  if (!s) return 'Este campo es obligatorio.'
+  // si no comienza con 9 mostrar mensaje específico pedido
+  if (!/^9/.test(s)) return 'Este no es un número de celular válido.'
+  if (!/^\d{9}$/.test(s)) return 'Teléfono Yape inválido. Debe tener 9 dígitos.'
+  return ''
 })
 
 // Datos del usuario (sin validaciones aquí, el backend los manejará)
@@ -706,10 +888,11 @@ const provinciasDisponibles = computed(() => {
   return ubicacionPeru[entrega.departamento]?.provincias || []
 })
 
-// Computed: Distritos disponibles según provincia seleccionada
+// Computed: Distritos disponibles según provincia seleccionada (ordenados alfabéticamente)
 const distritosDisponibles = computed(() => {
   if (!entrega.departamento || !entrega.provincia) return []
-  return ubicacionPeru[entrega.departamento]?.distritos[entrega.provincia] || []
+  const lista = ubicacionPeru[entrega.departamento]?.distritos[entrega.provincia] || []
+  return Array.isArray(lista) ? [...lista].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' })) : []
 })
 
 // Watch: Limpiar provincia cuando cambia departamento
@@ -730,6 +913,31 @@ function finalizarCompra() {
 }
 
 function avanzarPaso() {
+  // Validar el paso actual antes de avanzar
+  if (step.value === 1) {
+    // Desde Carrito -> Datos: solo permitir si hay items
+    if (carritoStore.items.length === 0) return
+    step.value = 2
+    return
+  }
+
+  if (step.value === 2) {
+    if (!datosValid.value) {
+      // Mantener en el mismo paso y mostrar errores
+      return
+    }
+    step.value = 3
+    return
+  }
+
+  if (step.value === 3) {
+    if (!entregaValid.value) {
+      return
+    }
+    step.value = 4
+    return
+  }
+
   if (step.value < 4) step.value++
 }
 
@@ -777,13 +985,13 @@ async function procesarPago() {
 
   // Validar datos de pago según el método
   if (paymentMethod.value === 'card') {
-    if (!card.number || !card.expiry || !card.cvv || !card.firstName || !card.lastName) {
-      alert('Por favor completa todos los datos de la tarjeta')
+    if (!cardValid.value) {
+      alert('Por favor revisa los datos de la tarjeta')
       return
     }
   } else if (paymentMethod.value === 'yape') {
     if (!isYapeComplete.value) {
-      alert('Por favor completa el teléfono y código de aprobación de Yape')
+      alert('Por favor completa el teléfono (9 dígitos) y el código de 6 dígitos de Yape')
       return
     }
   }
