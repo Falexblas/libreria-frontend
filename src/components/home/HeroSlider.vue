@@ -127,16 +127,26 @@ const modules = [Pagination, Navigation, Autoplay]
 <style scoped>
 .hero-slider-container {
   width: 100%;
-  height: 500px;
-  margin-bottom: 2rem;
+  height: 500px; /* ALTURA REDUCIDA - Cambia este valor según necesites */
+  margin: 0;
+  padding: 0;
+  position: relative;
 }
+
+/* 
+OPCIONES DE ALTURA:
+- 400px: Muy compacto
+- 500px: Moderado (recomendado)
+- 600px: Equilibrado
+- 70vh: 70% de la altura de la pantalla
+*/
 
 .hero-swiper {
   width: 100%;
   height: 100%;
-  border-radius: 15px;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 .slide-content {
@@ -216,8 +226,6 @@ const modules = [Pagination, Navigation, Autoplay]
   text-decoration: none;
 }
 
-/* Los fondos ahora son las imágenes, no necesitamos gradientes específicos */
-
 /* Estilos personalizados para Swiper */
 :deep(.swiper-pagination-bullet) {
   background: var(--color-accent);
@@ -258,7 +266,7 @@ const modules = [Pagination, Navigation, Autoplay]
 /* Responsive */
 @media (max-width: 768px) {
   .hero-slider-container {
-    height: 400px;
+    height: 350px; /* Altura reducida en tablets */
   }
   
   .slide-title {
@@ -283,7 +291,7 @@ const modules = [Pagination, Navigation, Autoplay]
 
 @media (max-width: 480px) {
   .hero-slider-container {
-    height: 350px;
+    height: 300px; /* Altura reducida en móviles */
   }
   
   .slide-title {

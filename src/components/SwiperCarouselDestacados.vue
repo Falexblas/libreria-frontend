@@ -8,6 +8,7 @@ import { useAutores } from '@/composables/useAutores'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import './SwiperCarousel.css'
+import LibroCard from '@/components/libros/LibroCard.vue'
 
 const librosStore = useLibrosStore()
 const { obtenerAutores } = useAutores()
@@ -65,25 +66,19 @@ const modules = [Navigation, Autoplay]
          :loop="true"
          :autoplay="{ delay: 3000, disableOnInteraction: false }"
         :breakpoints="{
-          640: { slidesPerView: 3, spaceBetween: 20 },
-          768: { slidesPerView: 4, spaceBetween: 20 },
-          1024: { slidesPerView: 5, spaceBetween: 20 },
-          1280: { slidesPerView: 6, spaceBetween: 20 },
+          640: { slidesPerView: 3, spaceBetween: 30 },
+          768: { slidesPerView: 4, spaceBetween: 30 },
+          1024: { slidesPerView: 5, spaceBetween: 30 },
+          1280: { slidesPerView: 6, spaceBetween: 30 },
         }"
         class="libros-swiper"
       >
         <swiper-slide v-for="libro in libros" :key="libro.id">
-          <div class="libro-card">
-            <div class="libro-image-wrapper">
-              <img :src="libro.portadaUrl" :alt="libro.titulo" class="libro-image" />
-              <div v-if="libro.descuento > 0" class="badge-descuento">
-                -{{ libro.descuento }}%
-              </div>
-              <div v-if="libro.nuevo" class="badge-nuevo">
-                Novedades
-              </div>
-            </div>
-            
+          <div class="libro-card" @click="verDetalles(libro)">
+            <!-- Agregar la prop modoCarrusel -->
+            <LibroCard :libro="libro" :modo-carrusel="true" />
+
+
             <div class="libro-info">
               <h3 class="libro-titulo">{{ libro.titulo }}</h3>
               <p class="libro-autor">{{ obtenerAutores(libro) }}</p>

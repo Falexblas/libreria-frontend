@@ -32,10 +32,22 @@
           <i class="fas fa-eye"></i> Ver 
         </button>
       </div>
+      
+       <!-- Botón de carrito flotante (solo para modo carrusel, visible en hover) -->
+      <button 
+        v-if="modoCarrusel"
+        @click.stop="agregarAlCarrito" 
+        class="btn btn-carrito-flotante position-absolute"
+        :disabled="!disponibleLibro"
+      >
+        <i v-if="disponibleLibro" class="fas fa-plus"></i>
+        <i v-else class="fas fa-times"></i>
+        {{ disponibleLibro ? 'Agregar al Carrito' : 'Agotado' }}
+      </button>
     </div>
     
-    <!-- Cuerpo de la card compacto -->
-    <div class="card-body d-flex flex-column p-3">
+    <!-- Cuerpo de la card (oculto en modo carrusel) -->
+    <div v-if="!modoCarrusel" class="card-body d-flex flex-column p-3">
       <!-- Título del libro -->
       <h6 class="card-title libro-titulo text-truncate mb-1" :title="tituloLibro">
         {{ tituloLibro }}
@@ -92,13 +104,18 @@ const props = defineProps({
     default: () => ({
       id: null,
       titulo: '',
-      autor: '', // Objeto autor o string
+      autor: '',
       precio: 0,
-      portadaUrl: '', // Ahora contiene la URL completa
+      portadaUrl: '',
       disponible: true,
       descuento: null,
       stock: 0
     })
+  },
+  // NUEVA PROP: modo carrusel
+  modoCarrusel: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -456,4 +473,55 @@ function toggleFavorito() {
 .libro-overlay .btn:hover {
   transform: scale(1.05);
 }
+
+/* Botón de carrito flotante para modo carrusel */
+.btn-carrito-flotante {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px); /* Oculto inicialmente */
+  z-index: 10;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  padding: 0.35rem 0.75rem; /* Más pequeño */
+  border-radius: 20px; /* Más pequeño */
+  font-size: 0.75rem; /* Texto más pequeño */
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(13, 110, 253, 0.4);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  opacity: 0; /* Invisible inicialmente */
+}
+
+/* Mostrar el botón al hacer hover sobre la imagen */
+.libro-imagen-wrapper:hover .btn-carrito-flotante {
+  transform: translateX(-50%) translateY(0); /* Aparece en su posición */
+  opacity: 1; /* Se hace visible */
+}
+
+.btn-carrito-flotante:hover:not(:disabled) {
+  background-color: #0b5ed7;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 5px 14px rgba(13, 110, 253, 0.5);
+}
+
+.btn-carrito-flotante:disabled {
+  background-color: #6c757d;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn-carrito-flotante i {
+  margin-right: 0.25rem;
+  font-size: 0.7rem; /* Icono más pequeño */
+}
+
+/* Responsive para móviles */
+@media (max-width: 576px) {
+  .btn-carrito-flotante {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
 </style>

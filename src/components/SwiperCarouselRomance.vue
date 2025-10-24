@@ -8,6 +8,7 @@ import { useAutores } from '@/composables/useAutores'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import './SwiperCarousel.css';
+import LibroCard from '@/components/libros/LibroCard.vue'
 
 const librosStore = useLibrosStore()
 const { obtenerAutores } = useAutores()
@@ -42,46 +43,31 @@ const modules = [Navigation, Autoplay]
     <div v-if="cargando" class="estado-mensaje">
       <div class="spinner"></div>
     </div>
-    
-   <div v-else-if="error" class="estado-mensaje">
-  <p>❌ Error al cargar los libros</p>
-  <button @click="librosStore.cargarTodosLosLibros()" class="btn-retry">Reintentar</button>
-</div>
+
+    <div v-else-if="error" class="estado-mensaje">
+      <p>❌ Error al cargar los libros</p>
+      <button @click="librosStore.cargarTodosLosLibros()" class="btn-retry">Reintentar</button>
+    </div>
     <div v-else-if="libros.length === 0" class="estado-mensaje">
       <p>No hay libros disponibles</p>
     </div>
-    
+
     <div v-else class="carousel-wrapper">
-      <swiper
-        :modules="modules"
-        :slides-per-view="2"
-        :space-between="20"
-        :navigation="{
-          prevEl: '.custom-prev',
-          nextEl: '.custom-next',
-        }"
-         :loop="true"
-         :autoplay="{ delay: 3000, disableOnInteraction: false }"
-        :breakpoints="{
-          640: { slidesPerView: 3, spaceBetween: 20 },
-          768: { slidesPerView: 4, spaceBetween: 20 },
-          1024: { slidesPerView: 5, spaceBetween: 20 },
-          1280: { slidesPerView: 6, spaceBetween: 20 },
-        }"
-        class="libros-swiper"
-      >
+      <swiper :modules="modules" :slides-per-view="2" :space-between="30" :navigation="{
+        prevEl: '.custom-prev',
+        nextEl: '.custom-next',
+      }" :loop="true" :autoplay="{ delay: 3000, disableOnInteraction: false }" :breakpoints="{
+          640: { slidesPerView: 3, spaceBetween: 30 },
+          768: { slidesPerView: 4, spaceBetween: 30 },
+          1024: { slidesPerView: 5, spaceBetween: 30 },
+          1280: { slidesPerView: 6, spaceBetween: 30 },
+        }" class="libros-swiper">
         <swiper-slide v-for="libro in libros" :key="libro.id">
-          <div class="libro-card">
-            <div class="libro-image-wrapper">
-              <img :src="libro.portadaUrl" :alt="libro.titulo" class="libro-image" />
-              <div v-if="libro.descuento > 0" class="badge-descuento">
-                -{{ libro.descuento }}%
-              </div>
-              <div v-if="libro.nuevo" class="badge-nuevo">
-                Novedades
-              </div>
-            </div>
-            
+          <div class="libro-card" @click="verDetalles(libro)">
+            <!-- Agregar la prop modoCarrusel -->
+            <LibroCard :libro="libro" :modo-carrusel="true" />
+
+
             <div class="libro-info">
               <h3 class="libro-titulo">{{ libro.titulo }}</h3>
               <p class="libro-autor">{{ obtenerAutores(libro) }}</p>
