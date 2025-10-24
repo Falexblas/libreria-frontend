@@ -135,6 +135,9 @@
                 >
                   <LibroCard
                     :libro="libro"
+                    @agregar-carrito="agregarAlCarrito"
+                    @ver-detalles="verDetalles"
+                    @toggle-favorito="toggleFavorito"
                   />
                 </div>
               </div>
@@ -166,10 +169,17 @@ const categoriaActual = computed(() => {
 
 const nombreCategoria = computed(() => {
   if (!categoriaActual.value) return "Todos los Libros";
-  const categoria = categoriasStore.categorias.find(
-    (c) => c.id === categoriaActual.value
-  );
-  return categoria ? categoria.nombre : "Categoría no encontrada";
+
+  // Buscar tanto en categorías principales como en subcategorías
+  for (const c of categoriasStore.categorias) {
+    if (c && c.id === categoriaActual.value) return c.nombre;
+    if (c && Array.isArray(c.subcategorias)) {
+      const sub = c.subcategorias.find((s) => s.id === categoriaActual.value);
+      if (sub) return sub.nombre;
+    }
+  }
+
+  return "Categoría no encontrada";
 });
 
 const terminoBusqueda = computed(() => {
@@ -373,6 +383,15 @@ async function cargarLibros() {
   } catch (err) {
     console.error("Error al cargar libros:", err);
   }
+}
+
+
+function verDetalles(libro) {
+  alert(`Ver detalles de: ${libro.titulo}`);
+}
+function toggleFavorito(data) {
+  const mensaje = data.esFavorito ? "agregado a" : "removido de";
+  alert(`${data.libro.titulo} ${mensaje} favoritos`);
 }
 
 watch(
