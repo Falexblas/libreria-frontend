@@ -151,12 +151,13 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import LibroCard from "@/components/libros/LibroCard.vue";
 import { useCategoriasStore } from "@/stores/categorias";
 import { useLibrosStore } from "@/stores/libros";
 
 const route = useRoute();
+const router = useRouter();
 const categoriasStore = useCategoriasStore();
 const librosStore = useLibrosStore();
 
@@ -387,11 +388,13 @@ async function cargarLibros() {
 
 
 function verDetalles(libro) {
-  alert(`Ver detalles de: ${libro.titulo}`);
+  // Navegar a la página de detalles del libro
+  router.push(`/libro/${libro.id}`)
 }
+
 function toggleFavorito(data) {
-  const mensaje = data.esFavorito ? "agregado a" : "removido de";
-  alert(`${data.libro.titulo} ${mensaje} favoritos`);
+  // La funcionalidad de favoritos ya está manejada en LibroCard
+  // No se necesita alert aquí
 }
 
 watch(

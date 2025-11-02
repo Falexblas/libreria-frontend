@@ -581,6 +581,7 @@ import { useRouter } from 'vue-router'
 import { useCarritoStore } from '@/stores/carrito'
 import { useAuthStore } from '@/stores/auth'
 import LogoYape from '@/assets/LogoYape.webp'
+import Swal from 'sweetalert2'
 
 const router = useRouter()
 const carritoStore = useCarritoStore()
@@ -967,31 +968,56 @@ const procesandoPago = ref(false)
 async function procesarPago() {
   // Validar que todos los datos estén completos
   if (!datos.correo || !datos.nombre || !datos.telefono) {
-    alert('Por favor completa todos los datos de identificación')
+    Swal.fire({
+      icon: 'warning',
+      title: 'Datos incompletos',
+      text: 'Por favor completa todos los datos de identificación',
+      confirmButtonText: 'Entendido'
+    })
     step.value = 2
     return
   }
 
   if (!entrega.departamento || !entrega.provincia || !entrega.distrito || !entrega.direccion) {
-    alert('Por favor completa todos los datos de envío')
+    Swal.fire({
+      icon: 'warning',
+      title: 'Datos de envío incompletos',
+      text: 'Por favor completa todos los datos de envío',
+      confirmButtonText: 'Entendido'
+    })
     step.value = 3
     return
   }
 
   if (!paymentMethod.value) {
-    alert('Por favor selecciona un método de pago')
+    Swal.fire({
+      icon: 'warning',
+      title: 'Método de pago no seleccionado',
+      text: 'Por favor selecciona un método de pago',
+      confirmButtonText: 'Entendido'
+    })
     return
   }
 
   // Validar datos de pago según el método
   if (paymentMethod.value === 'card') {
     if (!cardValid.value) {
-      alert('Por favor revisa los datos de la tarjeta')
+      Swal.fire({
+        icon: 'warning',
+        title: 'Datos de tarjeta incompletos',
+        text: 'Por favor revisa los datos de la tarjeta',
+        confirmButtonText: 'Entendido'
+      })
       return
     }
   } else if (paymentMethod.value === 'yape') {
     if (!isYapeComplete.value) {
-      alert('Por favor completa el teléfono (9 dígitos) y el código de 6 dígitos de Yape')
+      Swal.fire({
+        icon: 'warning',
+        title: 'Datos de Yape incompletos',
+        text: 'Por favor completa el teléfono (9 dígitos) y el código de 6 dígitos de Yape',
+        confirmButtonText: 'Entendido'
+      })
       return
     }
   }
@@ -1053,22 +1079,36 @@ async function procesarPago() {
         console.warn('⚠️ No se pudieron guardar los datos en el perfil, pero la orden se creó correctamente:', err)
       })
       
-      // Mostrar mensaje de éxito
-      alert(`¡Compra exitosa! 🎉\n\nNúmero de orden: ${result.ordenId}\n\nGracias por tu compra. Serás redirigido a tus pedidos.`)
-      
-      // Redirigir a la página de pedidos después de un pequeño delay
-      setTimeout(() => {
+      // Mostrar mensaje de éxito con SweetAlert2
+      Swal.fire({
+        icon: 'success',
+        title: '¡Compra exitosa! 🎉',
+        html: `<p><strong>Número de orden:</strong> ${result.ordenId}</p><p>Gracias por tu compra. Serás redirigido a tus pedidos.</p>`,
+        confirmButtonText: 'Ver mis pedidos',
+        timer: 3000,
+        timerProgressBar: true
+      }).then(() => {
         router.push('/pedidos')
-      }, 100)
+      })
       
     } else {
       console.error('❌ Error al crear orden:', result)
-      alert(`Error al procesar el pago: ${result.message || 'Intenta nuevamente'}`)
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al procesar el pago',
+        text: result.message || 'Intenta nuevamente',
+        confirmButtonText: 'Entendido'
+      })
     }
 
   } catch (error) {
     console.error('❌ Error al procesar pago:', error)
-    alert('Error de conexión. Por favor intenta nuevamente.')
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: 'Por favor intenta nuevamente.',
+      confirmButtonText: 'Entendido'
+    })
   } finally {
     procesandoPago.value = false
   }

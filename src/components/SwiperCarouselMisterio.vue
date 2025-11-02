@@ -10,7 +10,6 @@ import 'swiper/css/navigation'
 import './SwiperCarousel.css'
 import LibroCard from '@/components/libros/LibroCard.vue'
 
-
 const librosStore = useLibrosStore()
 const { obtenerAutores } = useAutores()
 
@@ -25,12 +24,6 @@ onMounted(async () => {
     await librosStore.cargarTodosLosLibros()
   }
 })
-
-
-function verDetalles(libro) {
-  console.log('Ver detalles desde swiper:', libro)
-  // podrías hacer algo más si quisieras
-}
 
 const modules = [Navigation, Autoplay]
 </script>
@@ -70,20 +63,15 @@ const modules = [Navigation, Autoplay]
           1280: { slidesPerView: 6, spaceBetween: 30 },
         }" class="libros-swiper">
         <swiper-slide v-for="libro in libros" :key="libro.id">
-          <div class="libro-card" @click="verDetalles(libro)">
-            <!-- Agregar la prop modoCarrusel -->
+          <div class="libro-card">
+            <!-- LibroCard para la imagen y botones flotantes -->
             <LibroCard :libro="libro" :modo-carrusel="true" />
-
-
+            
+            <!-- Información del libro debajo -->
             <div class="libro-info">
               <h3 class="libro-titulo">{{ libro.titulo }}</h3>
-<<<<<<< Updated upstream
               <p class="libro-autor">{{ obtenerAutores(libro) }}</p>
               
-=======
-              <p class="libro-autor">{{ libro.autor?.nombre }} {{ libro.autor?.apellido }}</p>
-
->>>>>>> Stashed changes
               <div class="libro-precios">
                 <span class="precio-actual">S/ {{ (libro.precio * (1 - libro.descuento / 100)).toFixed(2) }}</span>
                 <span v-if="libro.descuento > 0" class="precio-original">S/ {{ libro.precio.toFixed(2) }}</span>

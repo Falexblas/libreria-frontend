@@ -260,6 +260,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useCarritoStore } from '@/stores/carrito'
 import { useFavoritosStore } from '@/stores/favoritos'
 import api from '@/services/api'
+import Swal from 'sweetalert2'
 
 const route = useRoute()
 const router = useRouter()
@@ -368,8 +369,16 @@ function añadirAlCarrito() {
   if (libroDisponible.value) {
     carritoStore.agregarAlCarrito(libro.value, cantidad.value)
     
-    // Mostrar feedback al usuario
-    alert(`${libro.value.titulo} añadido al carrito`)
+    // Mostrar alerta de éxito con SweetAlert2
+    Swal.fire({
+      icon: 'success',
+      title: '¡Agregado al carrito!',
+      text: `"${libro.value.titulo}" fue agregado al carrito (${cantidad.value} ${cantidad.value === 1 ? 'unidad' : 'unidades'})`,
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end'
+    })
   }
 }
 
