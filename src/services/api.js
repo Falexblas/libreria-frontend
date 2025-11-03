@@ -9,6 +9,20 @@ const api = axios.create({
   }
 })
 
+// Interceptor para agregar el token JWT a todas las peticiones
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
 // Interceptor para manejar errores globalmente
 api.interceptors.response.use(
   (response) => response,

@@ -163,16 +163,26 @@ function cerrarCarrito() {
   carritoStore.cerrarCarrito()
 }
 
-function aumentarCantidad(itemId) {
-  carritoStore.aumentarCantidad(itemId)
+// Optimización: No esperar la respuesta del backend
+async function aumentarCantidad(itemId) {
+  // Ejecutar en segundo plano sin bloquear la UI
+  carritoStore.aumentarCantidad(itemId).catch(err => {
+    console.error('Error al aumentar cantidad:', err)
+  })
 }
 
-function disminuirCantidad(itemId) {
-  carritoStore.disminuirCantidad(itemId)
+async function disminuirCantidad(itemId) {
+  // Ejecutar en segundo plano sin bloquear la UI
+  carritoStore.disminuirCantidad(itemId).catch(err => {
+    console.error('Error al disminuir cantidad:', err)
+  })
 }
 
-function eliminarItem(itemId) {
-  carritoStore.eliminarItem(itemId)
+async function eliminarItem(itemId) {
+  // Ejecutar en segundo plano sin bloquear la UI
+  carritoStore.eliminarItem(itemId).catch(err => {
+    console.error('Error al eliminar item:', err)
+  })
 }
 
 function procederCompra() {
