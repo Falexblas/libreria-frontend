@@ -228,7 +228,7 @@
             </div>
 
             <div class="mt-3 btn-volver-row">
-              <button class="btn btn-outline-primary w-100 btn-volver" @click.prevent="regresarPaso">
+              <button class="btn btn-outline-primary w-100 btn-volver" @click.prevent="irAlPaso(1)">
                 <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>
                 Volver al carrito
               </button>
@@ -373,7 +373,7 @@
             </div>
 
             <div class="mt-3 btn-volver-row">
-              <button class="btn btn-outline-primary w-100 btn-volver" @click.prevent="regresarPaso">
+              <button class="btn btn-outline-primary w-100 btn-volver" @click.prevent="irAlPaso(1)">
                 <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>
                 Volver al carrito
               </button>
@@ -507,12 +507,25 @@
               </div>
 
                 <div class="mb-3">
-                <label class="form-label">Código de aprobación</label>
-                <div class="d-flex gap-2 code-inputs">
-                  <input v-for="(d, i) in yape.code" :key="i" type="text" maxlength="1" class="form-control code-digit text-center" v-model="yape.code[i]" @blur="yapeTouched.code = true" />
+                  <label class="form-label">Código de aprobación</label>
+                  <div class="d-flex gap-2 code-inputs">
+                    <input
+                      v-for="(d, i) in yape.code"
+                      :key="i"
+                      ref="codeInputs"
+                      type="text"
+                      maxlength="1"
+                      inputmode="numeric"
+                      class="form-control code-digit text-center"
+                      v-model="yape.code[i]"
+                      @input="onCodeInput($event, i)"
+                      @keydown="onCodeKeydown($event, i)"
+                      @paste="onCodePaste($event)"
+                      @blur="yapeTouched.code = true"
+                    />
+                  </div>
+                  <div v-if="!yapeCodeValid && yapeTouched.code" class="invalid-feedback d-block">Este campo es obligatorio.</div>
                 </div>
-                <div v-if="!yapeCodeValid && yapeTouched.code" class="invalid-feedback d-block">Este campo es obligatorio.</div>
-              </div>
 
               <div class="d-grid">
                 <button 
@@ -563,7 +576,7 @@
             </div>
 
             <div class="mt-3 btn-volver-row">
-              <button class="btn btn-outline-primary w-100 btn-volver" @click.prevent="regresarPaso">
+              <button class="btn btn-outline-primary w-100 btn-volver" @click.prevent="irAlPaso(1)">
                 <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>
                 Volver al carrito
               </button>
@@ -577,13 +590,14 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useCarritoStore } from '@/stores/carrito'
 import { useAuthStore } from '@/stores/auth'
 import LogoYape from '@/assets/LogoYape.webp'
 import Swal from 'sweetalert2'
 
 const router = useRouter()
+const route = useRoute()
 const carritoStore = useCarritoStore()
 const authStore = useAuthStore()
 
@@ -604,6 +618,62 @@ const isYapeComplete = computed(() => {
   const codeOk = Array.isArray(yape.code) && yape.code.length === 6 && yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
   return phoneOk && codeOk
 })
+
+// Refs para los inputs de código (se asignan automáticamente por ref="codeInputs" en el template v-for)
+const codeInputs = ref([])
+
+function onCodeInput(e, i) {
+  // Mantener solo dígitos y máximo 1
+  const raw = String(e.target.value || '')
+  const digit = raw.replace(/\D+/g, '').slice(0, 1)
+  // actualizar modelo
+  yape.code[i] = digit
+  // asegurar valor del input
+  e.target.value = digit
+
+  // avanzar al siguiente si hay dígito y existe siguiente input
+  if (digit && codeInputs.value && codeInputs.value[i + 1]) {
+    try { codeInputs.value[i + 1].focus(); codeInputs.value[i + 1].select && codeInputs.value[i + 1].select() } catch (err) {}
+  }
+}
+
+function onCodeKeydown(e, i) {
+  // manejar retroceso: si Backspace y el campo está vacío, moverse al anterior
+  if (e.key === 'Backspace') {
+    const val = String(yape.code[i] || '')
+    if (!val && i > 0) {
+      // prevenir comportamiento por defecto para controlar el foco
+      e.preventDefault()
+      try {
+        const prev = codeInputs.value[i - 1]
+        if (prev) {
+          prev.focus()
+          // borrar valor anterior
+          yape.code[i - 1] = ''
+        }
+      } catch (err) {}
+    }
+  }
+}
+
+function onCodePaste(e) {
+  // Pegar puede contener los 6 dígitos; repartirlos en los inputs
+  const paste = (e.clipboardData || window.clipboardData).getData('text') || ''
+  const digits = paste.replace(/\D+/g, '').slice(0, 6).split('')
+  if (!digits || digits.length === 0) return
+  e.preventDefault()
+  // llenar los inputs a partir del primero disponible
+  for (let j = 0; j < digits.length; j++) {
+    if (j >= yape.code.length) break
+    yape.code[j] = digits[j]
+    if (codeInputs.value && codeInputs.value[j]) {
+      try { codeInputs.value[j].value = digits[j] } catch (err) {}
+    }
+  }
+  // enfocar el siguiente tras los dígitos pegados
+  const nextIndex = Math.min(digits.length, yape.code.length - 1)
+  try { codeInputs.value[nextIndex]?.focus() } catch (err) {}
+}
 
 // Errores y validaciones reactivas
 const errors = reactive({ correo: '', nombre: '', apellidos: '', documento: '', telefono: '', direccion: '', codigoPostal: '' })
@@ -839,6 +909,23 @@ onMounted(async () => {
   } else {
     console.log('⚠️ Usuario no autenticado o sin ID')
   }
+  // Si la ruta incluye ?step=N, abrir ese paso al entrar
+  try {
+    const qStep = route?.query?.step
+    if (qStep) {
+      const s = parseInt(String(qStep))
+      if (!isNaN(s) && s >= 1 && s <= 4) step.value = s
+    }
+  } catch (err) {
+    /* noop */
+  }
+})
+
+// Observar cambios en query.step (por ejemplo desde router.push desde otro componente)
+watch(() => route.query.step, (newStep) => {
+  if (!newStep) return
+  const s = parseInt(String(newStep))
+  if (!isNaN(s) && s >= 1 && s <= 4) step.value = s
 })
 
 // ========================================
@@ -944,6 +1031,19 @@ function avanzarPaso() {
 
 function regresarPaso() {
   if (step.value > 1) step.value--
+}
+
+// Navegar a un paso específico (y sincronizar la query de la URL)
+function irAlPaso(n) {
+  const s = parseInt(String(n))
+  if (isNaN(s) || s < 1 || s > 4) return
+  step.value = s
+  try {
+    // Usar replace para no llenar el historial con cambios de paso pequeños
+    router.replace({ name: router.currentRoute.value.name || 'checkout', query: { ...router.currentRoute.value.query, step: String(s) } })
+  } catch (err) {
+    // fallback: no bloquear si router falla
+  }
 }
 
 function aumentarCantidad(id) { carritoStore.aumentarCantidad(id) }
