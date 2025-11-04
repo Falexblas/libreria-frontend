@@ -2,8 +2,8 @@
   <div class="checkout-page container py-4">
     <!-- Stepper -->
     <div class="mb-4">
-      <div class="stepper d-flex align-items-center justify-content-between">
-      <div class="step d-flex flex-column align-items-center" :class="{ active: step === 1, completed: step > 1 }">
+  <div class="stepper d-flex align-items-center justify-content-between">
+  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 1, completed: step > 1 }" role="button" tabindex="0" @click.prevent="irAlPaso(1)" @keydown.enter.prevent="irAlPaso(1)">
             <div class="step-circle">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.44C8.89 16.37 9.5 18 11 18h8v-2h-7.42c-.14 0-.25-.11-.25-.25l.03-.12L13.1 13h4.45c.75 0 1.41-.41 1.75-1.03L21.82 6H6.21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
@@ -14,7 +14,7 @@
           <div class="line-inner" :class="{ filled: step > 1 }"></div>
         </div>
 
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 2, completed: step > 2 }">
+  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 2, completed: step > 2 }" role="button" tabindex="0" @click.prevent="irAlPaso(2)" @keydown.enter.prevent="irAlPaso(2)">
           <div class="step-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM4 20c0-3.31 4.03-6 8-6s8 2.69 8 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -25,7 +25,7 @@
           <div class="line-inner" :class="{ filled: step > 2 }"></div>
         </div>
 
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 3, completed: step > 3 }">
+  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 3, completed: step > 3 }" role="button" tabindex="0" @click.prevent="irAlPaso(3)" @keydown.enter.prevent="irAlPaso(3)">
           <div class="step-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18v13H3zM16 3l3 4H5l3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -36,7 +36,7 @@
           <div class="line-inner" :class="{ filled: step > 3 }"></div>
         </div>
 
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 4 }">
+  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 4 }" role="button" tabindex="0" @click.prevent="irAlPaso(4)" @keydown.enter.prevent="irAlPaso(4)">
           <div class="step-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 7H3v10a2 2 0 002 2h14a2 2 0 002-2V7zM3 7l9 6 9-6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -812,6 +812,21 @@ const cardValid = computed(() => {
   const num = String(card.number || '').replace(/\s+/g, '')
   if (!/^[0-9]{13,19}$/.test(num)) { cardErrors.number = 'Número de tarjeta inválido'; ok = false }
   if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(String(card.expiry || '').trim())) { cardErrors.expiry = 'Formato MM/AA inválido'; ok = false }
+  else {
+    // Validar que la fecha de caducidad no sea anterior al mes actual
+    const m = String(card.expiry || '').trim().match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/)
+    if (m) {
+      const mm = parseInt(m[1], 10)
+      const yy = 2000 + parseInt(m[2], 10)
+      const now = new Date()
+      const currentYear = now.getFullYear()
+      const currentMonth = now.getMonth() + 1 // 1-12
+      if (yy < currentYear || (yy === currentYear && mm < currentMonth)) {
+        cardErrors.expiry = 'Ingrese una fecha válida.'
+        ok = false
+      }
+    }
+  }
   if (!/^[0-9]{3}$/.test(String(card.cvv || '').trim())) { cardErrors.cvv = 'CVV inválido'; ok = false }
   if (!card.firstName || String(card.firstName).trim().length < 2) { cardErrors.firstName = 'Nombre inválido'; ok = false }
   if (!card.lastName || String(card.lastName).trim().length < 2) { cardErrors.lastName = 'Apellido inválido'; ok = false }
@@ -1037,12 +1052,37 @@ function regresarPaso() {
 function irAlPaso(n) {
   const s = parseInt(String(n))
   if (isNaN(s) || s < 1 || s > 4) return
+  // Si intentan avanzar (ir a un paso mayor que el actual), validar requisitos
+  if (s > step.value) {
+    // Paso 2 requiere items en carrito
+    if (s === 2 && carritoStore.items.length === 0) {
+      Swal.fire({ icon: 'warning', title: 'Carrito vacío', text: 'Agrega al menos un producto antes de continuar.' })
+      return
+    }
+    // Paso 3 requiere datos válidos
+    if (s === 3 && !datosValid.value) {
+      Swal.fire({ icon: 'warning', title: 'Datos incompletos', text: 'Por favor completa tus datos antes de continuar.' })
+      // marcar touched para mostrar errores
+      Object.keys(datosTouched).forEach(k => datosTouched[k] = true)
+      step.value = 2
+      return
+    }
+    // Paso 4 requiere datos de entrega válidos
+    if (s === 4 && !entregaValid.value) {
+      Swal.fire({ icon: 'warning', title: 'Datos de envío incompletos', text: 'Por favor completa la dirección de entrega antes de continuar.' })
+      Object.keys(entregaTouched).forEach(k => entregaTouched[k] = true)
+      step.value = 3
+      return
+    }
+  }
+
+  // Si pasaron validaciones o es retroceso, aplicarlo
   step.value = s
   try {
     // Usar replace para no llenar el historial con cambios de paso pequeños
     router.replace({ name: router.currentRoute.value.name || 'checkout', query: { ...router.currentRoute.value.query, step: String(s) } })
   } catch (err) {
-    // fallback: no bloquear si router falla
+    // noop
   }
 }
 
@@ -1258,6 +1298,7 @@ async function guardarDatosEnPerfil() {
 <style scoped>
 .stepper { gap: 0.5rem; }
 .step { color: #9aa3ab; }
+.step[role="button"] { cursor: pointer; }
 .step.active { color: #2db34a; }
 .step-circle { width:48px; height:48px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; border:1px solid #e6edf0; }
 .step.active .step-circle { background: #2db34a; color:#fff; border-color: #2db34a; }
