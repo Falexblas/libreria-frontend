@@ -60,7 +60,7 @@
           required
           :disabled="loading"
           class="form-control"
-          @input="actualizarEmail"
+          @input="convertirAMinusculas"
         />
         <span class="input-group-text">@</span>
         <select 
@@ -275,6 +275,12 @@ const showConfirmPassword = ref(false)
 const error = ref("")
 const success = ref("")
 const loading = ref(false)
+
+// Función para convertir a minúsculas mientras se escribe
+const convertirAMinusculas = (event) => {
+  emailUsername.value = event.target.value.toLowerCase()
+  actualizarEmail()
+}
 
 // Función para actualizar el email completo
 const actualizarEmail = () => {

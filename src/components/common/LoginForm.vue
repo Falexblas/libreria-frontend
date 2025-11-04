@@ -49,9 +49,10 @@
             id="email"
             v-model="email"
             class="form-control form-control-lg"
-            placeholder="correo@ejemplo.com"
+            placeholder="Ingresa tu correo electrónico"
             required
             :disabled="loading"
+            @input="convertirEmailAMinusculas"
           />
         </div>
 
@@ -65,7 +66,7 @@
               id="password"
               v-model="password"
               class="form-control form-control-lg"
-              placeholder="••••••••"
+              placeholder="Ingresa tu contraseña"
               required
               :disabled="loading"
             />
@@ -155,6 +156,11 @@ const showPassword = ref(false)
 const error = ref("")
 const success = ref("")
 const loading = ref(false)
+
+// Función para convertir email a minúsculas mientras se escribe
+const convertirEmailAMinusculas = (event) => {
+  email.value = event.target.value.toLowerCase()
+}
 
 const handleSubmit = async () => {
   error.value = ""
