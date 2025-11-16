@@ -7,8 +7,13 @@
       class="chat-button"
       aria-label="Abrir chat"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 7v14"/>
+        <path d="M16 12h2"/>
+        <path d="M16 8h2"/>
+        <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
+        <path d="M6 12h2"/>
+        <path d="M6 8h2"/>
       </svg>
       <span class="chat-badge" v-if="mensajesNoLeidos > 0">{{ mensajesNoLeidos }}</span>
     </button>
@@ -19,9 +24,13 @@
       <div class="chat-header">
         <div class="chat-header-content">
           <div class="chat-avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 7v14"/>
+              <path d="M16 12h2"/>
+              <path d="M16 8h2"/>
+              <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
+              <path d="M6 12h2"/>
+              <path d="M6 8h2"/>
             </svg>
           </div>
           <div class="chat-title">
@@ -193,24 +202,35 @@ watch(() => chatStore.mensajes.length, () => {
 
 /* Botón flotante */
 .chat-button {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  color: white;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border: 3px solid white;
+  color: #333;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   position: relative;
+  animation: float 3s ease-in-out infinite;
 }
 
 .chat-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transform: scale(1.15);
+  box-shadow: 0 12px 32px rgba(255, 215, 0, 0.6);
+  animation: none;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .chat-badge {
@@ -255,12 +275,13 @@ watch(() => chatStore.mensajes.length, () => {
 
 /* Header */
 .chat-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #FFD700;
+  color: #333;
   padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 .chat-header-content {
@@ -270,13 +291,15 @@ watch(() => chatStore.mensajes.length, () => {
 }
 
 .chat-avatar {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: #333;
 }
 
 .chat-title h3 {
@@ -351,8 +374,8 @@ watch(() => chatStore.mensajes.length, () => {
 }
 
 .mensaje.usuario .mensaje-contenido {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #FFD700;
+  color: #333;
   border-bottom-right-radius: 4px;
 }
 
@@ -489,16 +512,16 @@ watch(() => chatStore.mensajes.length, () => {
 }
 
 .chat-input:focus {
-  border-color: #667eea;
+  border-color: #FFD700;
 }
 
 .chat-send {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #FFD700;
   border: none;
-  color: white;
+  color: #333;
   cursor: pointer;
   display: flex;
   align-items: center;

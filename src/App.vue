@@ -1,21 +1,41 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import Navbar from '@/components/common/Navbar.vue'
 import Footer from '@/components/common/Footer.vue'
 import CarritoSidebar from '@/components/carrito/CarritoSidebar.vue'
 import ChatBot from '@/components/ChatBot.vue'
+import NotificacionRecomendacion from '@/components/NotificacionRecomendacion.vue'
 import { useCarritoStore } from '@/stores/carrito'
+import { useAuthStore } from '@/stores/auth'
+import { useRecomendacionesStore } from '@/stores/recomendaciones'
 
 const carritoStore = useCarritoStore()
+const authStore = useAuthStore()
+const recomendacionesStore = useRecomendacionesStore()
 const route = useRoute()
 
 // Verificar si estamos en una ruta de admin
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
+// Función para cargar recomendaciones
+const cargarRecomendaciones = () => {
+  if (authStore.isAuthenticated && authStore.token && !isAdminRoute.value) {
+    setTimeout(() => {
+      recomendacionesStore.cargarRecomendacionesPersonalizadas(authStore.token)
+    }, 1500)
+  }
+}
+
 // Inicializar carrito al montar la app
 onMounted(() => {
   carritoStore.inicializar()
+  cargarRecomendaciones()
+})
+
+// Cargar recomendaciones cada vez que cambia de ruta
+watch(() => route.path, () => {
+  cargarRecomendaciones()
 })
 </script>
 
@@ -33,6 +53,13 @@ onMounted(() => {
     
     <!-- ChatBot solo para usuarios normales -->
     <ChatBot v-if="!isAdminRoute" />
+    
+    <!-- Notificación de recomendaciones -->
+    <NotificacionRecomendacion 
+      v-if="!isAdminRoute"
+      :mostrar="recomendacionesStore.mostrarNotificacion"
+      @cerrar="recomendacionesStore.cerrarNotificacion()"
+    />
   </div>
 </template>
 
