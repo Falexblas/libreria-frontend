@@ -275,7 +275,7 @@ watch(() => chatStore.mensajes.length, () => {
 
 /* Header */
 .chat-header {
-  background: #FFD700;
+  background: #FFC107;
   color: #333;
   padding: 16px;
   display: flex;

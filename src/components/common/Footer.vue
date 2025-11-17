@@ -57,6 +57,11 @@
                 <span class="contacto-texto">+51 955 079 929</span>
               </div>
             </div>
+            <!-- Sobre Nosotros (debajo de Contáctanos) -->
+            <div class="sobre-nosotros" style="margin-top:0.75rem;">
+              <h4 class="footer-subtitulo" style="margin-bottom:0.5rem;">Sobre Nosotros</h4>
+              <router-link to="/nosotros" class="footer-enlace">Quienes somos</router-link>
+            </div>
           </div>
 
          <!-- Métodos de Pago -->
@@ -188,6 +193,8 @@ async function suscribirseNewsletter() {
   border-bottom: 2px solid var(--color-accent);
   padding-bottom: 0.5rem;
 }
+
+/* Removed custom .sobre-subtitulo to inherit styles from .footer-enlace */
 
 .footer-descripcion {
   line-height: 1.6;
