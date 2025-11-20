@@ -167,9 +167,6 @@ import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.romance-banner:hover {
-  transform: scale(1.02);
-}
 
 .romance-banner .banner-image {
   width: 100%;
@@ -195,9 +192,6 @@ import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.misterio-banner:hover {
-  transform: scale(1.02);
-}
 
 .misterio-banner .banner-image {
   width: 100%;
