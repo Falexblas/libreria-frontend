@@ -87,10 +87,12 @@ import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRecomendacionesStore } from '@/stores/recomendaciones'
 import { useCarritoStore } from '@/stores/carrito'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const recomendacionesStore = useRecomendacionesStore()
 const carritoStore = useCarritoStore()
+const authStore = useAuthStore()
 
 const props = defineProps({
   mostrar: {
@@ -101,18 +103,23 @@ const props = defineProps({
 
 const emit = defineEmits(['cerrar'])
 
-const mostrar = computed(() => props.mostrar)
+// Solo mostrar las recomendaciones si el usuario es un cliente (rol USER), no admin
+const mostrar = computed(() => {
+  // Verificar que el usuario esté autenticado y sea de rol USER
+  const esUsuarioCliente = authStore.user?.rol === 'USER'
+  return props.mostrar && esUsuarioCliente
+})
 
 const libroDestacado = computed(() => {
-  return recomendacionesStore.recomendaciones[0] || null
+  return recomendacionesStore.obtenerLibroActual() || null
 })
 
 const masRecomendaciones = computed(() => {
-  return recomendacionesStore.recomendaciones.slice(1) || []
+  return recomendacionesStore.obtenerLibrosAdicionales() || []
 })
 
 const progressWidth = computed(() => {
-  return `${(recomendacionesStore.tiempoMostrado / 8) * 100}%`
+  return `${(recomendacionesStore.tiempoMostrado / 12) * 100}%`
 })
 
 function cerrar() {

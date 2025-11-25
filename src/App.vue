@@ -15,8 +15,9 @@ const authStore = useAuthStore()
 const recomendacionesStore = useRecomendacionesStore()
 const route = useRoute()
 
-// Verificar si estamos en una ruta de admin
+// Verificar si estamos en una ruta de admin o checkout
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+const isCheckoutRoute = computed(() => route.path.startsWith('/checkout'))
 
 // Función para cargar recomendaciones
 const cargarRecomendaciones = () => {
@@ -51,12 +52,12 @@ watch(() => route.path, () => {
     <!-- Carrito Sidebar solo para usuarios normales -->
     <CarritoSidebar v-if="!isAdminRoute" />
     
-    <!-- ChatBot solo para usuarios normales -->
-    <ChatBot v-if="!isAdminRoute" />
+    <!-- ChatBot solo para usuarios normales (no en admin ni checkout) -->
+    <ChatBot v-if="!isAdminRoute && !isCheckoutRoute" />
     
-    <!-- Notificación de recomendaciones -->
+    <!-- Notificación de recomendaciones (no en admin ni checkout) -->
     <NotificacionRecomendacion 
-      v-if="!isAdminRoute"
+      v-if="!isAdminRoute && !isCheckoutRoute"
       :mostrar="recomendacionesStore.mostrarNotificacion"
       @cerrar="recomendacionesStore.cerrarNotificacion()"
     />
