@@ -2370,7 +2370,7 @@ function crearGraficos() {
     }
   }).catch(error => {
     console.error('Error al cargar Chart.js:', error)
-    alert('⚠️ Por favor instala las dependencias: npm install chart.js vue-chartjs')
+    alert(' Por favor instala las dependencias')
   })
 }
 
