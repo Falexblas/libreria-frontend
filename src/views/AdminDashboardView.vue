@@ -96,8 +96,8 @@
 
           <!-- Gráficos -->
           <div class="row g-4">
-            <!-- Gráfico de Ventas por Mes -->
-            <div class="col-md-8">
+            <!-- Gráfico de Ventas por Mes (Full Width) -->
+            <div class="col-12">
               <div class="card">
                 <div class="card-header">
                   <h5 class="mb-0">
@@ -105,14 +105,14 @@
                     Ventas por Mes
                   </h5>
                 </div>
-                <div class="card-body">
-                  <canvas id="ventasPorMesChart" height="100"></canvas>
+                <div class="card-body" style="height: 180px; overflow: hidden;">
+                  <canvas id="ventasPorMesChart"></canvas>
                 </div>
               </div>
             </div>
 
             <!-- Gráfico de Estado de Órdenes -->
-            <div class="col-md-4">
+            <div class="col-md-6">
               <div class="card">
                 <div class="card-header">
                   <h5 class="mb-0">
@@ -120,7 +120,7 @@
                     Estado de Órdenes
                   </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="height: 220px;">
                   <canvas id="estadoOrdenesChart"></canvas>
                 </div>
               </div>
@@ -135,14 +135,14 @@
                     Top 5 Libros Más Vendidos
                   </h5>
                 </div>
-                <div class="card-body">
-                  <canvas id="topLibrosChart" height="150"></canvas>
+                <div class="card-body" style="height: 220px;">
+                  <canvas id="topLibrosChart"></canvas>
                 </div>
               </div>
             </div>
 
-            <!-- Categorías Más Populares -->
-            <div class="col-md-6">
+            <!-- Categorías Más Populares (Full Width) -->
+            <div class="col-12">
               <div class="card">
                 <div class="card-header">
                   <h5 class="mb-0">
@@ -150,8 +150,8 @@
                     Categorías Más Populares
                   </h5>
                 </div>
-                <div class="card-body">
-                  <canvas id="categoriasChart" height="150"></canvas>
+                <div class="card-body" style="height: 200px;">
+                  <canvas id="categoriasChart"></canvas>
                 </div>
               </div>
             </div>
