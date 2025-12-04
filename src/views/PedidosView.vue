@@ -34,63 +34,102 @@
       <!-- Lista de pedidos -->
       <div v-else class="pedidos-lista">
         <div v-for="(pedido, index) in pedidos" :key="pedido.id" class="pedido-card mb-4">
-          <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom">
-              <div class="row align-items-center">
-                <div class="col-md-3">
-                  <div class="small text-muted">N° de Pedido</div>
-                  <div class="fw-bold">#{{ index + 1 }}</div>
+          <div class="card shadow-sm border-0 rounded-4">
+            <!-- Header limpio y consistente -->
+            <div class="card-header border-0 rounded-top-4 p-4">
+              <div class="row align-items-center g-3">
+                <div class="col-md-2">
+                  <div class="small text-muted mb-1">Pedido</div>
+                  <div class="fw-bold fs-5">#{{ index + 1 }}</div>
                 </div>
                 <div class="col-md-3">
-                  <div class="small text-muted">Fecha</div>
-                  <div>{{ formatearFecha(pedido.fechaPedido) }}</div>
+                  <div class="small text-muted mb-1">
+                    <i class="fas fa-calendar me-1"></i>Fecha
+                  </div>
+                  <div class="fw-bold">{{ formatearFecha(pedido.fechaPedido).split(',')[0] }}</div>
+                </div>
+                <div class="col-md-2">
+                  <div class="small text-muted mb-1">
+                    <i class="fas fa-money-bill me-1"></i>Total
+                  </div>
+                  <div class="fw-bold text-success fs-5">S/{{ pedido.total.toFixed(2) }}</div>
                 </div>
                 <div class="col-md-3">
-                  <div class="small text-muted">Total</div>
-                  <div class="fw-bold text-primary">S/{{ pedido.total.toFixed(2) }}</div>
-                </div>
-                <div class="col-md-3">
-                  <div class="small text-muted">Estado</div>
-                  <span :class="['badge', getBadgeClass(pedido.estado)]">
-                    <i :class="getIconClass(pedido.estado)" class="me-1"></i>
+                  <div class="small text-muted mb-2">Estado</div>
+                  <span :class="['badge badge-lg', getBadgeClass(pedido.estado)]">
+                    <i :class="getIconClass(pedido.estado)" class="me-2"></i>
                     {{ getEstadoTexto(pedido.estado) }}
                   </span>
+                </div>
+                <div class="col-md-2 text-end">
+                  <button @click="verDetalle(pedido)" class="btn btn-sm btn-primary rounded-pill">
+                    <i class="fas fa-eye me-1"></i>Ver
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div class="card-body">
-              <!-- Detalles del pedido -->
-              <div class="pedido-detalles mb-3">
-                <h6 class="mb-2">Detalles del pedido:</h6>
-                <div class="row g-2">
-                  <div class="col-md-6">
-                    <small class="text-muted">
-                      <i class="fas fa-credit-card me-1"></i>
-                      Método de pago:
-                    </small>
-                    <span class="ms-2">{{ formatearMetodoPago(pedido.metodoPago) }}</span>
+            <div class="card-body p-4">
+              <!-- Grid de información principal - SIMPLIFICADO -->
+              <div class="info-grid mb-4">
+                <div class="info-item">
+                  <div class="info-label">
+                    <i class="fas fa-credit-card text-primary"></i>Método de Pago
                   </div>
-                  <div class="col-md-6">
-                    <small class="text-muted">
-                      <i class="fas fa-map-marker-alt me-1"></i>
-                      Dirección:
-                    </small>
-                    <span class="ms-2">{{ pedido.direccionEnvio }}</span>
+                  <div class="info-value">{{ formatearMetodoPago(pedido.metodoPago) }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">
+                    <i class="fas fa-map-marker-alt text-danger"></i>Dirección de Entrega
                   </div>
-                  <div class="col-md-6" v-if="pedido.telefonoContacto">
-                    <small class="text-muted">
-                      <i class="fas fa-phone me-1"></i>
-                      Teléfono:
-                    </small>
-                    <span class="ms-2">{{ pedido.telefonoContacto }}</span>
+                  <div class="info-value text-truncate" :title="pedido.direccionEnvio">{{ pedido.direccionEnvio }}</div>
+                </div>
+                <div class="info-item" v-if="pedido.telefonoContacto">
+                  <div class="info-label">
+                    <i class="fas fa-phone text-success"></i>Contacto
                   </div>
-                  <div class="col-md-6" v-if="pedido.codigoPostalEnvio">
-                    <small class="text-muted">
-                      <i class="fas fa-mail-bulk me-1"></i>
-                      Código Postal:
-                    </small>
-                    <span class="ms-2">{{ pedido.codigoPostalEnvio }}</span>
+                  <div class="info-value">{{ pedido.telefonoContacto }}</div>
+                </div>
+              </div>
+
+              <!-- Información de Envío - Limpia y sin repeticiones -->
+              <div class="envio-info-card mb-4 p-4 rounded-3">
+                <h6 class="mb-3 fw-bold d-flex align-items-center">
+                  <i class="fas fa-truck me-2"></i>Información de Envío
+                </h6>
+                
+                <div class="envio-grid">
+                  <!-- Número de Seguimiento (solo si no está pendiente) -->
+                  <div class="envio-item" v-if="pedido.estado !== 'pendiente'">
+                    <div class="envio-label">Número de Seguimiento</div>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                      <code class="tracking-code">{{ generarNumeroSeguimiento(pedido.id) }}</code>
+                      <button 
+                        @click="copiarSeguimiento(pedido.id)" 
+                        class="btn btn-sm btn-outline-secondary rounded-pill"
+                        title="Copiar"
+                      >
+                        <i class="fas fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Fecha Estimada de Entrega -->
+                  <div class="envio-item">
+                    <div class="envio-label">Fecha Estimada de Entrega</div>
+                    <div class="envio-value fw-bold mt-2">
+                      {{ calcularFechaEntrega(pedido.fechaPedido) }}
+                    </div>
+                    <small class="text-muted">(3-5 días hábiles)</small>
+                  </div>
+
+                  <!-- Cobertura -->
+                  <div class="envio-item">
+                    <div class="envio-label">Cobertura</div>
+                    <div class="envio-value fw-bold mt-2">
+                      <i class="fas fa-map-marked-alt me-1"></i>A nivel nacional
+                    </div>
+                    <small class="text-muted">Envío incluido en total</small>
                   </div>
                 </div>
               </div>
@@ -139,18 +178,18 @@
               </div>
 
               <!-- Acciones -->
-              <div class="d-flex gap-2 mt-3">
-                <button @click="verDetalle(pedido)" class="btn btn-sm btn-outline-primary">
-                  <i class="fas fa-eye me-1"></i>
-                  Ver detalle
-                </button>
+              <div class="d-flex gap-2 mt-4 pt-3 border-top">
                 <button 
                   v-if="pedido.estado === 'entregado'" 
                   @click="descargarFactura(pedido.id)"
-                  class="btn btn-sm btn-outline-success"
+                  class="btn btn-sm btn-success rounded-pill"
                 >
                   <i class="fas fa-download me-1"></i>
-                  Descargar factura
+                  Descargar Factura
+                </button>
+                <button v-else class="btn btn-sm btn-secondary rounded-pill disabled">
+                  <i class="fas fa-file me-1"></i>
+                  Factura (disponible al entregar)
                 </button>
               </div>
             </div>
@@ -381,6 +420,38 @@ function cerrarModal() {
   detallesPedido.value = []
 }
 
+// Generar número de seguimiento basado en ID del pedido
+function generarNumeroSeguimiento(pedidoId) {
+  const timestamp = Date.now().toString().slice(-6)
+  const id = String(pedidoId).padStart(5, '0')
+  return `PE${id}${timestamp}`
+}
+
+// Copiar número de seguimiento al portapapeles
+function copiarSeguimiento(pedidoId) {
+  const numero = generarNumeroSeguimiento(pedidoId)
+  navigator.clipboard.writeText(numero).then(() => {
+    // Mostrar feedback visual
+    const event = new CustomEvent('copiar-exito')
+    window.dispatchEvent(event)
+  })
+}
+
+// Calcular fecha estimada de entrega (3-5 días hábiles)
+function calcularFechaEntrega(fechaPedido) {
+  if (!fechaPedido) return 'N/A'
+  
+  const fecha = new Date(fechaPedido)
+  // Agregar 4 días (promedio de 3-5 días)
+  fecha.setDate(fecha.getDate() + 4)
+  
+  return fecha.toLocaleDateString('es-PE', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
 onMounted(() => {
   cargarPedidos()
 })
@@ -399,18 +470,58 @@ onMounted(() => {
 
 .pedido-card .card {
   border: none;
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  background: white;
 }
 
 .pedido-card .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important;
 }
 
 .card-header {
-  padding: 1.25rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  color: #2c3e50;
+}
+
+.badge-lg {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  border-radius: 25px;
+}
+
+/* Grid de información */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #0d6efd;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.95rem;
 }
 
 .badge {
@@ -563,10 +674,100 @@ onMounted(() => {
   background: #f8f9fa;
 }
 
+/* Información de Envío - Consistente y limpia */
+.envio-info-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-left: 4px solid #0d6efd;
+}
+
+.envio-info-card h6 {
+  color: #2c3e50;
+}
+
+.envio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .envio-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.envio-item {
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.envio-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #0d6efd;
+}
+
+.envio-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.envio-value {
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.tracking-code {
+  background: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #0056b3;
+  letter-spacing: 0.5px;
+  border: 1px solid #dee2e6;
+  font-size: 0.9rem;
+}
+
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .card-header .row > div {
     margin-bottom: 0.75rem;
+  }
+  
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    padding: 1rem;
+  }
+  
+  .card-header .row {
+    gap: 1rem !important;
+  }
+  
+  .card-header .col-md-2,
+  .card-header .col-md-3 {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .envio-grid {
+    grid-template-columns: 1fr;
   }
   
   .timeline {
@@ -591,6 +792,17 @@ onMounted(() => {
   .timeline-icon {
     margin: 0;
     flex-shrink: 0;
+  }
+  
+  .envio-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .envio-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
 }
 </style>

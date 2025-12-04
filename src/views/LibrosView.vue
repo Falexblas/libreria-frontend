@@ -114,6 +114,19 @@
                   <option value="disponible">Disponible</option>
                   <option value="sin-stock">Sin stock</option>
                 </select>
+
+                <hr />
+                <!-- TIPO DE PRODUCTO -->
+                <h6 class="fw-bold text-uppercase">Tipo de Producto</h6>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="tipoFisico" checked disabled>
+                  <label class="form-check-label" for="tipoFisico">
+                    <i class="fas fa-box me-2 text-success"></i>Producto Físico
+                  </label>
+                </div>
+                <p class="small text-muted mt-2">
+                  <i class="fas fa-info-circle me-1"></i>Todos nuestros libros son productos físicos con envío a nivel nacional.
+                </p>
               </div>
             </aside>
             <!-- ================== FIN FILTROS ================== -->

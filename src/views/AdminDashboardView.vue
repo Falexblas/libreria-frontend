@@ -1108,6 +1108,7 @@
                   <select class="form-select" v-model="usuarioForm.rol" required>
                     <option value="USER">Usuario Normal</option>
                     <option value="ADMIN">Administrador</option>
+                    <option value="EMPLEADO">Empleado</option>
                   </select>
                   <div class="form-text">
                     <i class="fas fa-info-circle me-1"></i>

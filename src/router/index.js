@@ -9,6 +9,7 @@ import ProfileView from '@/views/ProfileView.vue'
 import PedidosView from '@/views/PedidosView.vue'
 import FavoritosView from '@/views/FavoritosView.vue'
 import AdminDashboardView from '@/views/AdminDashboardView.vue'
+import EmpleadoDashboardView from '@/views/EmpleadoDashboardView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -79,6 +80,12 @@ const router = createRouter({
       component: AdminDashboardView,
       meta: { requiresAuth: true, requiresAdmin: true }  // Requiere ser admin
     },
+    {
+      path: '/empleado',
+      name: 'empleado',
+      component: EmpleadoDashboardView,
+      meta: { requiresAuth: true, requiresEmpleado: true }
+    },
   ],
   // Scroll automático al inicio en cada navegación
   scrollBehavior(to, from, savedPosition) {
@@ -114,6 +121,17 @@ router.beforeEach((to, from, next) => {
     const isAdmin = authStore.user?.rol?.nombre === 'ADMIN' || authStore.user?.rol === 'ADMIN'
     
     if (!isAdmin) {
+      alert('No tienes permisos para acceder a esta página')
+      next({ name: 'home' })
+      return
+    }
+  }
+  
+  // Si la ruta requiere ser empleado
+  if (to.meta.requiresEmpleado) {
+    const isEmpleado = authStore.user?.rol?.nombre === 'EMPLEADO' || authStore.user?.rol === 'EMPLEADO'
+
+    if (!isEmpleado) {
       alert('No tienes permisos para acceder a esta página')
       next({ name: 'home' })
       return

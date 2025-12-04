@@ -102,13 +102,16 @@
                   <div class="fw-bold">{{ authStore.nombreUsuario }}</div>
                   <div class="text-muted small">{{ authStore.user?.email }}</div>
                   <span v-if="isAdmin" class="badge bg-danger mt-1">ADMIN</span>
+                  <span v-else-if="isEmpleado" class="badge bg-primary mt-1">EMPLEADO</span>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <!-- Opciones de ADMIN -->
                 <li v-if="isAdmin"><router-link to="/admin" class="dropdown-item"><i class="bi bi-shield-lock me-2"></i>Panel Admin</router-link></li>
-                <!-- Opciones de USER -->
-                <li v-if="!isAdmin"><router-link to="/perfil" class="dropdown-item"><i class="bi bi-person me-2"></i>Mi Perfil</router-link></li>
-                <li v-if="!isAdmin"><router-link to="/pedidos" class="dropdown-item"><i class="bi bi-box-seam me-2"></i>Mis Pedidos</router-link></li>
+                <!-- Opciones de EMPLEADO -->
+                <li v-if="isEmpleado"><router-link to="/empleado" class="dropdown-item"><i class="bi bi-clipboard-check me-2"></i>Panel Empleado</router-link></li>
+                <!-- Opciones de USER normal (no admin, no empleado) -->
+                <li v-if="!isAdmin && !isEmpleado"><router-link to="/perfil" class="dropdown-item"><i class="bi bi-person me-2"></i>Mi Perfil</router-link></li>
+                <li v-if="!isAdmin && !isEmpleado"><router-link to="/pedidos" class="dropdown-item"><i class="bi bi-box-seam me-2"></i>Mis Pedidos</router-link></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a href="#" @click="cerrarSesion" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
               </ul>
@@ -241,6 +244,12 @@ const categoriaAbierta = ref(null)
 const isAdmin = computed(() => {
   const rol = authStore.user?.rol
   return rol === 'ADMIN' || (typeof rol === 'object' && rol?.nombre === 'ADMIN')
+})
+
+// Computed para verificar si el usuario es EMPLEADO
+const isEmpleado = computed(() => {
+  const rol = authStore.user?.rol
+  return rol === 'EMPLEADO' || (typeof rol === 'object' && rol?.nombre === 'EMPLEADO')
 })
 
 onMounted(() => {

@@ -63,6 +63,62 @@ import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
     <!-- Carrusel Misterio -->
     <SwiperCarouselMisterio/>
 
+    <!-- Sección de Servicios de Envío -->
+    <section class="servicios-envio-section">
+      <div class="container">
+        <h2 class="servicios-title mb-5">Nuestros Servicios de Envío</h2>
+        <div class="row g-4">
+          <!-- Card 1: Cobertura Nacional -->
+          <div class="col-md-4">
+            <div class="servicio-card h-100">
+              <div class="servicio-icon">
+                <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <h5 class="servicio-titulo">Cobertura Nacional</h5>
+              <p class="servicio-descripcion">Entregamos en los 24 departamentos del Perú. Desde la costa hasta la selva, llegamos a donde estés.</p>
+              <ul class="servicio-list">
+                <li><i class="fas fa-check-circle text-success me-2"></i>Lima y Callao</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Provincias</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Zonas remotas</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Card 2: Envío Rápido -->
+          <div class="col-md-4">
+            <div class="servicio-card h-100">
+              <div class="servicio-icon">
+                <i class="fas fa-truck"></i>
+              </div>
+              <h5 class="servicio-titulo">Envío Rápido</h5>
+              <p class="servicio-descripcion">Recibe tus libros en 3-5 días hábiles. Costo fijo de S/8.00 a cualquier parte del país.</p>
+              <ul class="servicio-list">
+                <li><i class="fas fa-clock text-warning me-2"></i>3-5 días hábiles</li>
+                <li><i class="fas fa-money-bill text-success me-2"></i>S/8.00 fijo</li>
+                <li><i class="fas fa-box text-info me-2"></i>Embalaje seguro</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Card 3: Productos Físicos -->
+          <div class="col-md-4">
+            <div class="servicio-card h-100">
+              <div class="servicio-icon">
+                <i class="fas fa-book"></i>
+              </div>
+              <h5 class="servicio-titulo">Productos Físicos</h5>
+              <p class="servicio-descripcion">Libros de alta calidad, ediciones originales y bestsellers listos para envío inmediato.</p>
+              <ul class="servicio-list">
+                <li><i class="fas fa-star text-warning me-2"></i>Libros de calidad</li>
+                <li><i class="fas fa-check text-success me-2"></i>Stock disponible</li>
+                <li><i class="fas fa-shield-alt text-info me-2"></i>Garantía de entrega</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Sección de características -->
     <section class="features-section">
       <div class="container">
@@ -198,6 +254,79 @@ import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
   height: 100%;
   display: block;
   object-fit: cover;
+}
+
+/* ========================================
+   SECCIÓN DE SERVICIOS DE ENVÍO
+   ======================================== */
+.servicios-envio-section {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  padding: 3rem 0;
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.servicios-title {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.servicio-card {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.servicio-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  border-color: #0d6efd;
+}
+
+.servicio-icon {
+  font-size: 2.5rem;
+  color: #0d6efd;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: rgba(13, 110, 253, 0.1);
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.servicio-titulo {
+  color: #2c3e50;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.servicio-descripcion {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.servicio-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.servicio-list li {
+  padding: 0.5rem 0;
+  color: #555;
+  font-size: 0.9rem;
 }
 
 /* ========================================

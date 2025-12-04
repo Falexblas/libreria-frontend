@@ -202,13 +202,16 @@ const handleSubmit = async () => {
         
         // Redirigir según el rol del usuario
         setTimeout(() => {
-          // Verificar si el usuario es administrador
-          const isAdmin = data.user.rol?.nombre === 'ADMIN' || data.user.rol === 'ADMIN'
-          
+          const rol = data.user.rol?.nombre || data.user.rol
+          const isAdmin = rol === 'ADMIN'
+          const isEmpleado = rol === 'EMPLEADO'
+
           if (isAdmin) {
-            router.push("/admin")
+            router.push('/admin')
+          } else if (isEmpleado) {
+            router.push('/empleado')
           } else {
-            router.push("/")
+            router.push('/')
           }
         }, 1500)
       } else {

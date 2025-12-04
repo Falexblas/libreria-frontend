@@ -248,6 +248,21 @@
               </div>
             </div>
 
+            <!-- Información de Envío Nacional -->
+            <div class="alert alert-info mb-4 border-0 rounded-3">
+              <div class="d-flex align-items-start">
+                <i class="fas fa-truck me-3 mt-1 text-info" style="font-size: 1.2rem;"></i>
+                <div class="flex-grow-1">
+                  <h6 class="mb-2 text-info fw-bold">📦 Envío a Nivel Nacional</h6>
+                  <div class="small">
+                    <p class="mb-1"><strong>🌍 Cobertura:</strong> Entregamos en los 24 departamentos del Perú</p>
+                    <p class="mb-1"><strong>💰 Costo:</strong> S/8.00 (fijo para todo el país)</p>
+                    <p class="mb-0"><strong>⏱️ Tiempo:</strong> 3-5 días hábiles después de confirmado el pago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <form class="mt-3" @submit.prevent>
               <div class="row g-3">
                 <!-- Fila 1: Departamento, Provincia, Distrito -->
