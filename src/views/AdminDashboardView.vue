@@ -1212,9 +1212,8 @@ const eliminarAutor = (index) => {
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
   { id: 'libros', label: 'Libros', icon: 'fas fa-book' },
-  { id: 'ordenes', label: 'Órdenes', icon: 'fas fa-shopping-cart' },
   { id: 'usuarios', label: 'Usuarios', icon: 'fas fa-users' },
-  // { id: 'reportes', label: 'Reportes', icon: 'fas fa-chart-bar' },
+  // { id: 'reportes', label: 'Reportes', icon: 'fas fa-file-alt' },
   { id: 'configuracion', label: 'Configuración', icon: 'fas fa-cog' }
 ]
 
