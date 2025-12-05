@@ -155,6 +155,14 @@
                           >
                             <i class="fas fa-eye"></i>
                           </button>
+                          <button
+                            class="btn btn-sm btn-outline-success"
+                            title="Descargar etiqueta"
+                            aria-label="Descargar etiqueta"
+                            @click="descargarOrden(orden)"
+                          >
+                            <i class="fas fa-download"></i>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -422,6 +430,19 @@ async function verDetalleOrden(ordenId) {
   } finally {
     cargandoDetalle.value = false
   }
+}
+
+// Reemplaza la descarga directa por generación de etiqueta vía composable
+import { useEtiqueta } from '@/composables/useEtiqueta'
+const { generarEtiqueta } = useEtiqueta()
+
+function descargarOrden(orden) {
+  // Llama al generador de etiqueta con el ID de la orden
+  if (!orden || !orden.id) {
+    alert('Orden inválida')
+    return
+  }
+  generarEtiqueta(orden.id)
 }
 
 function cerrarModal() {
