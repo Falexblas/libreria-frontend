@@ -58,7 +58,7 @@
                   <div class="small text-muted mb-1">
                     <i class="fas fa-money-bill me-1"></i>Total
                   </div>
-                  <div class="fw-bold text-success fs-5">S/{{ calcularTotalConEnvio(pedido).toFixed(2) }}</div>
+                  <div class="fw-bold text-success fs-5">S/{{ getTotalPedido(pedido).toFixed(2) }}</div>
                 </div>
                 <div class="col-md-2">
                   <div class="small text-muted mb-2">Estado</div>
@@ -277,7 +277,7 @@
                   <!-- Total -->
                   <div class="d-flex justify-content-between align-items-center border-top pt-3">
                     <span class="fs-5 fw-bold">Total del Pedido:</span>
-                    <strong class="text-primary fs-4">S/{{ calcularTotalConEnvio(pedidoSeleccionado).toFixed(2) }}</strong>
+                    <strong class="text-primary fs-4">S/{{ getTotalPedido(pedidoSeleccionado).toFixed(2) }}</strong>
                   </div>
                 </div>
               </div>
@@ -367,23 +367,25 @@ function calcularTarifaEnvioEstimada(pedido) {
 
 // Calcular subtotal de productos (sin envío)
 function calcularSubtotal(pedido) {
-  // Si el backend ya devuelve el subtotal, usarlo
+  // Si el backend ya devuelve el subtotal, usarlo directamente
   if (pedido.subtotal !== undefined && pedido.subtotal !== null) {
     return parseFloat(pedido.subtotal)
   }
-  
-  // Si no, calcular de los detalles
+
+  // Si hay detalles cargados del pedido seleccionado, calcular desde ellos
   if (detallesPedido.value.length > 0 && pedidoSeleccionado.value?.id === pedido.id) {
     return calcularSubtotalProductos()
   }
-  
-  // Si no hay detalles, calcular del total del backend
-  const totalBackend = parseFloat(pedido.total) || 0
-  const tarifaEnvio = calcularTarifaEnvioEstimada(pedido)
-  
-  // Verificar si el total del backend ya incluye el envío
-  // Asumimos que el backend devuelve el total SIN envío
-  return Math.max(0, totalBackend)
+
+  // Si no hay información extra, intentar aproximar el subtotal a partir del total y la tarifa
+  const totalBackend = parseFloat(pedido.total)
+  if (!isNaN(totalBackend)) {
+    const tarifaEnvio = calcularTarifaEnvioEstimada(pedido)
+    const subtotalAprox = totalBackend - tarifaEnvio
+    return subtotalAprox > 0 ? subtotalAprox : totalBackend
+  }
+
+  return 0
 }
 
 // Calcular subtotal de productos desde los detalles
@@ -396,10 +398,22 @@ function calcularSubtotalProductos() {
 }
 
 // Calcular total CON envío (para mostrar en la UI)
+// Si el backend ya envía el total final (incluyendo envío), usarlo directamente
 function calcularTotalConEnvio(pedido) {
+  const totalBackend = parseFloat(pedido.total)
+  if (!isNaN(totalBackend)) {
+    return totalBackend
+  }
+
   const subtotal = calcularSubtotal(pedido)
   const tarifaEnvio = calcularTarifaEnvioEstimada(pedido)
   return subtotal + tarifaEnvio
+}
+
+// Helper para obtener el total que se debe mostrar (coherente con la BD)
+function getTotalPedido(pedido) {
+  if (!pedido) return 0
+  return calcularTotalConEnvio(pedido)
 }
 
 // Obtener dirección completa

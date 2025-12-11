@@ -983,13 +983,15 @@ function onCodePaste(e) {
 async function cargarDepartamentos() {
   try {
     const response = await fetch('http://localhost:8080/api/ubigeo/departamentos')
-    if (response.ok) {
-      const todosDepartamentos = await response.json()
-      // Filtrar solo Lima y Callao
-      departamentosDisponibles.value = todosDepartamentos.filter(
-        depto => depto.name === 'Lima' || depto.name === 'Callao'
-      )
+    if (!response.ok) {
+      throw new Error('Respuesta no válida al cargar departamentos')
     }
+
+    const todosDepartamentos = await response.json()
+    // Filtrar solo Lima y Callao
+    departamentosDisponibles.value = todosDepartamentos.filter(
+      depto => depto.name === 'Lima' || depto.name === 'Callao'
+    )
   } catch (error) {
     console.error('Error cargando departamentos:', error)
     // Si hay error, usar valores por defecto
@@ -1009,17 +1011,19 @@ async function cargarProvincias(departamentoNombre) {
     }
     
     const response = await fetch('http://localhost:8080/api/ubigeo/provincias')
-    if (response.ok) {
-      const todasProvincias = await response.json()
-      
-      // Encontrar el departamento seleccionado
-      const depto = departamentosDisponibles.value.find(d => d.name === departamentoNombre)
-      if (depto) {
-        // Filtrar provincias del departamento seleccionado
-        provinciasDisponibles.value = todasProvincias.filter(p => p.department_id === depto.id)
-      } else {
-        provinciasDisponibles.value = []
-      }
+    if (!response.ok) {
+      throw new Error('Respuesta no válida al cargar provincias')
+    }
+
+    const todasProvincias = await response.json()
+    
+    // Encontrar el departamento seleccionado
+    const depto = departamentosDisponibles.value.find(d => d.name === departamentoNombre)
+    if (depto) {
+      // Filtrar provincias del departamento seleccionado
+      provinciasDisponibles.value = todasProvincias.filter(p => p.department_id === depto.id)
+    } else {
+      provinciasDisponibles.value = []
     }
   } catch (error) {
     console.error('Error cargando provincias:', error)
@@ -1030,15 +1034,17 @@ async function cargarProvincias(departamentoNombre) {
 async function cargarDistritos(provinciaNombre) {
   try {
     const response = await fetch('http://localhost:8080/api/ubigeo/distritos')
-    if (response.ok) {
-      const todosDistritos = await response.json()
-      // Buscar la provincia por nombre
-      const prov = provinciasDisponibles.value.find(p => p.name === provinciaNombre)
-      if (prov) {
-        distritosDisponibles.value = todosDistritos.filter(d => d.province_id === prov.id)
-      } else {
-        distritosDisponibles.value = []
-      }
+    if (!response.ok) {
+      throw new Error('Respuesta no válida al cargar distritos')
+    }
+
+    const todosDistritos = await response.json()
+    // Buscar la provincia por nombre
+    const prov = provinciasDisponibles.value.find(p => p.name === provinciaNombre)
+    if (prov) {
+      distritosDisponibles.value = todosDistritos.filter(d => d.province_id === prov.id)
+    } else {
+      distritosDisponibles.value = []
     }
   } catch (error) {
     console.error('Error cargando distritos:', error)
