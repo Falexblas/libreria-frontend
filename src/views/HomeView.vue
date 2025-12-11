@@ -68,18 +68,18 @@ import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
       <div class="container">
         <h2 class="servicios-title mb-5">Nuestros Servicios de Envío</h2>
         <div class="row g-4">
-          <!-- Card 1: Cobertura Nacional -->
+          <!-- Card 1: Cobertura Lima y Callao -->
           <div class="col-md-4">
             <div class="servicio-card h-100">
               <div class="servicio-icon">
                 <i class="fas fa-map-marked-alt"></i>
               </div>
-              <h5 class="servicio-titulo">Cobertura Nacional</h5>
-              <p class="servicio-descripcion">Entregamos en los 24 departamentos del Perú. Desde la costa hasta la selva, llegamos a donde estés.</p>
+              <h5 class="servicio-titulo">Cobertura Lima y Callao</h5>
+              <p class="servicio-descripcion">Entregamos en toda el área metropolitana de Lima y Callao. Cobertura rápida y confiable en la capital.</p>
               <ul class="servicio-list">
-                <li><i class="fas fa-check-circle text-success me-2"></i>Lima y Callao</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i>Provincias</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i>Zonas remotas</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Lima Metropolitana</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Provincias de Callao</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Distritos cercanos</li>
               </ul>
             </div>
           </div>
@@ -130,8 +130,8 @@ import SwiperCarouselRomance from '@/components/SwiperCarouselRomance.vue';
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </div>
-            <h3>Envío a todo el Perú</h3>
-            <p>Recibimos tus productos a tu casa</p>
+            <h3>Envío a Lima y Callao</h3>
+            <p>Entrega rápida en tu domicilio</p>
           </div>
 
           <div class="feature-item">
