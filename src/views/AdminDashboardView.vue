@@ -328,57 +328,8 @@
                         {{ orden.direccionEnvio }}
                       </td>
                       <td>
-                        <div class="d-flex gap-1">
-                          <!-- Dropdown para cambiar estado -->
-                          <div class="dropdown">
-                            <button 
-                              class="btn btn-sm btn-outline-secondary" 
-                              type="button" 
-                              :id="'dropdown-orden-' + orden.id"
-                              data-bs-toggle="dropdown" 
-                              aria-expanded="false"
-                              title="Cambiar estado"
-                            >
-                              <i class="fas fa-edit"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" :aria-labelledby="'dropdown-orden-' + orden.id">
-                              <li>
-                                <a 
-                                  class="dropdown-item" 
-                                  href="#" 
-                                  @click.prevent="cambiarEstado(orden.id, 'pendiente')"
-                                  :class="{ active: orden.estado === 'pendiente' }"
-                                >
-                                  <span class="badge bg-warning text-dark me-2">●</span>
-                                  Pendiente
-                                </a>
-                              </li>
-                              <li>
-                                <a 
-                                  class="dropdown-item" 
-                                  href="#" 
-                                  @click.prevent="cambiarEstado(orden.id, 'enviando')"
-                                  :class="{ active: orden.estado === 'enviando' }"
-                                >
-                                  <span class="badge bg-info text-white me-2">●</span>
-                                  En camino
-                                </a>
-                              </li>
-                              <li>
-                                <a 
-                                  class="dropdown-item" 
-                                  href="#" 
-                                  @click.prevent="cambiarEstado(orden.id, 'entregado')"
-                                  :class="{ active: orden.estado === 'entregado' }"
-                                >
-                                  <span class="badge bg-success text-white me-2">●</span>
-                                  Entregado
-                                </a>
-                              </li>
-                            </ul>
-                          </div>
-                          
-                          <!-- Botón ver detalles -->
+                        <div class="d-flex justify-content-center">
+                          <!-- Solo botón ver detalles para Admin -->
                           <button 
                             class="btn btn-sm btn-outline-primary" 
                             title="Ver detalles"
@@ -746,6 +697,44 @@
                 </div>
               </div>
 
+              <!-- Tickets generados (mismas imágenes que ve el empleado) -->
+              <div class="mb-4">
+                <h6 class="text-muted mb-3">Tickets generados</h6>
+                <div v-if="ticketsOrden.length === 0" class="text-muted small">
+                  No hay tickets registrados para esta orden.
+                </div>
+                <div v-else class="row g-3">
+                  <div
+                    v-for="ticket in ticketsOrden"
+                    :key="ticket.id"
+                    class="col-md-6"
+                  >
+                    <div class="border rounded p-3 h-100">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="small text-muted">Ticket #{{ ticket.id }}</div>
+                        <span class="badge bg-secondary small">{{ getEstadoTexto(ticket.estadoNuevo || ticket.estado) }}</span>
+                      </div>
+                      <div v-if="ticket.motivo" class="small mb-2">
+                        <strong>Motivo:</strong> {{ ticket.motivo }}
+                      </div>
+                      <div class="mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">Creado por: {{ ticket.creadoPor || 'N/D' }}</small>
+                        </div>
+                        <button
+                          class="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
+                          type="button"
+                          @click="abrirModalFoto(ticket.fotoUrl)"
+                        >
+                          <i class="fas fa-image"></i>
+                          <span>Ver foto del paquete</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Estado y Método de Pago -->
               <div class="row g-3">
                 <div class="col-md-6">
@@ -813,12 +802,13 @@
                       </option>
                     </select>
                     <button 
-                      class="btn btn-outline-primary" 
+                      class="btn btn-primary fw-semibold" 
                       type="button"
                       @click="agregarAutor"
                       :disabled="!autorSeleccionado"
                     >
-                      <i class="fas fa-plus"></i> Agregar
+                      <i class="fas fa-plus me-1"></i>
+                      Agregar autor
                     </button>
                   </div>
                   
@@ -1156,6 +1146,35 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Foto Paquete (Admin) -->
+    <div
+      v-if="mostrarModalFoto"
+      class="modal fade show d-block"
+      tabindex="-1"
+      style="background-color: rgba(0,0,0,0.5);"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Foto del paquete</h5>
+            <button type="button" class="btn-close" @click="cerrarModalFoto"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img
+              v-if="fotoSeleccionada"
+              :src="fotoSeleccionada"
+              alt="Foto del paquete"
+              class="img-fluid"
+              style="max-height: 500px; max-width: 100%;"
+            />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="cerrarModalFoto">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1211,6 +1230,7 @@ const eliminarAutor = (index) => {
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
+  { id: 'ordenes', label: 'Órdenes', icon: 'fas fa-shopping-cart' },
   { id: 'libros', label: 'Libros', icon: 'fas fa-book' },
   { id: 'usuarios', label: 'Usuarios', icon: 'fas fa-users' },
   // { id: 'reportes', label: 'Reportes', icon: 'fas fa-file-alt' },
@@ -1229,6 +1249,9 @@ const mostrarModal = ref(false)
 const ordenSeleccionada = ref(null)
 const detallesOrden = ref([])
 const cargandoDetalle = ref(false)
+const ticketsOrden = ref([])
+const mostrarModalFoto = ref(false)
+const fotoSeleccionada = ref(null)
 
 // Variables para gestión de libros
 const libros = ref([])
@@ -1565,6 +1588,24 @@ async function verDetalleOrden(ordenId) {
       const errorText = await responseDetalles.text()
       console.error('❌ Detalle del error:', errorText)
     }
+
+    // Obtener tickets de la orden reutilizando el endpoint de empleado
+    try {
+      const responseTickets = await fetch(`http://localhost:8080/api/empleado/ordenes/${ordenId}/tickets`, {
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`
+        }
+      })
+
+      if (responseTickets.ok) {
+        ticketsOrden.value = await responseTickets.json()
+        console.log('🎫 Tickets de la orden (admin):', ticketsOrden.value)
+      } else {
+        console.error('❌ Error al obtener tickets (admin):', responseTickets.status)
+      }
+    } catch (err) {
+      console.error('❌ Error al cargar tickets (admin):', err)
+    }
   } catch (error) {
     console.error('❌ Error al cargar detalles:', error)
     alert('❌ Error al cargar los detalles de la orden')
@@ -1577,6 +1618,18 @@ function cerrarModal() {
   mostrarModal.value = false
   ordenSeleccionada.value = null
   detallesOrden.value = []
+  ticketsOrden.value = []
+}
+
+function abrirModalFoto(url) {
+  if (!url) return
+  fotoSeleccionada.value = url
+  mostrarModalFoto.value = true
+}
+
+function cerrarModalFoto() {
+  mostrarModalFoto.value = false
+  fotoSeleccionada.value = null
 }
 
 // ========================================
