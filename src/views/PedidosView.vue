@@ -42,7 +42,7 @@
                   <div class="small text-muted mb-1">Pedido</div>
                   <div class="fw-bold fs-5">#{{ index + 1 }}</div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <div class="small text-muted mb-1">
                     <i class="fas fa-calendar me-1"></i>Fecha
                   </div>
@@ -50,11 +50,17 @@
                 </div>
                 <div class="col-md-2">
                   <div class="small text-muted mb-1">
+                    <i class="fas fa-shipping-fast me-1"></i>Costo de Envío
+                  </div>
+                  <div class="fw-bold">S/{{ calcularTarifaEnvioEstimada(pedido).toFixed(2) }}</div>
+                </div>
+                <div class="col-md-2">
+                  <div class="small text-muted mb-1">
                     <i class="fas fa-money-bill me-1"></i>Total
                   </div>
-                  <div class="fw-bold text-success fs-5">S/{{ pedido.total.toFixed(2) }}</div>
+                  <div class="fw-bold text-success fs-5">S/{{ calcularTotalConEnvio(pedido).toFixed(2) }}</div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <div class="small text-muted mb-2">Estado</div>
                   <span :class="['badge badge-lg', getBadgeClass(pedido.estado)]">
                     <i :class="getIconClass(pedido.estado)" class="me-2"></i>
@@ -82,7 +88,7 @@
                   <div class="info-label">
                     <i class="fas fa-map-marker-alt text-danger"></i>Dirección de Entrega
                   </div>
-                  <div class="info-value text-truncate" :title="pedido.direccionEnvio">{{ pedido.direccionEnvio }}</div>
+                  <div class="info-value text-truncate" :title="getDireccionCompleta(pedido)">{{ getDireccionCompleta(pedido) }}</div>
                 </div>
                 <div class="info-item" v-if="pedido.telefonoContacto">
                   <div class="info-label">
@@ -99,19 +105,27 @@
                 </h6>
                 
                 <div class="envio-grid">
-                  <!-- Número de Seguimiento (solo si no está pendiente) -->
-                  <div class="envio-item" v-if="pedido.estado !== 'pendiente'">
-                    <div class="envio-label">Número de Seguimiento</div>
+                  <!-- COSTO DE ENVÍO -->
+                  <div class="envio-item costo-envio">
+                    <div class="envio-label">Costo de Envío</div>
                     <div class="d-flex align-items-center gap-2 mt-2">
-                      <code class="tracking-code">{{ generarNumeroSeguimiento(pedido.id) }}</code>
-                      <button 
-                        @click="copiarSeguimiento(pedido.id)" 
-                        class="btn btn-sm btn-outline-secondary rounded-pill"
-                        title="Copiar"
-                      >
-                        <i class="fas fa-copy"></i>
-                      </button>
+                      <div class="envio-value fw-bold fs-5">
+                        S/{{ calcularTarifaEnvioEstimada(pedido).toFixed(2) }}
+                      </div>
                     </div>
+                    <small class="text-muted">Calculado al momento de la compra</small>
+                  </div>
+
+                  <!-- DIRECCIÓN DE ENTREGA -->
+                  <div class="envio-item">
+                    <div class="envio-label">Dirección de Entrega</div>
+                    <div class="envio-value fw-bold mt-2 text-truncate">
+                      {{ getDireccionCompleta(pedido) }}
+                    </div>
+                    <small class="text-muted">
+                      <i class="fas fa-map-marker-alt me-1"></i>
+                      {{ pedido.direccionEnvio }}
+                    </small>
                   </div>
 
                   <!-- Fecha Estimada de Entrega -->
@@ -121,15 +135,6 @@
                       {{ calcularFechaEntrega(pedido.fechaPedido) }}
                     </div>
                     <small class="text-muted">(3-5 días hábiles)</small>
-                  </div>
-
-                  <!-- Cobertura -->
-                  <div class="envio-item">
-                    <div class="envio-label">Cobertura</div>
-                    <div class="envio-value fw-bold mt-2">
-                      <i class="fas fa-map-marked-alt me-1"></i>A nivel nacional
-                    </div>
-                    <small class="text-muted">Envío incluido en total</small>
                   </div>
                 </div>
               </div>
@@ -247,11 +252,32 @@
                   </div>
                 </div>
 
-                <!-- Total -->
+                <!-- Desglose de costos -->
                 <div class="border-top pt-3 mt-3">
-                  <div class="d-flex justify-content-between align-items-center">
+                  <!-- Subtotal productos -->
+                  <div class="row mb-2">
+                    <div class="col-6">
+                      <small class="text-muted">Subtotal productos:</small>
+                    </div>
+                    <div class="col-6 text-end">
+                      <small>S/{{ calcularSubtotalProductos().toFixed(2) }}</small>
+                    </div>
+                  </div>
+                  
+                  <!-- Costo de envío -->
+                  <div class="row mb-2">
+                    <div class="col-6">
+                      <small class="text-muted">Costo de envío:</small>
+                    </div>
+                    <div class="col-6 text-end">
+                      <small>S/{{ calcularTarifaEnvioEstimada(pedidoSeleccionado).toFixed(2) }}</small>
+                    </div>
+                  </div>
+                  
+                  <!-- Total -->
+                  <div class="d-flex justify-content-between align-items-center border-top pt-3">
                     <span class="fs-5 fw-bold">Total del Pedido:</span>
-                    <strong class="text-primary fs-4">S/{{ pedidoSeleccionado.total.toFixed(2) }}</strong>
+                    <strong class="text-primary fs-4">S/{{ calcularTotalConEnvio(pedidoSeleccionado).toFixed(2) }}</strong>
                   </div>
                 </div>
               </div>
@@ -280,7 +306,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFactura } from '@/composables/useFactura'
 
@@ -293,6 +319,103 @@ const mostrarModal = ref(false)
 const pedidoSeleccionado = ref(null)
 const detallesPedido = ref([])
 const cargandoDetalle = ref(false)
+
+// NUEVAS FUNCIONES PARA CALCULAR EN FRONTEND
+
+// Calcular tarifa de envío basado en la dirección
+function calcularTarifaEnvioEstimada(pedido) {
+  // Si el backend ya devuelve la tarifa, úsala
+  if (pedido.tarifaEnvio !== undefined && pedido.tarifaEnvio !== null) {
+    return parseFloat(pedido.tarifaEnvio)
+  }
+  
+  // Si no, calcular basado en la dirección
+  const direccion = pedido.direccionEnvio || ''
+  const ciudad = pedido.ciudadEnvio || ''
+  
+  // Lógica simple de cálculo
+  // 1. Si contiene "Lima" o "Callao" = S/8.00
+  // 2. Si contiene algún departamento = S/20.00
+  // 3. Si no = S/0.00 (gratis o desconocido)
+  
+  const direccionLower = direccion.toLowerCase()
+  const ciudadLower = ciudad.toLowerCase()
+  
+  // Verificar si es Lima o Callao
+  if (direccionLower.includes('lima') || direccionLower.includes('callao') ||
+      ciudadLower.includes('lima') || ciudadLower.includes('callao')) {
+    return 8.0
+  }
+  
+  // Verificar si contiene nombres de departamentos peruanos (lista básica)
+  const departamentos = [
+    'amazonas', 'ancash', 'apurimac', 'arequipa', 'ayacucho', 'cajamarca',
+    'cusco', 'huancavelica', 'huanuco', 'ica', 'junin', 'la libertad',
+    'lambayeque', 'lima', 'loreto', 'madre de dios', 'moquegua', 'pasco',
+    'piura', 'puno', 'san martin', 'tacna', 'tumbes', 'ucayali'
+  ]
+  
+  for (const depto of departamentos) {
+    if (direccionLower.includes(depto) || ciudadLower.includes(depto)) {
+      return 20.0
+    }
+  }
+  
+  // Si no se reconoce, asumir que es local (Lima/Callao)
+  return 8.0
+}
+
+// Calcular subtotal de productos (sin envío)
+function calcularSubtotal(pedido) {
+  // Si el backend ya devuelve el subtotal, usarlo
+  if (pedido.subtotal !== undefined && pedido.subtotal !== null) {
+    return parseFloat(pedido.subtotal)
+  }
+  
+  // Si no, calcular de los detalles
+  if (detallesPedido.value.length > 0 && pedidoSeleccionado.value?.id === pedido.id) {
+    return calcularSubtotalProductos()
+  }
+  
+  // Si no hay detalles, calcular del total del backend
+  const totalBackend = parseFloat(pedido.total) || 0
+  const tarifaEnvio = calcularTarifaEnvioEstimada(pedido)
+  
+  // Verificar si el total del backend ya incluye el envío
+  // Asumimos que el backend devuelve el total SIN envío
+  return Math.max(0, totalBackend)
+}
+
+// Calcular subtotal de productos desde los detalles
+function calcularSubtotalProductos() {
+  if (detallesPedido.value.length === 0) return 0
+  
+  return detallesPedido.value.reduce((total, detalle) => {
+    return total + (detalle.cantidad * (detalle.precioUnitario || 0))
+  }, 0)
+}
+
+// Calcular total CON envío (para mostrar en la UI)
+function calcularTotalConEnvio(pedido) {
+  const subtotal = calcularSubtotal(pedido)
+  const tarifaEnvio = calcularTarifaEnvioEstimada(pedido)
+  return subtotal + tarifaEnvio
+}
+
+// Obtener dirección completa
+function getDireccionCompleta(pedido) {
+  // Si el backend ya tiene campos separados, usarlos
+  if (pedido.departamento || pedido.provincia || pedido.distrito) {
+    const partes = []
+    if (pedido.distrito) partes.push(pedido.distrito)
+    if (pedido.provincia) partes.push(pedido.provincia)
+    if (pedido.departamento) partes.push(pedido.departamento)
+    return partes.join(', ')
+  }
+  
+  // Si no, usar la dirección almacenada
+  return pedido.direccionEnvio || 'Dirección no especificada'
+}
 
 // Cargar pedidos del usuario
 async function cargarPedidos() {
@@ -310,6 +433,19 @@ async function cargarPedidos() {
 
     if (response.ok) {
       const data = await response.json()
+      
+      // DEBUG: Ver qué datos llegan del backend
+      console.log('📦 Datos de pedidos recibidos:', data)
+      if (data.length > 0) {
+        console.log('💰 Primer pedido:', data[0])
+        console.log('📊 Total del backend:', data[0].total)
+        console.log('🚚 Dirección:', data[0].direccionEnvio)
+        console.log('🌆 Ciudad:', data[0].ciudadEnvio)
+        console.log('🧮 Tarifa calculada:', calcularTarifaEnvioEstimada(data[0]))
+        console.log('🧮 Subtotal calculado:', calcularSubtotal(data[0]))
+        console.log('🧮 Total con envío:', calcularTotalConEnvio(data[0]))
+      }
+      
       // Ordenar por fecha: más antiguo primero
       pedidos.value = data.sort((a, b) => {
         return new Date(a.fechaPedido) - new Date(b.fechaPedido)
@@ -403,6 +539,9 @@ async function cargarDetallesPedido(pedidoId) {
     if (response.ok) {
       detallesPedido.value = await response.json()
       console.log('✅ Detalles cargados:', detallesPedido.value)
+      console.log('🧮 Subtotal de productos:', calcularSubtotalProductos())
+      console.log('🚚 Tarifa envío:', calcularTarifaEnvioEstimada(pedidoSeleccionado.value))
+      console.log('💰 Total final:', calcularTotalConEnvio(pedidoSeleccionado.value))
     } else {
       console.error('❌ Error al cargar detalles')
     }
@@ -486,6 +625,25 @@ onMounted(() => {
   background: #f8f9fa;
   border-bottom: 2px solid #e9ecef;
   color: #2c3e50;
+}
+
+.card-header .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.card-header .col-md-2 {
+  flex: 0 0 16.66666667%;
+  max-width: 16.66666667%;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .card-header .col-md-2 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
 }
 
 .badge-lg {
@@ -697,6 +855,12 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 768px) {
+  .envio-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .envio-item {
   padding: 1.25rem;
   background: white;
@@ -708,6 +872,14 @@ onMounted(() => {
 .envio-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-color: #0d6efd;
+}
+
+.envio-item.costo-envio {
+  border-left: 4px solid #2db34a;
+}
+
+.envio-item.costo-envio .envio-value {
+  color: #2db34a;
 }
 
 .envio-label {
@@ -756,17 +928,7 @@ onMounted(() => {
     gap: 1rem !important;
   }
   
-  .card-header .col-md-2,
-  .card-header .col-md-3 {
-    flex: 0 0 auto;
-    width: auto;
-  }
-  
   .info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .envio-grid {
     grid-template-columns: 1fr;
   }
   
@@ -792,17 +954,6 @@ onMounted(() => {
   .timeline-icon {
     margin: 0;
     flex-shrink: 0;
-  }
-  
-  .envio-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .envio-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
   }
 }
 </style>

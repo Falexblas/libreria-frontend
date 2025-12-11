@@ -2,11 +2,11 @@
   <div class="checkout-page container py-4">
     <!-- Stepper -->
     <div class="mb-4">
-  <div class="stepper d-flex align-items-center justify-content-between">
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 1, completed: step > 1 }" role="button" tabindex="0" @click.prevent="irAlPaso(1)" @keydown.enter.prevent="irAlPaso(1)">
-            <div class="step-circle">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.44C8.89 16.37 9.5 18 11 18h8v-2h-7.42c-.14 0-.25-.11-.25-.25l.03-.12L13.1 13h4.45c.75 0 1.41-.41 1.75-1.03L21.82 6H6.21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
+      <div class="stepper d-flex align-items-center justify-content-between">
+        <div class="step d-flex flex-column align-items-center" :class="{ active: step === 1, completed: step > 1 }" role="button" tabindex="0" @click.prevent="irAlPaso(1)" @keydown.enter.prevent="irAlPaso(1)">
+          <div class="step-circle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.44C8.89 16.37 9.5 18 11 18h8v-2h-7.42c-.14 0-.25-.11-.25-.25l.03-.12L13.1 13h4.45c.75 0 1.41-.41 1.75-1.03L21.82 6H6.21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
           <div class="step-label small mt-2 text-muted">Carrito</div>
         </div>
 
@@ -14,7 +14,7 @@
           <div class="line-inner" :class="{ filled: step > 1 }"></div>
         </div>
 
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 2, completed: step > 2 }" role="button" tabindex="0" @click.prevent="irAlPaso(2)" @keydown.enter.prevent="irAlPaso(2)">
+        <div class="step d-flex flex-column align-items-center" :class="{ active: step === 2, completed: step > 2 }" role="button" tabindex="0" @click.prevent="irAlPaso(2)" @keydown.enter.prevent="irAlPaso(2)">
           <div class="step-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM4 20c0-3.31 4.03-6 8-6s8 2.69 8 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -25,7 +25,7 @@
           <div class="line-inner" :class="{ filled: step > 2 }"></div>
         </div>
 
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 3, completed: step > 3 }" role="button" tabindex="0" @click.prevent="irAlPaso(3)" @keydown.enter.prevent="irAlPaso(3)">
+        <div class="step d-flex flex-column align-items-center" :class="{ active: step === 3, completed: step > 3 }" role="button" tabindex="0" @click.prevent="irAlPaso(3)" @keydown.enter.prevent="irAlPaso(3)">
           <div class="step-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18v13H3zM16 3l3 4H5l3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -36,7 +36,7 @@
           <div class="line-inner" :class="{ filled: step > 3 }"></div>
         </div>
 
-  <div class="step d-flex flex-column align-items-center" :class="{ active: step === 4 }" role="button" tabindex="0" @click.prevent="irAlPaso(4)" @keydown.enter.prevent="irAlPaso(4)">
+        <div class="step d-flex flex-column align-items-center" :class="{ active: step === 4 }" role="button" tabindex="0" @click.prevent="irAlPaso(4)" @keydown.enter.prevent="irAlPaso(4)">
           <div class="step-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 7H3v10a2 2 0 002 2h14a2 2 0 002-2V7zM3 7l9 6 9-6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -98,13 +98,13 @@
                 <!-- Precio + eliminar: col-3 en md+ -->
                 <div class="col-12 col-md-3 d-flex justify-content-end align-items-center gap-2 precio-col">
                   <div class="precio-item">S/{{ (item.precio * item.cantidad).toFixed(2) }}</div>
-                    <button 
-                      class="btn-eliminar"
-                      @click="eliminar(item.id)"
-                      title="Eliminar del carrito"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
+                  <button 
+                    class="btn-eliminar"
+                    @click="eliminar(item.id)"
+                    title="Eliminar del carrito"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -123,12 +123,12 @@
 
             <div class="d-flex justify-content-between mb-2">
               <div>Envío</div>
-              <div>S/8.00</div>
+              <div>S/{{ tarifaEnvio.toFixed(2) }}</div>
             </div>
 
             <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-2">
               <div>Total</div>
-              <div>S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</div>
+              <div>S/{{ (carritoStore.subtotal + tarifaEnvio).toFixed(2) }}</div>
             </div>
 
             <button class="btn btn-success w-100 mt-4 py-3 btn-pagar" :disabled="carritoStore.items.length === 0" @click="finalizarCompra">PAGAR AHORA</button>
@@ -137,7 +137,7 @@
       </template>
 
       <template v-else-if="step === 2">
-        <!-- Left: formulario Datos (igual diseño a la primera imagen) -->
+        <!-- Left: formulario Datos -->
         <div class="col-lg-8">
           <div class="checkout-card p-4 rounded shadow-sm">
             <div class="d-flex align-items-start mb-3">
@@ -161,7 +161,6 @@
                   <input type="text" v-model="datos.nombre" class="form-control" placeholder="Nombre" @blur="datosTouched.nombre = true" />
                   <div v-if="errors.nombre && datosTouched.nombre" class="invalid-feedback d-block">{{ errors.nombre }}</div>
                 </div>
- 
 
                 <div class="col-12 col-md-6">
                   <label class="form-label">Apellidos</label>
@@ -189,7 +188,7 @@
           </div>
         </div>
 
-        <!-- Right: resumen con estilo 'PEDIDO' similar a la segunda imagen -->
+        <!-- Right: resumen -->
         <div class="col-lg-4">
           <aside class="order-summary p-4 rounded shadow-sm">
             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -208,22 +207,19 @@
               </div>
             </div>
 
-            <!-- cupón removido según solicitud -->
-
             <div class="mt-2">
-              <!-- Nota solo en Entrega: se muestra en ese paso -->
               <div class="d-flex justify-content-between small text-muted mb-1">
                 <div>Subtotal</div>
                 <div>S/{{ carritoStore.subtotal.toFixed(2) }}</div>
               </div>
               <div class="d-flex justify-content-between small text-muted mb-2">
                 <div>Envío</div>
-                <div>S/8.00</div>
+                <div>S/{{ tarifaEnvio.toFixed(2) }}</div>
               </div>
 
               <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
                 <div class="fw-bold">Total</div>
-                <div class="fw-bold text-primary">S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</div>
+                <div class="fw-bold text-primary">S/{{ (carritoStore.subtotal + tarifaEnvio).toFixed(2) }}</div>
               </div>
             </div>
 
@@ -236,8 +232,9 @@
           </aside>
         </div>
       </template>
+
       <template v-else-if="step === 3">
-        <!-- Entrega: formulario con layout similar a la imagen (sin pestañas) y resumen a la derecha -->
+        <!-- Entrega -->
         <div class="col-lg-8">
           <div class="checkout-card p-4 rounded shadow-sm">
             <div class="d-flex align-items-start mb-3">
@@ -248,16 +245,16 @@
               </div>
             </div>
 
-            <!-- Información de Envío Nacional -->
+            <!-- Información de Envío limitado a Lima y Callao -->
             <div class="alert alert-info mb-4 border-0 rounded-3">
               <div class="d-flex align-items-start">
-                <i class="fas fa-truck me-3 mt-1 text-info" style="font-size: 1.2rem;"></i>
+                <i class="fas fa-map-marker-alt me-3 mt-1 text-info" style="font-size: 1.2rem;"></i>
                 <div class="flex-grow-1">
-                  <h6 class="mb-2 text-info fw-bold">📦 Envío a Nivel Nacional</h6>
+                  <h6 class="mb-2 text-info fw-bold">📍 Envío solo a Lima y Callao</h6>
                   <div class="small">
-                    <p class="mb-1"><strong>🌍 Cobertura:</strong> Entregamos en los 24 departamentos del Perú</p>
-                    <p class="mb-1"><strong>💰 Costo:</strong> S/8.00 (fijo para todo el país)</p>
-                    <p class="mb-0"><strong>⏱️ Tiempo:</strong> 3-5 días hábiles después de confirmado el pago</p>
+                    <p class="mb-1"><strong>🌆 Cobertura:</strong> Actualmente solo realizamos entregas en Lima Metropolitana y Callao</p>
+                    <p class="mb-1"><strong>💰 Costo:</strong> S/8.00 (tarifa única para ambos)</p>
+                    <p class="mb-0"><strong>⏱️ Tiempo:</strong> 1-2 días hábiles después de confirmado el pago</p>
                   </div>
                 </div>
               </div>
@@ -268,51 +265,48 @@
                 <!-- Fila 1: Departamento, Provincia, Distrito -->
                 <div class="col-12">
                   <div class="row g-2">
+                    <!-- Departamento (solo Lima y Callao) -->
                     <div class="col-12 col-md-4">
                       <label class="form-label">Departamento</label>
-                      <select v-model="entrega.departamento" class="form-select">
-                        <option value="">Seleccione</option>
-                        <option>Amazonas</option>
-                        <option>Áncash</option>
-                        <option>Apurímac</option>
-                        <option>Arequipa</option>
-                        <option>Ayacucho</option>
-                        <option>Cajamarca</option>
-                        <option>El Callao</option>
-                        <option>Cusco</option>
-                        <option>Huancavelica</option>
-                        <option>Huánuco</option>
-                        <option>Ica</option>
-                        <option>Junín</option>
-                        <option>La Libertad</option>
-                        <option>Lambayeque</option>
-                        <option>Lima</option>
-                        <option>Loreto</option>
-                        <option>Madre de Dios</option>
-                        <option>Moquegua</option>
-                        <option>Pasco</option>
-                        <option>Piura</option>
-                        <option>Puno</option>
-                        <option>San Martín</option>
-                        <option>Tacna</option>
-                        <option>Tumbes</option>
-                        <option>Ucayali</option>
+                      <select 
+                        v-model="entrega.departamento" 
+                        class="form-select" 
+                        @change="onDepartamentoChange"
+                      >
+                        <option value="">Seleccione departamento</option>
+                        <option v-for="depto in departamentosDisponibles" :key="depto.id" :value="depto.name">
+                          {{ depto.name }}
+                        </option>
                       </select>
+                      <small class="text-muted">Actualmente solo enviamos a Lima y Callao</small>
                     </div>
 
                     <div class="col-12 col-md-4">
                       <label class="form-label">Provincia</label>
-                      <select v-model="entrega.provincia" class="form-select" :disabled="!entrega.departamento" @change="entregaTouched.provincia = true" @blur="entregaTouched.provincia = true">
-                        <option value="">{{ entrega.departamento ? 'Seleccione' : 'Primero seleccione departamento' }}</option>
-                        <option v-for="prov in provinciasDisponibles" :key="prov" :value="prov">{{ prov }}</option>
+                      <select 
+                        v-model="entrega.provincia" 
+                        class="form-select" 
+                        :disabled="!entrega.departamento" 
+                        @change="onProvinciaChange"
+                      >
+                        <option value="">{{ entrega.departamento ? 'Seleccione provincia' : 'Primero seleccione departamento' }}</option>
+                        <option v-for="prov in provinciasDisponibles" :key="prov.id" :value="prov.name">
+                          {{ prov.name }}
+                        </option>
                       </select>
                     </div>
 
                     <div class="col-12 col-md-4">
                       <label class="form-label">Distrito</label>
-                      <select v-model="entrega.distrito" class="form-select" :disabled="!entrega.provincia" @change="entregaTouched.distrito = true" @blur="entregaTouched.distrito = true">
-                        <option value="">{{ entrega.provincia ? 'Seleccione' : 'Primero seleccione provincia' }}</option>
-                        <option v-for="dist in distritosDisponibles" :key="dist" :value="dist">{{ dist }}</option>
+                      <select 
+                        v-model="entrega.distrito" 
+                        class="form-select" 
+                        :disabled="!entrega.provincia"
+                      >
+                        <option value="">{{ entrega.provincia ? 'Seleccione distrito' : 'Primero seleccione provincia' }}</option>
+                        <option v-for="dist in distritosDisponibles" :key="dist.id" :value="dist.name">
+                          {{ dist.name }}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -355,7 +349,7 @@
           </div>
         </div>
 
-        <!-- Right: resumen igual que en Datos -->
+        <!-- Right: resumen -->
         <div class="col-lg-4">
           <aside class="order-summary p-4 rounded shadow-sm">
             <h6 class="summary-title mb-3">PEDIDO</h6>
@@ -378,12 +372,12 @@
               </div>
               <div class="d-flex justify-content-between small text-muted mb-2">
                 <div>Envío</div>
-                <div>S/8.00</div>
+                <div>S/{{ tarifaEnvio.toFixed(2) }}</div>
               </div>
 
               <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
                 <div class="fw-bold">Total</div>
-                <div class="fw-bold text-primary">S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</div>
+                <div class="fw-bold text-primary">S/{{ (carritoStore.subtotal + tarifaEnvio).toFixed(2) }}</div>
               </div>
             </div>
 
@@ -398,7 +392,7 @@
       </template>
 
       <template v-else-if="step === 4">
-        <!-- Pago: formulario con selección de método (Tarjeta / Código Yape) -->
+        <!-- Pago -->
         <div class="col-lg-8">
           <div class="checkout-card p-4 rounded shadow-sm">
             <div class="d-flex align-items-start mb-3">
@@ -424,7 +418,7 @@
 
             <!-- Formulario Tarjeta -->
             <div v-if="paymentMethod === 'card'">
-                <div class="mb-3">
+              <div class="mb-3">
                 <label class="form-label">Número de tarjeta</label>
                 <input class="form-control" placeholder="1234 1234 1234 1234" v-model="card.number" @blur="cardTouched.number = true" @input="onCardNumberInput" inputmode="numeric" maxlength="19" />
                 <div v-if="cardErrors.number && cardTouched.number" class="invalid-feedback d-block">{{ cardErrors.number }}</div>
@@ -467,7 +461,7 @@
                   @click="procesarPago" 
                   :disabled="procesandoPago || !cardValid"
                   class="btn btn-primary py-3">
-                  <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</span>
+                  <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + tarifaEnvio).toFixed(2) }}</span>
                   <span v-else>
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Procesando...
@@ -501,7 +495,6 @@
 
                       <div class="yape-step d-flex align-items-start">
                         <span class="icon-circle icon-info">
-                          <!-- info icon -->
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6" fill="currentColor"/><rect x="7.1" y="4.1" width="1.8" height="1.8" rx="0.9" fill="#fff"/><rect x="7" y="7" width="1.8" height="4" rx="0.9" fill="#fff"/></svg>
                         </span>
                         <div class="step-text small text-muted ms-3">El monto límite para pagos a través de Yape es de S/ 2,000.</div>
@@ -521,33 +514,33 @@
                 <div v-if="yapeTouched.phone && yapePhoneError" class="invalid-feedback d-block">{{ yapePhoneError }}</div>
               </div>
 
-                <div class="mb-3">
-                  <label class="form-label">Código de aprobación</label>
-                  <div class="d-flex gap-2 code-inputs">
-                    <input
-                      v-for="(d, i) in yape.code"
-                      :key="i"
-                      ref="codeInputs"
-                      type="text"
-                      maxlength="1"
-                      inputmode="numeric"
-                      class="form-control code-digit text-center"
-                      v-model="yape.code[i]"
-                      @input="onCodeInput($event, i)"
-                      @keydown="onCodeKeydown($event, i)"
-                      @paste="onCodePaste($event)"
-                      @blur="yapeTouched.code = true"
-                    />
-                  </div>
-                  <div v-if="!yapeCodeValid && yapeTouched.code" class="invalid-feedback d-block">Este campo es obligatorio.</div>
+              <div class="mb-3">
+                <label class="form-label">Código de aprobación</label>
+                <div class="d-flex gap-2 code-inputs">
+                  <input
+                    v-for="(d, i) in yape.code"
+                    :key="i"
+                    ref="codeInputs"
+                    type="text"
+                    maxlength="1"
+                    inputmode="numeric"
+                    class="form-control code-digit text-center"
+                    v-model="yape.code[i]"
+                    @input="onCodeInput($event, i)"
+                    @keydown="onCodeKeydown($event, i)"
+                    @paste="onCodePaste($event)"
+                    @blur="yapeTouched.code = true"
+                  />
                 </div>
+                <div v-if="!yapeCodeValid && yapeTouched.code" class="invalid-feedback d-block">Este campo es obligatorio.</div>
+              </div>
 
               <div class="d-grid">
                 <button 
                   @click="procesarPago"
                   :class="['btn py-3', isYapeComplete && !procesandoPago ? 'btn-yape-ready' : 'btn-secondary']" 
                   :disabled="!isYapeComplete || procesandoPago">
-                  <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</span>
+                  <span v-if="!procesandoPago">Pagar S/{{ (carritoStore.subtotal + tarifaEnvio).toFixed(2) }}</span>
                   <span v-else>
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Procesando...
@@ -558,7 +551,7 @@
           </div>
         </div>
 
-        <!-- Right: resumen igual que en Entrega -->
+        <!-- Right: resumen -->
         <div class="col-lg-4">
           <aside class="order-summary p-4 rounded shadow-sm">
             <h6 class="summary-title mb-3">PEDIDO</h6>
@@ -581,12 +574,12 @@
               </div>
               <div class="d-flex justify-content-between small text-muted mb-2">
                 <div>Envío</div>
-                <div>S/8.00</div>
+                <div>S/{{ tarifaEnvio.toFixed(2) }}</div>
               </div>
 
               <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
                 <div class="fw-bold">Total</div>
-                <div class="fw-bold text-primary">S/{{ (carritoStore.subtotal + 8).toFixed(2) }}</div>
+                <div class="fw-bold text-primary">S/{{ (carritoStore.subtotal + tarifaEnvio).toFixed(2) }}</div>
               </div>
             </div>
 
@@ -616,89 +609,109 @@ const route = useRoute()
 const carritoStore = useCarritoStore()
 const authStore = useAuthStore()
 
-// Estado del paso actual: 1=Carrito,2=Datos,3=Entrega,4=Pago
+// Estado del paso actual
 const step = ref(1)
 
-const entrega = reactive({ direccion: '', referencia: '', codigoPostal: '', departamento: '', provincia: '', distrito: '', nota: '' })
-
-// Payment state
-const paymentMethod = ref('card')
-const card = reactive({ number: '', expiry: '', cvv: '', firstName: '', lastName: '', email: '' })
-const yape = reactive({ phone: '', code: ['', '', '', '', '', ''] })
-
-// Computed: true cuando el teléfono y los 6 dígitos del código están rellenados y tienen formato correcto
-const isYapeComplete = computed(() => {
-  const phoneStr = String(yape.phone || '').replace(/\s+/g, '')
-  const phoneOk = /^9\d{8}$/.test(phoneStr)
-  const codeOk = Array.isArray(yape.code) && yape.code.length === 6 && yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
-  return phoneOk && codeOk
+// Datos de envío
+const entrega = reactive({ 
+  direccion: '', 
+  referencia: '', 
+  codigoPostal: '', 
+  departamento: '', 
+  provincia: '', 
+  distrito: '', 
+  nota: '' 
 })
 
-// Refs para los inputs de código (se asignan automáticamente por ref="codeInputs" en el template v-for)
+// Datos de pago
+const paymentMethod = ref('card')
+const card = reactive({ 
+  number: '', 
+  expiry: '', 
+  cvv: '', 
+  firstName: '', 
+  lastName: '', 
+  email: '' 
+})
+const yape = reactive({ 
+  phone: '', 
+  code: ['', '', '', '', '', ''] 
+})
+
+// Tarifa de envío dinámica
+const tarifaEnvio = ref(8.0)
+
+// Datos de ubigeo
+const departamentosDisponibles = ref([])
+const provinciasDisponibles = ref([])
+const distritosDisponibles = ref([])
+
+// Datos del usuario
+const datos = reactive({ 
+  correo: '', 
+  nombre: '', 
+  apellidos: '', 
+  documento: '', 
+  telefono: '' 
+})
+
+// Estado de carga
+const cargandoUbigeo = ref(false)
+const procesandoPago = ref(false)
+
+// Refs para inputs de código
 const codeInputs = ref([])
 
-function onCodeInput(e, i) {
-  // Mantener solo dígitos y máximo 1
-  const raw = String(e.target.value || '')
-  const digit = raw.replace(/\D+/g, '').slice(0, 1)
-  // actualizar modelo
-  yape.code[i] = digit
-  // asegurar valor del input
-  e.target.value = digit
+// Errores y validaciones
+const errors = reactive({ 
+  correo: '', 
+  nombre: '', 
+  apellidos: '', 
+  documento: '', 
+  telefono: '', 
+  direccion: '', 
+  codigoPostal: '' 
+})
+const cardErrors = reactive({ 
+  number: '', 
+  expiry: '', 
+  cvv: '', 
+  firstName: '', 
+  lastName: '', 
+  email: '' 
+})
 
-  // avanzar al siguiente si hay dígito y existe siguiente input
-  if (digit && codeInputs.value && codeInputs.value[i + 1]) {
-    try { codeInputs.value[i + 1].focus(); codeInputs.value[i + 1].select && codeInputs.value[i + 1].select() } catch (err) {}
-  }
-}
+// Flags 'touched'
+const datosTouched = reactive({ 
+  correo: false, 
+  nombre: false, 
+  apellidos: false, 
+  documento: false, 
+  telefono: false 
+})
+const entregaTouched = reactive({ 
+  departamento: false, 
+  provincia: false, 
+  distrito: false, 
+  direccion: false, 
+  codigoPostal: false 
+})
+const cardTouched = reactive({ 
+  number: false, 
+  expiry: false, 
+  cvv: false, 
+  firstName: false, 
+  lastName: false, 
+  email: false 
+})
+const yapeTouched = reactive({ 
+  phone: false, 
+  code: false 
+})
 
-function onCodeKeydown(e, i) {
-  // manejar retroceso: si Backspace y el campo está vacío, moverse al anterior
-  if (e.key === 'Backspace') {
-    const val = String(yape.code[i] || '')
-    if (!val && i > 0) {
-      // prevenir comportamiento por defecto para controlar el foco
-      e.preventDefault()
-      try {
-        const prev = codeInputs.value[i - 1]
-        if (prev) {
-          prev.focus()
-          // borrar valor anterior
-          yape.code[i - 1] = ''
-        }
-      } catch (err) {}
-    }
-  }
-}
-
-function onCodePaste(e) {
-  // Pegar puede contener los 6 dígitos; repartirlos en los inputs
-  const paste = (e.clipboardData || window.clipboardData).getData('text') || ''
-  const digits = paste.replace(/\D+/g, '').slice(0, 6).split('')
-  if (!digits || digits.length === 0) return
-  e.preventDefault()
-  // llenar los inputs a partir del primero disponible
-  for (let j = 0; j < digits.length; j++) {
-    if (j >= yape.code.length) break
-    yape.code[j] = digits[j]
-    if (codeInputs.value && codeInputs.value[j]) {
-      try { codeInputs.value[j].value = digits[j] } catch (err) {}
-    }
-  }
-  // enfocar el siguiente tras los dígitos pegados
-  const nextIndex = Math.min(digits.length, yape.code.length - 1)
-  try { codeInputs.value[nextIndex]?.focus() } catch (err) {}
-}
-
-// Errores y validaciones reactivas
-const errors = reactive({ correo: '', nombre: '', apellidos: '', documento: '', telefono: '', direccion: '', codigoPostal: '' })
-const cardErrors = reactive({ number: '', expiry: '', cvv: '', firstName: '', lastName: '', email: '' })
-
-// Flags 'touched' para mostrar errores solo después de interacción
-const datosTouched = reactive({ correo: false, nombre: false, apellidos: false, documento: false, telefono: false })
-const entregaTouched = reactive({ departamento: false, provincia: false, distrito: false, direccion: false, codigoPostal: false })
-const cardTouched = reactive({ number: false, expiry: false, cvv: false, firstName: false, lastName: false, email: false })
-const yapeTouched = reactive({ phone: false, code: false })
+// ========================================
+// FUNCIONES DE UTILIDAD
+// ========================================
 
 function validarEmail(email) {
   if (!email) return false
@@ -706,34 +719,182 @@ function validarEmail(email) {
   return re.test(String(email).toLowerCase())
 }
 
-// Formatear teléfono agrupando cada 3 dígitos (ej: "999 999 999").
-// acepta un parámetro opcional maxDigits para truncar la entrada.
 function formatPhoneGrouped(value, maxDigits) {
   let digits = String(value || '').replace(/\D+/g, '')
   if (!digits) return ''
   if (typeof maxDigits === 'number' && maxDigits > 0) digits = digits.slice(0, maxDigits)
-  // agrupar en bloques de 3
   return digits.replace(/(.{1,3})/g, '$1 ').trim()
 }
 
+// ========================================
+// VALIDACIONES COMPUTED
+// ========================================
+
+const datosValid = computed(() => {
+  errors.correo = ''
+  errors.nombre = ''
+  errors.apellidos = ''
+  errors.documento = ''
+  errors.telefono = ''
+
+  let ok = true
+  if (!datos.correo) { 
+    errors.correo = 'Este campo es obligatorio.'; ok = false 
+  } else if (!validarEmail(datos.correo)) { 
+    errors.correo = 'Correo inválido'; ok = false 
+  }
+
+  if (!datos.nombre || String(datos.nombre).trim().length < 2) { 
+    errors.nombre = 'Este campo es obligatorio.'; ok = false 
+  }
+  if (!datos.apellidos || String(datos.apellidos).trim().length < 2) { 
+    errors.apellidos = 'Este campo es obligatorio.'; ok = false 
+  }
+  
+  if (!datos.documento) { 
+    errors.documento = 'Este campo es obligatorio.'; ok = false 
+  } else {
+    const docClean = String(datos.documento || '').replace(/\s+/g, '')
+    if (!/^\d{8,20}$/.test(docClean)) {
+      errors.documento = 'Documento inválido. Debe tener 8 dígitos.'
+      ok = false
+    }
+  }
+
+  const tel = String(datos.telefono || '').replace(/\D+/g, '')
+  if (!tel) { 
+    errors.telefono = 'Este campo es obligatorio.'; ok = false 
+  } else if (!/^\d{9}$/.test(tel)) { 
+    errors.telefono = 'Teléfono inválido'; ok = false 
+  }
+  return ok
+})
+
+const entregaValid = computed(() => {
+  errors.direccion = ''
+  errors.codigoPostal = ''
+  let ok = true
+  
+  // Validar que sea Lima o Callao
+  if (!entrega.departamento || (entrega.departamento !== 'Lima' && entrega.departamento !== 'Callao')) {
+    ok = false
+  }
+  
+  if (!entrega.provincia) { 
+    ok = false 
+  }
+  
+  if (!entrega.distrito) { 
+    ok = false 
+  }
+  
+  if (!entrega.direccion || String(entrega.direccion).trim().length < 5) { 
+    errors.direccion = 'Dirección demasiado corta'; ok = false 
+  }
+  
+  const cp = String(entrega.codigoPostal || '').trim()
+  if (!cp) { 
+    errors.codigoPostal = 'Este campo es obligatorio.'; ok = false 
+  } else if (!/^\d{5}$/.test(cp)) { 
+    errors.codigoPostal = 'Código postal inválido. Debe tener 5 números.'; ok = false 
+  }
+  return ok
+})
+
+const cardValid = computed(() => {
+  cardErrors.number = ''
+  cardErrors.expiry = ''
+  cardErrors.cvv = ''
+  cardErrors.firstName = ''
+  cardErrors.lastName = ''
+  cardErrors.email = ''
+
+  let ok = true
+  const num = String(card.number || '').replace(/\s+/g, '')
+  if (!/^[0-9]{13,19}$/.test(num)) { 
+    cardErrors.number = 'Número de tarjeta inválido'; ok = false 
+  }
+  
+  if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(String(card.expiry || '').trim())) { 
+    cardErrors.expiry = 'Formato MM/AA inválido'; ok = false 
+  } else {
+    const m = String(card.expiry || '').trim().match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/)
+    if (m) {
+      const mm = parseInt(m[1], 10)
+      const yy = 2000 + parseInt(m[2], 10)
+      const now = new Date()
+      const currentYear = now.getFullYear()
+      const currentMonth = now.getMonth() + 1
+      if (yy < currentYear || (yy === currentYear && mm < currentMonth)) {
+        cardErrors.expiry = 'Ingrese una fecha válida.'
+        ok = false
+      }
+    }
+  }
+  
+  if (!/^[0-9]{3}$/.test(String(card.cvv || '').trim())) { 
+    cardErrors.cvv = 'CVV inválido'; ok = false 
+  }
+  
+  if (!card.firstName || String(card.firstName).trim().length < 2) { 
+    cardErrors.firstName = 'Nombre inválido'; ok = false 
+  }
+  
+  if (!card.lastName || String(card.lastName).trim().length < 2) { 
+    cardErrors.lastName = 'Apellido inválido'; ok = false 
+  }
+  
+  if (!validarEmail(card.email)) { 
+    cardErrors.email = 'Email inválido'; ok = false 
+  }
+  
+  return ok
+})
+
+const isYapeComplete = computed(() => {
+  const phoneStr = String(yape.phone || '').replace(/\s+/g, '')
+  const phoneOk = /^9\d{8}$/.test(phoneStr)
+  const codeOk = Array.isArray(yape.code) && yape.code.length === 6 && 
+                 yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
+  return phoneOk && codeOk
+})
+
+const yapePhoneValid = computed(() => {
+  const phoneStr = String(yape.phone || '').replace(/\s+/g, '')
+  return /^9\d{8}$/.test(phoneStr)
+})
+
+const yapeCodeValid = computed(() => {
+  return Array.isArray(yape.code) && yape.code.length === 6 && 
+         yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
+})
+
+const yapePhoneClean = computed(() => String(yape.phone || '').replace(/\D+/g, ''))
+
+const yapePhoneError = computed(() => {
+  const s = yapePhoneClean.value
+  if (!s) return 'Este campo es obligatorio.'
+  if (!/^9/.test(s)) return 'Este no es un número de celular válido.'
+  if (!/^\d{9}$/.test(s)) return 'Teléfono Yape inválido. Debe tener 9 dígitos.'
+  return ''
+})
+
+// ========================================
+// FUNCIONES DE FORMATEO DE INPUT
+// ========================================
+
 function onDatosTelefonoInput(e) {
-  // limitar a 9 dígitos para el teléfono de identificación
   const formatted = formatPhoneGrouped(e.target.value, 9)
   datos.telefono = formatted
 }
 
 function onYapePhoneInput(e) {
-  // limitar a 9 dígitos para Yape (número local) y formatear cada 3
   const formatted = formatPhoneGrouped(e.target.value, 9)
   yape.phone = formatted
 }
 
-// Formatear caducidad automáticamente: después de 2 dígitos insertar '/'
-// Limita a 4 dígitos (MMYY) y muestra como MM/YY. Evita permitir más caracteres.
 function onCardExpiryInput(e) {
-  // obtener sólo dígitos
   let digits = String(e.target.value || '').replace(/\D+/g, '')
-  // limitar a 4 dígitos (MMYY)
   digits = digits.slice(0, 4)
 
   if (digits.length === 0) {
@@ -746,19 +907,16 @@ function onCardExpiryInput(e) {
     return
   }
 
-  // 3 o 4 dígitos => insertar '/'
   const mm = digits.slice(0, 2)
   const yy = digits.slice(2)
   card.expiry = `${mm}/${yy}`
 }
 
-// Limitar CVV a 3 dígitos y permitir solo números
 function onCvvInput(e) {
   const digits = String(e.target.value || '').replace(/\D+/g, '').slice(0, 3)
   card.cvv = digits
 }
 
-// Formatear número de tarjeta en bloques de 4: "1234 1234 1234 1234"
 function formatCardNumber(value) {
   const digits = String(value || '').replace(/\D+/g, '').slice(0, 16)
   if (!digits) return ''
@@ -770,176 +928,256 @@ function onCardNumberInput(e) {
   card.number = formatted
 }
 
-const datosValid = computed(() => {
-  // Limpiar mensajes
-  errors.correo = ''
-  errors.nombre = ''
-  errors.apellidos = ''
-  errors.documento = ''
-  errors.telefono = ''
+function onCodeInput(e, i) {
+  const raw = String(e.target.value || '')
+  const digit = raw.replace(/\D+/g, '').slice(0, 1)
+  yape.code[i] = digit
+  e.target.value = digit
 
-  let ok = true
-  if (!datos.correo) { errors.correo = 'Este campo es obligatorio.'; ok = false }
-  else if (!validarEmail(datos.correo)) { errors.correo = 'Correo inválido'; ok = false }
+  if (digit && codeInputs.value && codeInputs.value[i + 1]) {
+    try { 
+      codeInputs.value[i + 1].focus(); 
+      codeInputs.value[i + 1].select && codeInputs.value[i + 1].select() 
+    } catch (err) {}
+  }
+}
 
-  if (!datos.nombre || String(datos.nombre).trim().length < 2) { errors.nombre = 'Este campo es obligatorio.'; ok = false }
-  if (!datos.apellidos || String(datos.apellidos).trim().length < 2) { errors.apellidos = 'Este campo es obligatorio.'; ok = false }
-  if (!datos.documento) { errors.documento = 'Este campo es obligatorio.'; ok = false }
-  else {
-    const docClean = String(datos.documento || '').replace(/\s+/g, '')
-    if (!/^\d{8,20}$/.test(docClean)) {
-      errors.documento = 'Documento inválido. Debe tener 8 dígitos.'
-      ok = false
+function onCodeKeydown(e, i) {
+  if (e.key === 'Backspace') {
+    const val = String(yape.code[i] || '')
+    if (!val && i > 0) {
+      e.preventDefault()
+      try {
+        const prev = codeInputs.value[i - 1]
+        if (prev) {
+          prev.focus()
+          yape.code[i - 1] = ''
+        }
+      } catch (err) {}
     }
   }
+}
 
-  // Validar que el teléfono de identificación tenga exactamente 9 dígitos
-  const tel = String(datos.telefono || '').replace(/\D+/g, '')
-  if (!tel) { errors.telefono = 'Este campo es obligatorio.'; ok = false }
-  else if (!/^\d{9}$/.test(tel)) { errors.telefono = 'Teléfono inválido'; ok = false }
-  return ok
-})
+function onCodePaste(e) {
+  const paste = (e.clipboardData || window.clipboardData).getData('text') || ''
+  const digits = paste.replace(/\D+/g, '').slice(0, 6).split('')
+  if (!digits || digits.length === 0) return
+  e.preventDefault()
+  
+  for (let j = 0; j < digits.length; j++) {
+    if (j >= yape.code.length) break
+    yape.code[j] = digits[j]
+    if (codeInputs.value && codeInputs.value[j]) {
+      try { codeInputs.value[j].value = digits[j] } catch (err) {}
+    }
+  }
+  
+  const nextIndex = Math.min(digits.length, yape.code.length - 1)
+  try { codeInputs.value[nextIndex]?.focus() } catch (err) {}
+}
 
-const entregaValid = computed(() => {
-  errors.direccion = ''
-  errors.codigoPostal = ''
-  let ok = true
-  if (!entrega.departamento) { ok = false }
-  if (!entrega.provincia) { ok = false }
-  if (!entrega.distrito) { ok = false }
-  if (!entrega.direccion || String(entrega.direccion).trim().length < 5) { errors.direccion = 'Dirección demasiado corta'; ok = false }
-  const cp = String(entrega.codigoPostal || '').trim()
-  if (!cp) { errors.codigoPostal = 'Este campo es obligatorio.'; ok = false }
-  else if (!/^\d{5}$/.test(cp)) { errors.codigoPostal = 'Código postal inválido. Debe tener 5 números.'; ok = false }
-  return ok
-})
+// ========================================
+// FUNCIONES DE UBIGEO
+// ========================================
 
-const cardValid = computed(() => {
-  // limpiar errores
-  cardErrors.number = ''
-  cardErrors.expiry = ''
-  cardErrors.cvv = ''
-  cardErrors.firstName = ''
-  cardErrors.lastName = ''
-  cardErrors.email = ''
+async function cargarDepartamentos() {
+  try {
+    const response = await fetch('http://localhost:8080/api/ubigeo/departamentos')
+    if (response.ok) {
+      const todosDepartamentos = await response.json()
+      // Filtrar solo Lima y Callao
+      departamentosDisponibles.value = todosDepartamentos.filter(
+        depto => depto.name === 'Lima' || depto.name === 'Callao'
+      )
+    }
+  } catch (error) {
+    console.error('Error cargando departamentos:', error)
+    // Si hay error, usar valores por defecto
+    departamentosDisponibles.value = [
+      { id: 15, name: 'Lima' },
+      { id: 7, name: 'Callao' }
+    ]
+  }
+}
 
-  let ok = true
-  const num = String(card.number || '').replace(/\s+/g, '')
-  if (!/^[0-9]{13,19}$/.test(num)) { cardErrors.number = 'Número de tarjeta inválido'; ok = false }
-  if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(String(card.expiry || '').trim())) { cardErrors.expiry = 'Formato MM/AA inválido'; ok = false }
-  else {
-    // Validar que la fecha de caducidad no sea anterior al mes actual
-    const m = String(card.expiry || '').trim().match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/)
-    if (m) {
-      const mm = parseInt(m[1], 10)
-      const yy = 2000 + parseInt(m[2], 10)
-      const now = new Date()
-      const currentYear = now.getFullYear()
-      const currentMonth = now.getMonth() + 1 // 1-12
-      if (yy < currentYear || (yy === currentYear && mm < currentMonth)) {
-        cardErrors.expiry = 'Ingrese una fecha válida.'
-        ok = false
+async function cargarProvincias(departamentoNombre) {
+  try {
+    // Si no es Lima o Callao, no cargar nada
+    if (departamentoNombre !== 'Lima' && departamentoNombre !== 'Callao') {
+      provinciasDisponibles.value = []
+      return
+    }
+    
+    const response = await fetch('http://localhost:8080/api/ubigeo/provincias')
+    if (response.ok) {
+      const todasProvincias = await response.json()
+      
+      // Encontrar el departamento seleccionado
+      const depto = departamentosDisponibles.value.find(d => d.name === departamentoNombre)
+      if (depto) {
+        // Filtrar provincias del departamento seleccionado
+        provinciasDisponibles.value = todasProvincias.filter(p => p.department_id === depto.id)
+      } else {
+        provinciasDisponibles.value = []
       }
     }
+  } catch (error) {
+    console.error('Error cargando provincias:', error)
+    provinciasDisponibles.value = []
   }
-  if (!/^[0-9]{3}$/.test(String(card.cvv || '').trim())) { cardErrors.cvv = 'CVV inválido'; ok = false }
-  if (!card.firstName || String(card.firstName).trim().length < 2) { cardErrors.firstName = 'Nombre inválido'; ok = false }
-  if (!card.lastName || String(card.lastName).trim().length < 2) { cardErrors.lastName = 'Apellido inválido'; ok = false }
-  if (!validarEmail(card.email)) { cardErrors.email = 'Email inválido'; ok = false }
-  return ok
-})
+}
 
-// Validaciones específicas para Yape (se usan también para mensajes de touched)
-const yapePhoneValid = computed(() => {
-  const phoneStr = String(yape.phone || '').replace(/\s+/g, '')
-  return /^9\d{8}$/.test(phoneStr)
-})
+async function cargarDistritos(provinciaNombre) {
+  try {
+    const response = await fetch('http://localhost:8080/api/ubigeo/distritos')
+    if (response.ok) {
+      const todosDistritos = await response.json()
+      // Buscar la provincia por nombre
+      const prov = provinciasDisponibles.value.find(p => p.name === provinciaNombre)
+      if (prov) {
+        distritosDisponibles.value = todosDistritos.filter(d => d.province_id === prov.id)
+      } else {
+        distritosDisponibles.value = []
+      }
+    }
+  } catch (error) {
+    console.error('Error cargando distritos:', error)
+    distritosDisponibles.value = []
+  }
+}
 
-const yapeCodeValid = computed(() => {
-  return Array.isArray(yape.code) && yape.code.length === 6 && yape.code.every(c => /^[0-9]$/.test(String(c || '').trim()))
-})
+async function calcularTarifaEnvio(departamentoNombre) {
+  // Tarifa fija para Lima y Callao
+  tarifaEnvio.value = 8.0
+  
+  // Si seleccionan algo que no sea Lima o Callao, mostrar error
+  if (departamentoNombre && departamentoNombre !== 'Lima' && departamentoNombre !== 'Callao') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Ubicación no disponible',
+      html: `
+        <p>Actualmente solo realizamos entregas en <strong>Lima Metropolitana y Callao</strong>.</p>
+        <p class="mb-0">Próximamente ampliaremos nuestra cobertura a más ciudades.</p>
+      `,
+      confirmButtonText: 'Entendido'
+    }).then(() => {
+      entrega.departamento = ''
+      entrega.provincia = ''
+      entrega.distrito = ''
+      provinciasDisponibles.value = []
+      distritosDisponibles.value = []
+    })
+  }
+}
 
-// Limpia el teléfono de Yape (sólo dígitos)
-const yapePhoneClean = computed(() => String(yape.phone || '').replace(/\D+/g, ''))
+// ========================================
+// MANEJADORES DE CAMBIOS
+// ========================================
 
-// Error específico para el teléfono Yape mostrado después de touch/blur
-const yapePhoneError = computed(() => {
-  const s = yapePhoneClean.value
-  if (!s) return 'Este campo es obligatorio.'
-  // si no comienza con 9 mostrar mensaje específico pedido
-  if (!/^9/.test(s)) return 'Este no es un número de celular válido.'
-  if (!/^\d{9}$/.test(s)) return 'Teléfono Yape inválido. Debe tener 9 dígitos.'
-  return ''
-})
+async function onDepartamentoChange() {
+  entrega.provincia = ''
+  entrega.distrito = ''
+  provinciasDisponibles.value = []
+  distritosDisponibles.value = []
+  
+  if (entrega.departamento) {
+    // Validar que sea Lima o Callao
+    if (entrega.departamento !== 'Lima' && entrega.departamento !== 'Callao') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Ubicación no disponible',
+        html: `
+          <p>Actualmente solo realizamos entregas en <strong>Lima Metropolitana y Callao</strong>.</p>
+          <p class="mb-0">Próximamente ampliaremos nuestra cobertura a más ciudades.</p>
+        `,
+        confirmButtonText: 'Entendido'
+      }).then(() => {
+        entrega.departamento = ''
+        entrega.provincia = ''
+        entrega.distrito = ''
+      })
+      return
+    }
+    
+    await cargarProvincias(entrega.departamento)
+    await calcularTarifaEnvio(entrega.departamento)
+  }
+}
 
-// Datos del usuario (sin validaciones aquí, el backend los manejará)
-const datos = reactive({ correo: '', nombre: '', apellidos: '', documento: '', telefono: '' })
+async function onProvinciaChange() {
+  entrega.distrito = ''
+  distritosDisponibles.value = []
+  
+  if (entrega.provincia) {
+    await cargarDistritos(entrega.provincia)
+  }
+}
 
-// ✅ Cargar datos del usuario autenticado desde el backend
+// ========================================
+// CICLO DE VIDA
+// ========================================
+
 onMounted(async () => {
   console.log('🔍 CheckoutView montado')
-  console.log('🔍 Usuario autenticado:', authStore.isAuthenticated)
-  console.log('🔍 Datos del usuario en store:', authStore.user)
-  console.log('🔍 Token:', authStore.token ? 'Existe' : 'No existe')
   
+  // Cargar departamentos (solo Lima y Callao)
+  await cargarDepartamentos()
+  
+  // Tarifa fija inicial
+  tarifaEnvio.value = 8.0
+  
+  // Cargar datos del usuario si está autenticado
   if (authStore.isAuthenticated && authStore.user?.id) {
     try {
       const url = `http://localhost:8080/api/usuarios/${authStore.user.id}`
-      console.log('🔍 Haciendo petición a:', url)
-      
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${authStore.token}`
         }
       })
       
-      console.log('🔍 Respuesta status:', response.status)
-      
       if (response.ok) {
         const usuario = await response.json()
-        console.log('🔍 Datos recibidos del backend:', usuario)
         
-        // Rellenar automáticamente los campos del formulario
+        // Rellenar datos del formulario
         datos.correo = usuario.email || ''
         datos.nombre = usuario.nombre || ''
         datos.apellidos = usuario.apellido || ''
         datos.telefono = usuario.telefono || ''
-        datos.documento = usuario.documento || ''  // ✅ Ahora sí existe en BD
+        datos.documento = usuario.documento || ''
         
-        // También rellenar datos de entrega si existen
+        // Rellenar datos de entrega
         if (usuario.direccion) entrega.direccion = usuario.direccion
         if (usuario.codigoPostal) entrega.codigoPostal = usuario.codigoPostal
         
-        // Cargar ubicación con nextTick para asegurar que los selects se actualicen
-        if (usuario.departamento) {
+        // Cargar ubicación si existe y es Lima o Callao
+        if (usuario.departamento && (usuario.departamento === 'Lima' || usuario.departamento === 'Callao')) {
           entrega.departamento = usuario.departamento
-          await nextTick()  // Esperar a que se actualicen las provincias
+          await nextTick()
+          await cargarProvincias(usuario.departamento)
+          await calcularTarifaEnvio(usuario.departamento)
+          
           if (usuario.provincia) {
             entrega.provincia = usuario.provincia
-            await nextTick()  // Esperar a que se actualicen los distritos
+            await nextTick()
+            await cargarDistritos(usuario.provincia)
+            
             if (usuario.distrito) {
               entrega.distrito = usuario.distrito
             }
           }
         }
         
-        if (usuario.notas) entrega.referencia = usuario.notas  // ← Corregido: notas va a referencia
+        if (usuario.notas) entrega.referencia = usuario.notas
         
         console.log('✅ Datos del usuario cargados automáticamente')
-        console.log('✅ Formulario rellenado:', datos)
-        console.log('✅ Datos de entrega:', entrega)
-      } else {
-        console.error('❌ Error en la respuesta:', response.status, response.statusText)
-        const errorText = await response.text()
-        console.error('❌ Detalle del error:', errorText)
       }
     } catch (error) {
       console.error('❌ Error al cargar datos del usuario:', error)
     }
-  } else {
-    console.log('⚠️ Usuario no autenticado o sin ID')
   }
-  // Si la ruta incluye ?step=N, abrir ese paso al entrar
+  
+  // Verificar paso desde query string
   try {
     const qStep = route?.query?.step
     if (qStep) {
@@ -951,7 +1189,6 @@ onMounted(async () => {
   }
 })
 
-// Observar cambios en query.step (por ejemplo desde router.push desde otro componente)
 watch(() => route.query.step, (newStep) => {
   if (!newStep) return
   const s = parseInt(String(newStep))
@@ -959,99 +1196,29 @@ watch(() => route.query.step, (newStep) => {
 })
 
 // ========================================
-// Datos de ubicación: Provincias y Distritos por Departamento
+// NAVEGACIÓN ENTRE PASOS
 // ========================================
-const ubicacionPeru = {
-  'Lima': {
-    provincias: ['Lima', 'Barranca', 'Cajatambo', 'Canta', 'Cañete', 'Huaral', 'Huarochirí', 'Huaura', 'Oyón', 'Yauyos'],
-    distritos: {
-      'Lima': ['Cercado de Lima', 'Miraflores', 'San Isidro', 'Surco', 'La Molina', 'San Borja', 'Barranco', 'San Miguel', 'Jesús María', 'Lince', 'Magdalena', 'Pueblo Libre', 'Breña', 'Rímac', 'Los Olivos', 'Independencia', 'San Martín de Porres', 'Comas', 'Carabayllo', 'Puente Piedra', 'Santa Rosa', 'Ancón', 'San Juan de Lurigancho', 'Lurigancho-Chosica', 'Ate', 'El Agustino', 'Santa Anita', 'La Victoria', 'San Luis', 'Surquillo', 'Chorrillos', 'Villa María del Triunfo', 'Villa El Salvador', 'San Juan de Miraflores', 'Lurín', 'Pachacámac', 'Punta Hermosa', 'Punta Negra', 'San Bartolo', 'Santa María del Mar', 'Pucusana', 'Cieneguilla'],
-      'Barranca': ['Barranca', 'Paramonga', 'Pativilca', 'Supe', 'Supe Puerto'],
-      'Cañete': ['San Vicente de Cañete', 'Asia', 'Calango', 'Cerro Azul', 'Chilca', 'Coayllo', 'Imperial', 'Lunahuaná', 'Mala', 'Nuevo Imperial', 'Pacarán', 'Quilmaná', 'San Antonio', 'San Luis', 'Santa Cruz de Flores', 'Zúñiga']
-    }
-  },
-  'Arequipa': {
-    provincias: ['Arequipa', 'Camaná', 'Caravelí', 'Castilla', 'Caylloma', 'Condesuyos', 'Islay', 'La Unión'],
-    distritos: {
-      'Arequipa': ['Cercado', 'Alto Selva Alegre', 'Cayma', 'Cerro Colorado', 'Characato', 'Chiguata', 'Jacobo Hunter', 'José Luis Bustamante y Rivero', 'La Joya', 'Mariano Melgar', 'Miraflores', 'Mollebaya', 'Paucarpata', 'Pocsi', 'Polobaya', 'Quequeña', 'Sabandia', 'Sachaca', 'San Juan de Siguas', 'San Juan de Tarucani', 'Santa Isabel de Siguas', 'Santa Rita de Siguas', 'Socabaya', 'Tiabaya', 'Uchumayo', 'Vitor', 'Yanahuara', 'Yarabamba', 'Yura'],
-      'Camaná': ['Camaná', 'José María Quimper', 'Mariano Nicolás Valcárcel', 'Mariscal Cáceres', 'Nicolás de Piérola', 'Ocoña', 'Quilca', 'Samuel Pastor']
-    }
-  },
-  'Cusco': {
-    provincias: ['Cusco', 'Acomayo', 'Anta', 'Calca', 'Canas', 'Canchis', 'Chumbivilcas', 'Espinar', 'La Convención', 'Paruro', 'Paucartambo', 'Quispicanchi', 'Urubamba'],
-    distritos: {
-      'Cusco': ['Cusco', 'Ccorca', 'Poroy', 'San Jerónimo', 'San Sebastián', 'Santiago', 'Saylla', 'Wanchaq'],
-      'Urubamba': ['Urubamba', 'Chinchero', 'Huayllabamba', 'Machupicchu', 'Maras', 'Ollantaytambo', 'Yucay']
-    }
-  },
-  'La Libertad': {
-    provincias: ['Trujillo', 'Ascope', 'Bolívar', 'Chepén', 'Julcán', 'Otuzco', 'Pacasmayo', 'Pataz', 'Sánchez Carrión', 'Santiago de Chuco', 'Gran Chimú', 'Virú'],
-    distritos: {
-      'Trujillo': ['Trujillo', 'El Porvenir', 'Florencia de Mora', 'Huanchaco', 'La Esperanza', 'Laredo', 'Moche', 'Poroto', 'Salaverry', 'Simbal', 'Víctor Larco Herrera'],
-      'Ascope': ['Ascope', 'Casa Grande', 'Chicama', 'Chocope', 'Magdalena de Cao', 'Paiján', 'Rázuri', 'Santiago de Cao']
-    }
-  },
-  'Piura': {
-    provincias: ['Piura', 'Ayabaca', 'Huancabamba', 'Morropón', 'Paita', 'Sechura', 'Sullana', 'Talara'],
-    distritos: {
-      'Piura': ['Piura', 'Castilla', 'Catacaos', 'Cura Mori', 'El Tallán', 'La Arena', 'La Unión', 'Las Lomas', 'Tambo Grande'],
-      'Sullana': ['Sullana', 'Bellavista', 'Ignacio Escudero', 'Lancones', 'Marcavelica', 'Miguel Checa', 'Querecotillo', 'Salitral']
-    }
-  }
-}
-
-// Computed: Provincias disponibles según departamento seleccionado
-const provinciasDisponibles = computed(() => {
-  if (!entrega.departamento) return []
-  return ubicacionPeru[entrega.departamento]?.provincias || []
-})
-
-// Computed: Distritos disponibles según provincia seleccionada (ordenados alfabéticamente)
-const distritosDisponibles = computed(() => {
-  if (!entrega.departamento || !entrega.provincia) return []
-  const lista = ubicacionPeru[entrega.departamento]?.distritos[entrega.provincia] || []
-  return Array.isArray(lista) ? [...lista].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' })) : []
-})
-
-// Watch: Limpiar provincia cuando cambia departamento
-watch(() => entrega.departamento, () => {
-  entrega.provincia = ''
-  entrega.distrito = ''
-})
-
-// Watch: Limpiar distrito cuando cambia provincia
-watch(() => entrega.provincia, () => {
-  entrega.distrito = ''
-})
 
 function finalizarCompra() {
-  // Avanzar al paso de Datos dentro de la misma vista
   if (carritoStore.items.length === 0) return
   step.value = 2
 }
 
 function avanzarPaso() {
-  // Validar el paso actual antes de avanzar
   if (step.value === 1) {
-    // Desde Carrito -> Datos: solo permitir si hay items
     if (carritoStore.items.length === 0) return
     step.value = 2
     return
   }
 
   if (step.value === 2) {
-    if (!datosValid.value) {
-      // Mantener en el mismo paso y mostrar errores
-      return
-    }
+    if (!datosValid.value) return
     step.value = 3
     return
   }
 
   if (step.value === 3) {
-    if (!entregaValid.value) {
-      return
-    }
+    if (!entregaValid.value) return
     step.value = 4
     return
   }
@@ -1063,47 +1230,69 @@ function regresarPaso() {
   if (step.value > 1) step.value--
 }
 
-// Navegar a un paso específico (y sincronizar la query de la URL)
 function irAlPaso(n) {
   const s = parseInt(String(n))
   if (isNaN(s) || s < 1 || s > 4) return
-  // Si intentan avanzar (ir a un paso mayor que el actual), validar requisitos
+  
   if (s > step.value) {
-    // Paso 2 requiere items en carrito
     if (s === 2 && carritoStore.items.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Carrito vacío', text: 'Agrega al menos un producto antes de continuar.' })
+      Swal.fire({ 
+        icon: 'warning', 
+        title: 'Carrito vacío', 
+        text: 'Agrega al menos un producto antes de continuar.' 
+      })
       return
     }
-    // Paso 3 requiere datos válidos
+    
     if (s === 3 && !datosValid.value) {
-      Swal.fire({ icon: 'warning', title: 'Datos incompletos', text: 'Por favor completa tus datos antes de continuar.' })
-      // marcar touched para mostrar errores
+      Swal.fire({ 
+        icon: 'warning', 
+        title: 'Datos incompletos', 
+        text: 'Por favor completa tus datos antes de continuar.' 
+      })
       Object.keys(datosTouched).forEach(k => datosTouched[k] = true)
       step.value = 2
       return
     }
-    // Paso 4 requiere datos de entrega válidos
+    
     if (s === 4 && !entregaValid.value) {
-      Swal.fire({ icon: 'warning', title: 'Datos de envío incompletos', text: 'Por favor completa la dirección de entrega antes de continuar.' })
+      Swal.fire({ 
+        icon: 'warning', 
+        title: 'Datos de envío incompletos', 
+        text: 'Por favor completa la dirección de entrega antes de continuar.' 
+      })
       Object.keys(entregaTouched).forEach(k => entregaTouched[k] = true)
       step.value = 3
       return
     }
   }
 
-  // Si pasaron validaciones o es retroceso, aplicarlo
   step.value = s
   try {
-    // Usar replace para no llenar el historial con cambios de paso pequeños
-    router.replace({ name: router.currentRoute.value.name || 'checkout', query: { ...router.currentRoute.value.query, step: String(s) } })
+    router.replace({ 
+      name: router.currentRoute.value.name || 'checkout', 
+      query: { ...router.currentRoute.value.query, step: String(s) } 
+    })
   } catch (err) {
     // noop
   }
 }
 
-function aumentarCantidad(id) { carritoStore.aumentarCantidad(id) }
-function disminuirCantidad(id) { carritoStore.disminuirCantidad(id) }
-function eliminar(id) { carritoStore.eliminarItem(id) }
+// ========================================
+// FUNCIONES DEL CARRITO
+// ========================================
+
+function aumentarCantidad(id) { 
+  carritoStore.aumentarCantidad(id) 
+}
+
+function disminuirCantidad(id) { 
+  carritoStore.disminuirCantidad(id) 
+}
+
+function eliminar(id) { 
+  carritoStore.eliminarItem(id) 
+}
 
 function obtenerNombreAutor(autor) {
   if (!autor) return 'Autor desconocido'
@@ -1116,12 +1305,26 @@ function obtenerNombreAutor(autor) {
 }
 
 // ========================================
-// PROCESAR PAGO Y CREAR ORDEN
+// PROCESAR PAGO
 // ========================================
-const procesandoPago = ref(false)
 
 async function procesarPago() {
-  // Validar que todos los datos estén completos
+  // Validar que sea Lima o Callao
+  if (entrega.departamento !== 'Lima' && entrega.departamento !== 'Callao') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Ubicación no disponible',
+      html: `
+        <p>Actualmente solo realizamos entregas en <strong>Lima Metropolitana y Callao</strong>.</p>
+        <p class="mb-0">Próximamente ampliaremos nuestra cobertura a más ciudades.</p>
+      `,
+      confirmButtonText: 'Entendido'
+    })
+    step.value = 3
+    return
+  }
+  
+  // Validaciones básicas
   if (!datos.correo || !datos.nombre || !datos.telefono) {
     Swal.fire({
       icon: 'warning',
@@ -1133,7 +1336,7 @@ async function procesarPago() {
     return
   }
 
-  if (!entrega.departamento || !entrega.provincia || !entrega.distrito || !entrega.direccion) {
+  if (!entrega.provincia || !entrega.distrito || !entrega.direccion) {
     Swal.fire({
       icon: 'warning',
       title: 'Datos de envío incompletos',
@@ -1154,30 +1357,27 @@ async function procesarPago() {
     return
   }
 
-  // Validar datos de pago según el método
-  if (paymentMethod.value === 'card') {
-    if (!cardValid.value) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Datos de tarjeta incompletos',
-        text: 'Por favor revisa los datos de la tarjeta',
-        confirmButtonText: 'Entendido'
-      })
-      return
-    }
-  } else if (paymentMethod.value === 'yape') {
-    if (!isYapeComplete.value) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Datos de Yape incompletos',
-        text: 'Por favor completa el teléfono (9 dígitos) y el código de 6 dígitos de Yape',
-        confirmButtonText: 'Entendido'
-      })
-      return
-    }
+  if (paymentMethod.value === 'card' && !cardValid.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Datos de tarjeta incompletos',
+      text: 'Por favor revisa los datos de la tarjeta',
+      confirmButtonText: 'Entendido'
+    })
+    return
   }
 
-  procesandoPago.value = true
+  if (paymentMethod.value === 'yape' && !isYapeComplete.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Datos de Yape incompletos',
+      text: 'Por favor completa el teléfono (9 dígitos) y el código de 6 dígitos de Yape',
+      confirmButtonText: 'Entendido'
+    })
+    return
+  }
+
+ procesandoPago.value = true
 
   try {
     // Preparar items del carrito
@@ -1187,26 +1387,25 @@ async function procesarPago() {
       precioUnitario: item.precio
     }))
 
+    // CALCULAR EL TOTAL (subtotal + envío)
+    const totalOrden = carritoStore.subtotal + tarifaEnvio.value
+
     // Preparar datos de la orden
     const ordenData = {
-      // Items del carrito
       items: items,
-      
-      // Datos de pago
       metodoPago: paymentMethod.value === 'card' ? 'tarjeta' : 'yape',
-      
-      // Datos de envío
       direccionEnvio: entrega.direccion,
       ciudadEnvio: entrega.distrito,
       codigoPostalEnvio: entrega.codigoPostal || '',
       telefonoContacto: datos.telefono,
       notas: entrega.nota || '',
-      
-      // Datos adicionales de ubicación
       departamento: entrega.departamento,
       provincia: entrega.provincia,
       distrito: entrega.distrito,
-      referencia: entrega.referencia || ''
+      referencia: entrega.referencia || '',
+      tarifaEnvio: tarifaEnvio.value,
+      total: totalOrden,  // <--- ¡AGREGA ESTE CAMPO!
+      subtotal: carritoStore.subtotal  // <--- También podrías enviar el subtotal si lo necesitas
     }
 
     console.log('📦 Enviando orden:', ordenData)
@@ -1226,15 +1425,15 @@ async function procesarPago() {
     if (response.ok && result.success) {
       console.log('✅ Orden creada exitosamente:', result)
       
-      // Limpiar carrito en el store
+      // Limpiar carrito
       carritoStore.vaciarCarrito()
       
-      // Guardar datos del checkout en el perfil del usuario (sin bloquear el flujo)
+      // Guardar datos en perfil
       guardarDatosEnPerfil().catch(err => {
-        console.warn('⚠️ No se pudieron guardar los datos en el perfil, pero la orden se creó correctamente:', err)
+        console.warn('⚠️ No se pudieron guardar los datos en el perfil:', err)
       })
       
-      // Mostrar mensaje de éxito con SweetAlert2
+      // Mostrar éxito
       Swal.fire({
         icon: 'success',
         title: '¡Compra exitosa! 🎉',
@@ -1269,12 +1468,11 @@ async function procesarPago() {
   }
 }
 
-// Guardar datos del checkout en el perfil del usuario
 async function guardarDatosEnPerfil() {
   try {
     const perfilData = {
       telefono: datos.telefono,
-      documento: datos.documento || '',  // ← Agregar documento
+      documento: datos.documento || '',
       direccion: entrega.direccion,
       departamento: entrega.departamento,
       provincia: entrega.provincia,
@@ -1296,16 +1494,11 @@ async function guardarDatosEnPerfil() {
 
     if (response.ok) {
       console.log('✅ Datos guardados en perfil exitosamente')
-      
-      // Actualizar el usuario en el store
       const usuarioActualizado = await response.json()
       authStore.updateUser(usuarioActualizado)
-    } else {
-      console.warn('⚠️ No se pudieron guardar los datos en el perfil')
     }
   } catch (error) {
     console.error('❌ Error al guardar datos en perfil:', error)
-    // No mostramos error al usuario porque la orden ya se creó exitosamente
   }
 }
 </script>
