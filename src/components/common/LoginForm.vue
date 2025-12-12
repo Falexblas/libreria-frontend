@@ -182,7 +182,7 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    const response = await fetch("http://localhost:8080/api/auth/login", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

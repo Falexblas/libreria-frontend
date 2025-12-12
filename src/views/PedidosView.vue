@@ -439,7 +439,7 @@ async function cargarPedidos() {
   }
 
   try {
-    const response = await fetch('http://localhost:8080/api/ordenes', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ordenes`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -544,7 +544,7 @@ async function cargarDetallesPedido(pedidoId) {
   detallesPedido.value = []
   
   try {
-    const response = await fetch(`http://localhost:8080/api/ordenes/${pedidoId}/detalles`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ordenes/${pedidoId}/detalles`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }

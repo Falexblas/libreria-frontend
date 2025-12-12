@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const API_URL = import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'
 const CACHE_KEY = 'recomendaciones_cache'
 const CACHE_EXPIRY_KEY = 'recomendaciones_cache_expiry'
 const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 días en milisegundos

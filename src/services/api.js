@@ -1,8 +1,10 @@
 import axios from 'axios'
 
-// Configuración base de la API
+// Configuración base de la API (usa variable de entorno VITE_API_URL o fallback a producción)
+const BASE = (import.meta.env.VITE_API_URL ?? 'https://libreria-backend-oebo.onrender.com') + '/api'
+
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: BASE,
   withCredentials: true, // Importante para las cookies de sesión de Spring Security
   headers: {
     'Content-Type': 'application/json'

@@ -982,7 +982,7 @@ function onCodePaste(e) {
 
 async function cargarDepartamentos() {
   try {
-    const response = await fetch('http://localhost:8080/api/ubigeo/departamentos')
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ubigeo/departamentos`)
     if (!response.ok) {
       throw new Error('Respuesta no válida al cargar departamentos')
     }
@@ -1010,7 +1010,7 @@ async function cargarProvincias(departamentoNombre) {
       return
     }
     
-    const response = await fetch('http://localhost:8080/api/ubigeo/provincias')
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ubigeo/provincias`)
     if (!response.ok) {
       throw new Error('Respuesta no válida al cargar provincias')
     }
@@ -1033,7 +1033,7 @@ async function cargarProvincias(departamentoNombre) {
 
 async function cargarDistritos(provinciaNombre) {
   try {
-    const response = await fetch('http://localhost:8080/api/ubigeo/distritos')
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ubigeo/distritos`)
     if (!response.ok) {
       throw new Error('Respuesta no válida al cargar distritos')
     }
@@ -1135,7 +1135,7 @@ onMounted(async () => {
   // Cargar datos del usuario si está autenticado
   if (authStore.isAuthenticated && authStore.user?.id) {
     try {
-      const url = `http://localhost:8080/api/usuarios/${authStore.user.id}`
+      const url = `${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/usuarios/${authStore.user.id}`
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${authStore.token}`
@@ -1417,7 +1417,7 @@ async function procesarPago() {
     console.log('📦 Enviando orden:', ordenData)
 
     // Enviar al backend
-    const response = await fetch('http://localhost:8080/api/ordenes', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ordenes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1489,7 +1489,7 @@ async function guardarDatosEnPerfil() {
 
     console.log('💾 Guardando datos en perfil:', perfilData)
 
-    const response = await fetch('http://localhost:8080/api/usuarios/perfil', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/usuarios/perfil`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

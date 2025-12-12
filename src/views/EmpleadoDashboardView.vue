@@ -1033,7 +1033,7 @@ function puedeCambiarA(estadoActual, nuevoEstado) {
 async function cargarTodasLasOrdenes() {
   cargandoTodasOrdenes.value = true;
   try {
-    const response = await fetch("http://localhost:8080/api/empleado/ordenes", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`,
       },
@@ -1093,7 +1093,7 @@ async function confirmarCambioEstado() {
     formData.append("fotoPaquete", fotoPaquete.value);
 
     const response = await fetch(
-      `http://localhost:8080/api/empleado/ordenes/${ordenCambioEstado.value.id}/estado`,
+      `${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes/${ordenCambioEstado.value.id}/estado`,
       {
         method: "PUT",
         headers: {
@@ -1151,7 +1151,7 @@ async function verDetalleOrden(ordenId) {
 
   try {
     const responseOrden = await fetch(
-      `http://localhost:8080/api/empleado/ordenes/${ordenId}`,
+      `${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes/${ordenId}`,
       {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
@@ -1166,12 +1166,12 @@ async function verDetalleOrden(ordenId) {
     }
 
     const [responseDetalles, responseTickets] = await Promise.all([
-      fetch(`http://localhost:8080/api/empleado/ordenes/${ordenId}/detalles`, {
+      fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes/${ordenId}/detalles`, {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
       }),
-      fetch(`http://localhost:8080/api/empleado/ordenes/${ordenId}/tickets`, {
+      fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes/${ordenId}/tickets`, {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },

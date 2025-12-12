@@ -41,7 +41,7 @@ export function useFactura() {
       })
 
       // Obtener datos de la factura desde el backend
-      const response = await fetch(`http://localhost:8080/api/ordenes/${pedidoId}/factura`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ordenes/${pedidoId}/factura`, {
         headers: {
           'Authorization': `Bearer ${authStore.token}`
         }

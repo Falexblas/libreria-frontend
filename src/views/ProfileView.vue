@@ -249,7 +249,7 @@ const cargarDatos = async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost:8080/api/usuarios/${authStore.user.id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/usuarios/${authStore.user.id}`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -294,7 +294,7 @@ const guardarCambios = async () => {
 
   try {
     // Usar el endpoint de perfil que acepta todos los campos
-    const response = await fetch(`http://localhost:8080/api/usuarios/perfil`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/usuarios/perfil`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -359,7 +359,7 @@ const cambiarPassword = async () => {
   loadingPassword.value = true
 
   try {
-    const response = await fetch(`http://localhost:8080/api/usuarios/${authStore.user.id}/cambiar-password`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/usuarios/${authStore.user.id}/cambiar-password`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

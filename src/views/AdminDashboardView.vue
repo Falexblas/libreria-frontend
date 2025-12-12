@@ -1427,7 +1427,7 @@ watch(currentView, (newView) => {
 
 async function cargarEstadisticas() {
   try {
-    const response = await fetch('http://localhost:8080/api/admin/estadisticas', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/estadisticas`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1443,7 +1443,7 @@ async function cargarEstadisticas() {
 
 async function cargarOrdenesRecientes() {
   try {
-    const response = await fetch('http://localhost:8080/api/admin/ordenes/recientes', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/ordenes/recientes`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1516,7 +1516,7 @@ function getEstadoTexto(estado) {
 
 async function cambiarEstado(ordenId, nuevoEstado) {
   try {
-    const response = await fetch(`http://localhost:8080/api/admin/ordenes/${ordenId}/estado`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/ordenes/${ordenId}/estado`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1560,7 +1560,7 @@ async function verDetalleOrden(ordenId) {
   
   try {
     // Obtener datos de la orden
-    const responseOrden = await fetch(`http://localhost:8080/api/admin/ordenes/${ordenId}`, {
+    const responseOrden = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/ordenes/${ordenId}`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1574,7 +1574,7 @@ async function verDetalleOrden(ordenId) {
     }
     
     // Obtener detalles de la orden (usando endpoint de admin)
-    const responseDetalles = await fetch(`http://localhost:8080/api/admin/ordenes/${ordenId}/detalles`, {
+    const responseDetalles = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/ordenes/${ordenId}/detalles`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1591,7 +1591,7 @@ async function verDetalleOrden(ordenId) {
 
     // Obtener tickets de la orden reutilizando el endpoint de empleado
     try {
-      const responseTickets = await fetch(`http://localhost:8080/api/empleado/ordenes/${ordenId}/tickets`, {
+      const responseTickets = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes/${ordenId}/tickets`, {
         headers: {
           'Authorization': `Bearer ${authStore.token}`
         }
@@ -1651,7 +1651,7 @@ async function cargarLibros(forzarRecarga = false) {
   console.log('🔄 Cargando libros desde el servidor...')
   cargandoLibros.value = true
   try {
-    const response = await fetch('http://localhost:8080/api/libros')
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/libros`)
     if (response.ok) {
       libros.value = await response.json()
       ultimaCargaLibros.value = Date.now() // Actualizar timestamp del caché
@@ -1666,7 +1666,7 @@ async function cargarLibros(forzarRecarga = false) {
 
 async function cargarAutores() {
   try {
-    const response = await fetch('http://localhost:8080/api/autores', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/autores`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1681,7 +1681,7 @@ async function cargarAutores() {
 
 async function cargarCategorias() {
   try {
-    const response = await fetch('http://localhost:8080/api/categorias', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/categorias`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1696,7 +1696,7 @@ async function cargarCategorias() {
 
 async function cargarEditoriales() {
   try {
-    const response = await fetch('http://localhost:8080/api/editoriales', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/editoriales`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1801,7 +1801,7 @@ async function guardarLibro() {
     let response
     if (libroEditando.value) {
       // Actualizar libro existente
-      response = await fetch(`http://localhost:8080/api/libros/${libroEditando.value.id}`, {
+      response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/libros/${libroEditando.value.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1811,7 +1811,7 @@ async function guardarLibro() {
       })
     } else {
       // Crear nuevo libro
-      response = await fetch('http://localhost:8080/api/libros', {
+      response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/libros`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1866,7 +1866,7 @@ async function eliminarLibro(libroId) {
   })
 
   try {
-    const response = await fetch(`http://localhost:8080/api/libros/${libroId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/libros/${libroId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${authStore.token}`
@@ -1909,7 +1909,7 @@ async function eliminarLibro(libroId) {
 async function cargarTodasLasOrdenes() {
   cargandoTodasOrdenes.value = true
   try {
-    const response = await fetch('http://localhost:8080/api/admin/ordenes', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/ordenes`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -1931,7 +1931,7 @@ async function cargarTodasLasOrdenes() {
 async function cargarUsuarios() {
   cargandoUsuarios.value = true
   try {
-    const response = await fetch('http://localhost:8080/api/admin/usuarios', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/usuarios`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2001,7 +2001,7 @@ async function guardarUsuario() {
         activo: usuarioForm.value.activo
       }
 
-      response = await fetch(`http://localhost:8080/api/admin/usuarios/${usuarioEditando.value.id}`, {
+      response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/usuarios/${usuarioEditando.value.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -2021,7 +2021,7 @@ async function guardarUsuario() {
         codigoPostal: usuarioForm.value.codigoPostal || ''
       }
 
-      response = await fetch('http://localhost:8080/api/auth/register', {
+      response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2059,7 +2059,7 @@ async function eliminarUsuario(usuarioId) {
   }
 
   try {
-    const response = await fetch(`http://localhost:8080/api/admin/usuarios/${usuarioId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/usuarios/${usuarioId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${authStore.token}`
@@ -2085,7 +2085,7 @@ async function eliminarUsuario(usuarioId) {
 async function cargarReportes() {
   try {
     // Cargar estadísticas generales
-    const responseStats = await fetch('http://localhost:8080/api/admin/estadisticas', {
+    const responseStats = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/estadisticas`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2097,7 +2097,7 @@ async function cargarReportes() {
     }
 
     // Cargar ventas por mes
-    const responseVentas = await fetch('http://localhost:8080/api/admin/reportes/ventas-por-mes', {
+    const responseVentas = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/reportes/ventas-por-mes`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2108,7 +2108,7 @@ async function cargarReportes() {
     }
 
     // Cargar estado de órdenes
-    const responseEstado = await fetch('http://localhost:8080/api/admin/reportes/estado-ordenes', {
+    const responseEstado = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/reportes/estado-ordenes`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2119,7 +2119,7 @@ async function cargarReportes() {
     }
 
     // Cargar top libros
-    const responseTopLibros = await fetch('http://localhost:8080/api/admin/reportes/top-libros', {
+    const responseTopLibros = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/reportes/top-libros`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2130,7 +2130,7 @@ async function cargarReportes() {
     }
 
     // Cargar categorías populares
-    const responseCategorias = await fetch('http://localhost:8080/api/admin/reportes/categorias-populares', {
+    const responseCategorias = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/reportes/categorias-populares`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2433,7 +2433,7 @@ function crearGraficos() {
 
 async function cargarConfiguracion() {
   try {
-    const response = await fetch('http://localhost:8080/api/admin/configuracion', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/configuracion`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -2461,7 +2461,7 @@ async function cambiarPassword() {
   }
 
   try {
-    const response = await fetch('http://localhost:8080/api/admin/cambiar-password', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/admin/cambiar-password`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

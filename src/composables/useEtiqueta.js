@@ -35,7 +35,7 @@ export function useEtiqueta() {
       })
 
       // Obtener datos de la orden
-      const res = await fetch(`http://localhost:8080/api/empleado/ordenes/${pedidoId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/empleado/ordenes/${pedidoId}`, {
         headers: { Authorization: `Bearer ${authStore.token}` }
       })
 
@@ -48,7 +48,7 @@ export function useEtiqueta() {
       // Intentar obtener datos adicionales de factura
       let factura = null
       try {
-        const respFac = await fetch(`http://localhost:8080/api/ordenes/${pedidoId}/factura`, {
+        const respFac = await fetch(`${import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'}/api/ordenes/${pedidoId}/factura`, {
           headers: { Authorization: `Bearer ${authStore.token}` }
         })
         if (respFac.ok) factura = await respFac.json()

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import Swal from 'sweetalert2'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const API_URL = import.meta.env.VITE_API_URL || 'https://libreria-backend-oebo.onrender.com'
 
 export const useFavoritosStore = defineStore('favoritos', () => {
   const favoritos = ref([])
